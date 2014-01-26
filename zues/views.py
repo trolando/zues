@@ -2,7 +2,7 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.contrib.formtools.preview import FormPreview
 from django.core.context_processors import csrf
-from django.core.mail import EmailMultiAlternatives
+from django.core.mail import EmailMessage
 from django.core.urlresolvers import reverse_lazy
 from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import render_to_response
@@ -33,7 +33,7 @@ def retrieve_attributes(lidnummer):
         else:
             if result_type == ldap.RES_SEARCH_RESULT:
                 userDN, userAttrs = result_data[0]
-                return userAttrs["mail"], userAttrs["sn"]
+                return userAttrs["mail"][0], userAttrs["sn"][0]
     except ldap.NO_SUCH_OBJECT, e:
         return None
     except ldap.LDAPError, e:
@@ -50,9 +50,10 @@ def get_lid(lidnummer):
         lid = models.Login(lidnummer=lidnummer, secret=code)
         lid.save()
 
-    # email, naam = retrieve_attributes(lidnummer)
-    email, naam = ('t.vandijk@gmail.com','Tom')
-    
+    res = retrieve_attributes(lidnummer)
+    if res == None: return None
+
+    email, naam = res
     return (lid, email, naam)
 
 def check_login(request):
@@ -83,27 +84,26 @@ def view_home(request):
             lidnummer = form.cleaned_data['lidnummer']
 
             # opzoeken email
-            result = get_lid(lidnummer)
+            result = get_lid(int(lidnummer))
             if result != None:
                 lid, to, naam = result
                 subject = '[JD] Toegang voorstelsysteem'
-                from_email = 't.vandijk@gmail.com'
+                from_email = 'noreply@jongedemocraten.nl'
 
                 inhoud = []
                 inhoud.append('Beste %s,' % naam)
                 inhoud.append('')
-                inhoud.append('Om het voorstelsysteem van de Jonge Democraten te gebruiken, gebruik de volgende geheime URL:')
+                inhoud.append('Om het voorstelsysteem van de Jonge Democraten te gebruiken, gebruik de volgende persoonlijke geheime URL:')
                 inhoud.append(request.build_absolute_uri(lid.get_secret_url()))
                 inhoud.append('')
+                inhoud.append('Deze URL kun je ook gebruiken om jouw ingediende voorstellen in te zien, te wijzigen en terug te trekken. Deel deze URL dus niet met anderen!')
+                inhoud.append('')
                 inhoud.append('Met vrijzinnige groet,')
-                inhoud.append('Zues.')
+                inhoud.append('De Jonge Democraten.')
                 inhoud = '\n'.join(inhoud)
 
-                msg = EmailMultiAlternatives(subject, inhoud, from_email, [to])
-                #msg.attach_alternative(inhoud, "text/html")
+                msg = EmailMessage(subject, inhoud, from_email=from_email, to=[to])
                 msg.send()
-                #msg_html = render_to_string('email/%s.html' % template_name, context)
-                #msg.content_subtype = "html"
 
             return HttpResponseRedirect('/loginverzonden/')
     else:

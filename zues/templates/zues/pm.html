@@ -1,5 +1,5 @@
 {% extends 'zues/base.html' %}
-{% block title %}Jonge Democraten Congresvoorbereiding{% endblock %}
+{% block title %}{{ motie.titel }} - Jonge Democraten Voorstelsysteem{% endblock %}
 {% block content %}
 <h1>Politieke Motie</h1>
 
@@ -7,7 +7,13 @@
 
 {{ motie.as_html }}
 
+{% if lid %}
+
 <p><a href="{% url 'zues:wijzigpm' pk=motie.pk %}">Wijzigen</a></p>
 <p><a href="{% url 'zues:verwijderpm' pk=motie.pk %}">Verwijderen</a></p>
+
+{% endif %}
+
+<p>Deze Politieke Motie is voor iedereen te zien via <a href="{{ motie.get_absolute_url }}">deze link</a>.</p>
 
 {% endblock %} 

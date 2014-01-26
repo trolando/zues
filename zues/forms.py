@@ -3,8 +3,8 @@ from captcha.fields import ReCaptchaField
 from zues import models
 
 class PMForm(ModelForm):
-    constateringen = CharField(widget=Textarea, label='Constateert dat')
-    overwegingen = CharField(widget=Textarea, label='Overweegt dat')
+    constateringen = CharField(widget=Textarea, label='Constaterende dat')
+    overwegingen = CharField(widget=Textarea, label='Overwegende dat')
     uitspraken = CharField(widget=Textarea, label='Spreekt uit dat')
 
     class Meta:

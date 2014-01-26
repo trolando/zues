@@ -1,5 +1,5 @@
 {% extends 'zues/base.html' %}
-{% block terugnaarbegin %}{% endblock %}
+{% block terugnaarbegin %}<p>Ingelogd als lid {{ lid.lidnummer }}</p>{% endblock %}
 {% block content %}
 <h1>Voorstelsysteem Jonge Democraten</h1>
 
@@ -7,9 +7,22 @@
 
 <h3>Voorstellen beheren</h3>
 
+<fieldset>
 {% for m in pm %}
-<p><a href="{{ m.get_secret_url }}">Politieke Motie '{{m.titel}}'</a> :: <a href="{% url 'zues:wijzigpm' pk=m.pk %}">wijzigen</a> :: <a href="{% url 'zues:verwijderpm' pk=m.pk %}">verwijderen</a></p>
+<div class="row">
+<div class="cell" style="min-width: 300px;">
+<p><a href="{{ m.get_secret_url }}">Politieke Motie '{{m.titel}}'</a></p>
+</div>
+<div class="cell" style="padding-left:20px;">
+<p><a href="{% url 'zues:wijzigpm' pk=m.pk %}">wijzigen</a></p>
+</div>
+<div class="cell" style="padding-left:20px;">
+<p><a href="{% url 'zues:verwijderpm' pk=m.pk %}">verwijderen</a></p>
+</div>
+</div>
+<!-- <p><a href="{{ m.get_secret_url }}">Politieke Motie '{{m.titel}}'</a> :: <a href="{% url 'zues:wijzigpm' pk=m.pk %}">wijzigen</a> :: <a href="{% url 'zues:verwijderpm' pk=m.pk %}">verwijderen</a></p> -->
 {% endfor %}
+</fieldset>
 
 {% endif %}
 
