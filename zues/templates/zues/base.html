@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html lang="nl">
+  <head>
+    <meta charset="utf-8" />
+    <title>{% block title %}Voorstelsite Jonge Democraten{% endblock %}</title>
+    <link rel="stylesheet" type="text/css" href="https://jongedemocraten.nl/templates/jd/css/template.css">
+    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+    <style>
+      .container { width: 605px; margin: 30px auto; }
+      .pol_motie { background: #ebebeb; padding: 10px; font-size: 12px; line-height: 16px; }
+
+      .pol_tags { width: 150px; font-size: 12px; }
+
+      h2 { margin-bottom: 4px; }
+      h3 { background-color: #578439; background-image: url('https://jongedemocraten.nl/templates/jd/images/TitleBackground.png'); background-repeat: repeat-x; color: white; font-size: 14px; line-height: 20px; font-weight: bold; display: inline; padding: 2px 10px 2px 10px; margin: 0; vertical-align: middle; }
+
+      #menu_div { height: 30px; background-image: url('http://jongedemocraten.nl/templates/jd/images/MenuBackground.png'); border-left: 1px solid #E2E2E1; border-right: 1px solid #E2E2E1; margin: 20px 0 10px 0; }
+      #menu_div ul { margin: 0px; padding: 0px; height: 30px; }
+      #menu_div ul li { margin: 0px; display: inline-block; line-height: 32px; height: 30px; padding: 0 20px; border-right: 1px solid #E2E2E1; }
+      #menu_div ul li a { text-decoration: none; color: #4D4D4D; }
+      #menu_div ul li a:hover { color: #99B44A; }
+
+      #homeDiv fieldset label { display: block; margin: 0; padding: 0; float: none; }
+      #homeDiv fieldset textarea { margin-bottom: 3px; }
+      #homeDiv fieldset button { margin-left: 0; }
+      #homeDiv fieldset p { margin-top: 0; padding-top: 0; }
+      #homeDiv fieldset .row { display: table-row; margin: 0; padding: 1em 0; }
+      #homeDiv fieldset .cell { display: table-cell; margin: 0; padding: 0; vertical-align: top; }
+      #homeDiv fieldset .errors { display: block; color: red; margin: 0; padding: 0; }
+
+      h1 { line-height: 1em; }
+    </style>
+{% block head %}{% endblock %}
+  </head>
+  <body>
+    <div class="container">
+      <div id="homeDiv">
+      {% block logo %}<a href="{% url 'zues:home' %}"><img src="{% static 'zues/images/JD-Logo.png' %}" border="0" /></a>{% endblock %}
+      {% block terugnaarbegin %}<p><a href="{% url 'zues:home' %}">Terug naar begin</a>{% if lid %} (ingelogd als lid {{ lid.lidnummer }}) {% endif %}</p>{% endblock %}
+      {% block content %}{% endblock %}
+      </div>
+    </div>
+  </body>
+</html>

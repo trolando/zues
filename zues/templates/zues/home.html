@@ -1,0 +1,30 @@
+{% extends 'zues/base.html' %}
+{% block terugnaarbegin %}{% endblock %}
+{% block content %}
+<h1>Voorstelsysteem Jonge Democraten</h1>
+
+<h3>Toegang tot het systeem</h3>
+
+<form action="" method="post">{% csrf_token %}
+<fieldset>
+<div><p>Vul hieronder je lidnummer van de Jonge Democraten in. Je krijgt vervolgens een e-mail op het bij ons bekende e-mailadres.</p></div>
+{{ form.non_field_errors }}
+{% for f in form.visible_fields %}
+<div class="row">
+<div class="cell">
+{{ f.label_tag }}
+</div>
+<div class="cell">
+{% if f.errors %}
+<span class="errors">{{ f.errors.as_text }}</span>
+{% endif %}
+{{ f }}
+</div>
+</div>
+{% endfor %}
+<button class="button" type="submit">Aanvragen</button>
+</fieldset>
+</form>
+</div>
+
+{% endblock %} 

@@ -36,6 +36,11 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.formtools',
+    'south',
+    'zues',
+    'ldap',
+    'captcha',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -65,7 +70,7 @@ DATABASES = {
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'nl_NL'
 
 TIME_ZONE = 'UTC'
 
@@ -80,3 +85,17 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# EMAIL_HOST = ''
+# EMAIL_HOST_USER = ''
+# EMAIL_HOST_PASSWORD = ''
+# EMAIL_PORT = 0
+# EMAIL_USE_TLS = True
+
+# RECAPTCHA_PUBLIC_KEY = '6Lc1lu0SAAAAANm3LcaA6OSjbNgnLF_tE_K1mcfi'
+# RECAPTCHA_PRIVATE_KEY = '6Lc1lu0SAAAAAEgYNds2IaTOfz5E21aTY4rspdqj'
+# RECAPTCHA_USE_SSL = True
+
+# LDAP_NAME="ldap://127.0.0.1:389/"
+# LDAP_DN="cn=writeuser,ou=sysUsers,dc=jd,dc=nl"
+# LDAP_PASS="..."

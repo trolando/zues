@@ -1,0 +1,24 @@
+{% extends 'zues/base.html' %}
+{% block terugnaarbegin %}{% endblock %}
+{% block content %}
+<h1>Voorstelsysteem Jonge Democraten</h1>
+
+{% if count %}
+
+<h3>Voorstellen beheren</h3>
+
+{% for m in pm %}
+<p><a href="{{ m.get_secret_url }}">Politieke Motie '{{m.titel}}'</a> :: <a href="{% url 'zues:wijzigpm' pk=m.pk %}">wijzigen</a> :: <a href="{% url 'zues:verwijderpm' pk=m.pk %}">verwijderen</a></p>
+{% endfor %}
+
+{% endif %}
+
+<h3>Voorstellen indienen</h3>
+
+<p><a href="{% url 'zues:nieuwepm' %}">Nieuwe Politieke Motie</a></p>
+
+<h3>Uitloggen</h3>
+
+<p><a href="{% url 'zues:loguit' %}">Uitloggen</a></p>
+
+{% endblock %} 
