@@ -146,16 +146,72 @@ class Modificatie(Stuk):
     class Meta:
         abstract = True
 
+    def to_p(self, str):
+        if str == None: return ""
+        str = "\n".join([s.strip() for s in str.strip().split("\n")])
+        str = sub("(?<!\n)(\n)(?!\n)", "<br />", str)
+        str = [s for s in str.split("\n") if len(s)]
+        if len(str) == 0: return ""
+        return "<p>" + "</p><p>".join(str) + "</p>"
+
+    def get_content(self):
+        if self.type == self.SCHRAPPEN:
+            return "<p><strong>Schrap:</strong></p>" + self.to_p(self.tekst1)
+
+        if self.type == self.TOEVOEGEN:
+            return "<p><strong>Voeg toe:</strong></p>" + self.to_p(self.tekst1)
+
+        if self.type == self.WIJZIGEN:
+            return "<p><strong>Schrap:</strong></p>" + self.to_p(self.tekst1) + "<p><strong>Vervang door:</strong></p>" + self.to_p(self.tekst2)
+
+        return "Geen inhoud?!"
+
+    def as_html(self):
+        html = []
+        html.append("<div class='pm'>")
+        html.append("<fieldset>")
+        html.append("<div class='row'>")
+        html.append("<div class='cell'><label>Titel:</label></div>")
+        html.append("<div class='cell'><p>%s</p></div>" % self.titel)
+        html.append("</div>")
+        html.append("<div class='row'>")
+        html.append("<div class='cell'><label>Indieners:</label></div>")
+        html.append("<div class='cell'><p>%s</p></div>" % self.indieners)
+        html.append("</div>")
+        html.append("<div class='row'>")
+        html.append("<div class='cell'><label>Woordvoerder:</label></div>")
+        html.append("<div class='cell'><p>%s</p></div>" % self.woordvoerder)
+        html.append("</div>")
+        html.append("<div class='row'>")
+        html.append("<div class='cell'><label>Betreft:</label></div>")
+        html.append("<div class='cell'><p>%s</p></div>" % self.betreft)
+        html.append("</div>")
+        html.append("<div class='row'>")
+        html.append("<div class='cell'><label>Inhoud:</label></div>")
+        html.append("<div class='cell'>%s</div>" % self.get_content())
+        html.append("</div>")
+        html.append("</fieldset>")
+        html.append("</div>")
+        return mark_safe('\n'.join(html))
+
 class Resolutie(Modificatie):
     class Meta:
         verbose_name_plural = 'resoluties'
 
-class AmendementRes(Modificatie):
-    resolutie = models.ForeignKey(Resolutie)
+    def get_absolute_url(self):
+        return reverse('zues:res', kwargs={'key': self.secret, 'pk': self.pk})
 
+class AmendementRes(Modificatie):
     class Meta:
         verbose_name_plural = 'amendementen op een resolutie'
+
+    def get_absolute_url(self):
+        return reverse('zues:amres', kwargs={'key': self.secret, 'pk': self.pk})
 
 class AmendementPP(Modificatie):
     class Meta:
         verbose_name_plural = 'amendementen op het politieke programma'
+
+    def get_absolute_url(self):
+        return reverse('zues:ampp', kwargs={'key': self.secret, 'pk': self.pk})
+

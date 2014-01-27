@@ -1,0 +1,21 @@
+{% extends 'zues/base.html' %}
+{% block title %}Jonge Democraten Congresvoorbereiding{% endblock %}
+{% block content %}
+<h1>Amendement op resolutie</h1>
+
+<div class="jdform">
+<h3>Amendement verwijderen</h3>
+<form action="" method="post">{% csrf_token %}
+<p>Weet je zeker dat je het amendement op een resolutie '{{ object.titel }}' wilt verwijderen?</p>
+<div class="row">
+<div class="cell">&nbsp;</div>
+<div class="cell">
+<button class="button" type="button" onClick="history.back(1); event.stopPropagation();">Terug</button>
+<button class="button" type="submit">Verwijderen</button>
+</div>
+</div>
+</fieldset>
+</form>
+</div>
+
+{% endblock %} 

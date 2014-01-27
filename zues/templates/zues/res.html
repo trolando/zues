@@ -1,0 +1,19 @@
+{% extends 'zues/base.html' %}
+{% block title %}{{ resolutie.titel }} - Jonge Democraten Voorstelsysteem{% endblock %}
+{% block content %}
+<h1>Resolutie</h1>
+
+<h3>Resolutie</h3>
+
+{{ voorstel.as_html }}
+
+{% if lid %}
+
+<p><a href="{% url 'zues:wijzigres' pk=voorstel.pk %}">Wijzigen</a></p>
+<p><a href="{% url 'zues:verwijderres' pk=voorstel.pk %}">Verwijderen</a></p>
+
+<p>Deze Resolutie is voor iedereen te zien via <a href="{{ voorstel.get_absolute_url }}">deze link</a>.</p>
+
+{% endif %}
+
+{% endblock %} 

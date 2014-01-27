@@ -29,6 +29,30 @@ class ORGForm(ModelForm):
         model = models.Organimo
         fields = ('titel', 'woordvoerder', 'indieners', 'constateringen', 'overwegingen', 'uitspraken', 'toelichting',)
 
+class RESForm(ModelForm):
+    tekst1 = CharField(widget=Textarea, label='Schrap/Voeg toe:')
+    tekst2 = CharField(widget=Textarea, label='Vervang door:', required=False)
+
+    class Meta:
+        model = models.Resolutie
+        fields = ('titel', 'woordvoerder', 'indieners', 'betreft', 'type', 'tekst1', 'tekst2',)
+
+class AMRESForm(ModelForm):
+    tekst1 = CharField(widget=Textarea, label='Schrap/Voeg toe:')
+    tekst2 = CharField(widget=Textarea, label='Vervang door:', required=False)
+
+    class Meta:
+        model = models.AmendementRes
+        fields = ('titel', 'woordvoerder', 'indieners', 'betreft', 'type', 'tekst1', 'tekst2',)
+
+class AMPPForm(ModelForm):
+    tekst1 = CharField(widget=Textarea, label='Schrap/Voeg toe:')
+    tekst2 = CharField(widget=Textarea, label='Vervang door:', required=False)
+
+    class Meta:
+        model = models.AmendementPP
+        fields = ('titel', 'woordvoerder', 'indieners', 'betreft', 'type', 'tekst1', 'tekst2',)
+
 class LidnummerForm(Form):
     lidnummer = IntegerField()
     captcha = ReCaptchaField()

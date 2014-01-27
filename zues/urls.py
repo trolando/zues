@@ -22,5 +22,20 @@ urlpatterns = patterns('moties.views',
     url(r'^org/nieuw/', views.NieuweORG.as_view(), name='nieuweorg'),
     url(r'^org/wijzig/(?P<pk>\d+)/$', views.WijzigORG.as_view(), name='wijzigorg'),
     url(r'^org/verwijder/(?P<pk>\d+)/$', views.VerwijderORG.as_view(), name='verwijderorg'),
+
+    url(r'^res/(?P<pk>\d+)/(?P<key>.+)/$', views.RESView.as_view(), name='res'),
+    url(r'^res/nieuw/', views.NieuweRES.as_view(), name='nieuweres'),
+    url(r'^res/wijzig/(?P<pk>\d+)/$', views.WijzigRES.as_view(), name='wijzigres'),
+    url(r'^res/verwijder/(?P<pk>\d+)/$', views.VerwijderRES.as_view(), name='verwijderres'),
+
+    url(r'^amres/(?P<pk>\d+)/(?P<key>.+)/$', views.AMRESView.as_view(), name='amres'),
+    url(r'^amres/nieuw/', views.NieuweAMRES.as_view(), name='nieuweamres'),
+    url(r'^amres/wijzig/(?P<pk>\d+)/$', views.WijzigAMRES.as_view(), name='wijzigamres'),
+    url(r'^amres/verwijder/(?P<pk>\d+)/$', views.VerwijderAMRES.as_view(), name='verwijderamres'),
+
+    url(r'^ampp/(?P<pk>\d+)/(?P<key>.+)/$', views.AMPPView.as_view(), name='ampp'),
+    url(r'^ampp/nieuw/', views.NieuweAMPP.as_view(), name='nieuweampp'),
+    url(r'^ampp/wijzig/(?P<pk>\d+)/$', views.WijzigAMPP.as_view(), name='wijzigampp'),
+    url(r'^ampp/verwijder/(?P<pk>\d+)/$', views.VerwijderAMPP.as_view(), name='verwijderampp'),
 )
 

@@ -76,7 +76,10 @@ def view_home(request):
         context['pm'] = models.PolitiekeMotie.objects.filter(eigenaar=lid).filter(verwijderd=False)
         context['apm'] = models.ActuelePolitiekeMotie.objects.filter(eigenaar=lid).filter(verwijderd=False)
         context['org'] = models.Organimo.objects.filter(eigenaar=lid).filter(verwijderd=False)
-        context['count'] = len(context['pm'])+len(context['apm'])+len(context['org'])
+        context['res'] = models.Resolutie.objects.filter(eigenaar=lid).filter(verwijderd=False)
+        context['amres'] = models.AmendementRes.objects.filter(eigenaar=lid).filter(verwijderd=False)
+        context['ampp'] = models.AmendementPP.objects.filter(eigenaar=lid).filter(verwijderd=False)
+        context['count'] = len(context['pm'])+len(context['apm'])+len(context['org'])+len(context['res'])+len(context['amres'])+len(context['ampp'])
         return render_to_response("zues/yolo.html", context)
 
     if request.method == 'POST': 
@@ -307,4 +310,155 @@ class VerwijderORG(LoginMixin, DeleteView):
         self.object.verwijderd = True
         self.object.save()
         return HttpResponseRedirect(reverse_lazy("zues:home"))
+
+class RESView(LidMixin, DetailView):
+    template_name = 'zues/res.html'
+    context_object_name = "voorstel"
+    model = models.Resolutie
+    queryset = models.Resolutie.objects.filter(verwijderd=False)
+
+    def get_object(self, **kwargs):
+        obj = super(RESView, self).get_object(**kwargs)
+        if self.kwargs['key'] != obj.secret:
+            raise Http404
+        return obj
+
+class NieuweRES(LoginMixin, CreateView):
+    model = models.Resolutie
+    form_class = forms.RESForm
+    template_name = 'zues/resnew.html'
+
+    def form_valid(self, form):
+        if 'preview' not in self.request.POST:
+            self.object = form.save(commit=False)
+            return self.render_to_response(self.get_context_data(form=form, obj=self.object))
+        else:
+            self.object = form.save(commit=False)
+            self.object.secret = base64.urlsafe_b64encode(os.urandom(30))
+            self.object.eigenaar = models.Login.objects.filter(lidnummer=self.request.session['lid'])[0]
+            self.object.save()
+            return HttpResponseRedirect(self.object.get_absolute_url())
+
+class WijzigRES(LoginMixin, UpdateView):
+    model = models.Resolutie
+    form_class = forms.RESForm
+    template_name = 'zues/resnew.html'
+    queryset = models.Resolutie.objects.filter(verwijderd=False)
+
+    def get_context_data(self, **kwargs):
+        context = super(WijzigRES, self).get_context_data(**kwargs)
+        context['edit'] = 1
+        return context
+
+class VerwijderRES(LoginMixin, DeleteView):
+    model = models.Resolutie
+    template_name = 'zues/resdel.html'
+    queryset = models.Resolutie.objects.filter(verwijderd=False)
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.object.verwijderd = True
+        self.object.save()
+        return HttpResponseRedirect(reverse_lazy("zues:home"))
+
+class AMRESView(LidMixin, DetailView):
+    template_name = 'zues/amres.html'
+    context_object_name = "voorstel"
+    model = models.AmendementRes
+    queryset = models.AmendementRes.objects.filter(verwijderd=False)
+
+    def get_object(self, **kwargs):
+        obj = super(AMRESView, self).get_object(**kwargs)
+        if self.kwargs['key'] != obj.secret:
+            raise Http404
+        return obj
+
+class NieuweAMRES(LoginMixin, CreateView):
+    model = models.AmendementRes
+    form_class = forms.AMRESForm
+    template_name = 'zues/amresnew.html'
+
+    def form_valid(self, form):
+        if 'preview' not in self.request.POST:
+            self.object = form.save(commit=False)
+            return self.render_to_response(self.get_context_data(form=form, obj=self.object))
+        else:
+            self.object = form.save(commit=False)
+            self.object.secret = base64.urlsafe_b64encode(os.urandom(30))
+            self.object.eigenaar = models.Login.objects.filter(lidnummer=self.request.session['lid'])[0]
+            self.object.save()
+            return HttpResponseRedirect(self.object.get_absolute_url())
+
+class WijzigAMRES(LoginMixin, UpdateView):
+    model = models.AmendementRes
+    form_class = forms.AMRESForm
+    template_name = 'zues/amresnew.html'
+    queryset = models.AmendementRes.objects.filter(verwijderd=False)
+
+    def get_context_data(self, **kwargs):
+        context = super(WijzigAMRES, self).get_context_data(**kwargs)
+        context['edit'] = 1
+        return context
+
+class VerwijderAMRES(LoginMixin, DeleteView):
+    model = models.AmendementRes
+    template_name = 'zues/amresdel.html'
+    queryset = models.AmendementRes.objects.filter(verwijderd=False)
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.object.verwijderd = True
+        self.object.save()
+        return HttpResponseRedirect(reverse_lazy("zues:home"))
+
+class AMPPView(LidMixin, DetailView):
+    template_name = 'zues/ampp.html'
+    context_object_name = "voorstel"
+    model = models.AmendementPP
+    queryset = models.AmendementPP.objects.filter(verwijderd=False)
+
+    def get_object(self, **kwargs):
+        obj = super(AMPPView, self).get_object(**kwargs)
+        if self.kwargs['key'] != obj.secret:
+            raise Http404
+        return obj
+
+class NieuweAMPP(LoginMixin, CreateView):
+    model = models.AmendementPP
+    form_class = forms.AMPPForm
+    template_name = 'zues/amppnew.html'
+
+    def form_valid(self, form):
+        if 'preview' not in self.request.POST:
+            self.object = form.save(commit=False)
+            return self.render_to_response(self.get_context_data(form=form, obj=self.object))
+        else:
+            self.object = form.save(commit=False)
+            self.object.secret = base64.urlsafe_b64encode(os.urandom(30))
+            self.object.eigenaar = models.Login.objects.filter(lidnummer=self.request.session['lid'])[0]
+            self.object.save()
+            return HttpResponseRedirect(self.object.get_absolute_url())
+
+class WijzigAMPP(LoginMixin, UpdateView):
+    model = models.AmendementPP
+    form_class = forms.AMPPForm
+    template_name = 'zues/amppnew.html'
+    queryset = models.AmendementPP.objects.filter(verwijderd=False)
+
+    def get_context_data(self, **kwargs):
+        context = super(WijzigAMPP, self).get_context_data(**kwargs)
+        context['edit'] = 1
+        return context
+
+class VerwijderAMPP(LoginMixin, DeleteView):
+    model = models.AmendementPP
+    template_name = 'zues/amppdel.html'
+    queryset = models.AmendementPP.objects.filter(verwijderd=False)
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.object.verwijderd = True
+        self.object.save()
+        return HttpResponseRedirect(reverse_lazy("zues:home"))
+
 

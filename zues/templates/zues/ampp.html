@@ -1,0 +1,19 @@
+{% extends 'zues/base.html' %}
+{% block title %}{{ resolutie.titel }} - Jonge Democraten Voorstelsysteem{% endblock %}
+{% block content %}
+<h1>Amendement op het Politieke Programma</h1>
+
+<h3>Amendement op het Politieke Programma</h3>
+
+{{ voorstel.as_html }}
+
+{% if lid %}
+
+<p><a href="{% url 'zues:wijzigampp' pk=voorstel.pk %}">Wijzigen</a></p>
+<p><a href="{% url 'zues:verwijderampp' pk=voorstel.pk %}">Verwijderen</a></p>
+
+<p>Dit Amendement op het Politieke Programma is voor iedereen te zien via <a href="{{ voorstel.get_absolute_url }}">deze link</a>.</p>
+
+{% endif %}
+
+{% endblock %} 
