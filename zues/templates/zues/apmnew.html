@@ -1,0 +1,76 @@
+{% extends 'zues/base.html' %}
+{% block title %}Jonge Democraten Congresvoorbereiding{% endblock %}
+{% block content %}
+<h1>Actueel Politieke Motie</h1>
+
+<h3>Bindende aanwijzingen</h3>
+<ul>
+<li>Actueel Politieke Moties kunnen worden gebruikt om iets onder de aandacht te brengen dat geen betrekking heeft op een congresvoorstel.</li>
+<li>Een Actueel Politieke Motie is een Politieke Motie die op een volgende Ledenvergadering achterhaald is en derhalve als actueel wordt aangemerkt. Afkorting: APM</li>
+<li>Een Actueel Politieke Motie mag maximaal 200 woorden lang zijn (dit behelst de constatering, de overweging en de spreekt uit)</li>
+<li>Actueel Politieke Moties die niet aan de criteria (o.a. deadlines en verkeerd format) voldoen, worden niet aan de ALV voorgelegd. Wanneer dit het geval is wordt dit gemeld aan de indiener. </li>
+<li>Actueel Politieke Moties kunnen tot aanvang van de ALV worden ingediend. Indien de Actueel Politieke Motie minder dan veertien dagen van tevoren wordt ingediend, dient de indiener zelf te zorgen voor adequate visuele ondersteuning tijdens behandeling ervan.</li>
+</ul>
+
+<h3>Niet-bindende aanwijzingen</h3>
+<ul>
+<li>&quot;JD&quot; is vrouwelijk enkelvoud.</li>
+<li>&quot;Jonge Democraten&quot; is meervoud.</li>
+<li>Actueel Politieke Moties worden in derde persoon geschreven (dus: &quot;De JD vindt&quot;, i.t.t. &quot;wij vinden&quot;).</li>
+<li>Wanneer een Actueel Politieke Motie wordt ingediend door een afdeling of een ander orgaan dient deze ondertekend te worden voor de voorzitter en secretaris van de afdeling/orgaan.</li>
+</ul>
+
+{% if obj %}
+
+<h3>Voorbeeld</h3>
+{{ obj.as_html }}
+<div><p>Als het bovenstaande voorbeeld correct is, klik dan op Verzenden. Zo niet, ga dan terug naar de vorige pagina en breng verbeteringen aan.</p></div>
+<form action="" method="post">{% csrf_token %}
+{% for field in form %}{{ field.as_hidden }}
+{% endfor %}
+<input type="hidden" name="{{ stage_field }}" value="2" />
+<input type="hidden" name="{{ hash_field }}" value="{{ hash_value }}" />
+<input type="hidden" name="preview" value="1" />
+<button class="button" type="button" onClick="history.back(1); event.stopPropagation();">Terug</button>
+<button class="button" type="submit">Verzenden</button>
+</form>
+
+{% else %}
+
+<div class="jdform">
+<h3>Formulier</h3>
+<form action="" method="post">{% csrf_token %}
+<fieldset>
+<div><p>Constateringen, overwegingen en toelichting zijn niet verplicht. <strong>Het formulier maakt automatisch bullets.</strong></p></div>
+{{ form.non_field_errors }}
+{% for f in form.visible_fields %}
+<div class="row">
+<div class="cell">
+{{ f.label_tag }}
+</div>
+<div class="cell">
+{% if f.errors %}
+<span class="errors">{{ f.errors.as_text }}</span>
+{% endif %}
+{{ f }}
+</div>
+</div>
+{% endfor %}
+<div class="row">
+<div class="cell">&nbsp;</div>
+<div class="cell">
+<button class="button" type="button" onClick="history.back(1); event.stopPropagation();">Terug</button>
+{% if edit %}
+<button class="button" type="submit">Wijzigen</button>
+{% else %}
+<button class="button" type="submit">Voorbeeld</button>
+{% endif %}
+</div>
+</div>
+</fieldset>
+</form>
+</div>
+
+{% endif %}
+
+{% endblock %} 

@@ -3,12 +3,30 @@ from captcha.fields import ReCaptchaField
 from zues import models
 
 class PMForm(ModelForm):
-    constateringen = CharField(widget=Textarea, label='Constaterende dat')
-    overwegingen = CharField(widget=Textarea, label='Overwegende dat')
+    constateringen = CharField(widget=Textarea, label='Constaterende dat', required=False)
+    overwegingen = CharField(widget=Textarea, label='Overwegende dat', required=False)
     uitspraken = CharField(widget=Textarea, label='Spreekt uit dat')
 
     class Meta:
         model = models.PolitiekeMotie
+        fields = ('titel', 'woordvoerder', 'indieners', 'constateringen', 'overwegingen', 'uitspraken', 'toelichting',)
+
+class APMForm(ModelForm):
+    constateringen = CharField(widget=Textarea, label='Constaterende dat', required=False)
+    overwegingen = CharField(widget=Textarea, label='Overwegende dat', required=False)
+    uitspraken = CharField(widget=Textarea, label='Spreekt uit dat')
+
+    class Meta:
+        model = models.ActuelePolitiekeMotie
+        fields = ('titel', 'woordvoerder', 'indieners', 'constateringen', 'overwegingen', 'uitspraken', 'toelichting',)
+
+class ORGForm(ModelForm):
+    constateringen = CharField(widget=Textarea, label='Constaterende dat', required=False)
+    overwegingen = CharField(widget=Textarea, label='Overwegende dat', required=False)
+    uitspraken = CharField(widget=Textarea, label='Spreekt uit dat')
+
+    class Meta:
+        model = models.Organimo
         fields = ('titel', 'woordvoerder', 'indieners', 'constateringen', 'overwegingen', 'uitspraken', 'toelichting',)
 
 class LidnummerForm(Form):

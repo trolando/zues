@@ -1,0 +1,19 @@
+{% extends 'zues/base.html' %}
+{% block title %}{{ motie.titel }} - Jonge Democraten Voorstelsysteem{% endblock %}
+{% block content %}
+<h1>Organimo</h1>
+
+<h3>Motie</h3>
+
+{{ motie.as_html }}
+
+{% if lid %}
+
+<p><a href="{% url 'zues:wijzigorg' pk=motie.pk %}">Wijzigen</a></p>
+<p><a href="{% url 'zues:verwijderorg' pk=motie.pk %}">Verwijderen</a></p>
+
+<p>Deze Organimo is voor iedereen te zien via <a href="{{ motie.get_absolute_url }}">deze link</a>.</p>
+
+{% endif %}
+
+{% endblock %} 

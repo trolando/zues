@@ -107,6 +107,9 @@ class Organimo(Motie):
     def __unicode__(self):
         return 'Organimo %s' % self.titel
 
+    def get_absolute_url(self):
+        return reverse('zues:org', kwargs={'key': self.secret, 'pk': self.pk})
+
 class PolitiekeMotie(Motie):
     class Meta:
         ordering = ('-laatsteupdate',)
@@ -115,11 +118,8 @@ class PolitiekeMotie(Motie):
     def __unicode__(self):
         return 'Politieke Motie %s' % self.titel
 
-    def get_secret_url(self):
-        return reverse('zues:pm', kwargs={'key': self.secret, 'pk': self.pk})
-
     def get_absolute_url(self):
-        return self.get_secret_url()
+        return reverse('zues:pm', kwargs={'key': self.secret, 'pk': self.pk})
 
 class ActuelePolitiekeMotie(Motie):
     class Meta:
@@ -128,6 +128,9 @@ class ActuelePolitiekeMotie(Motie):
 
     def __unicode__(self):
         return 'Actuele Politieke Motie %s' % self.titel
+
+    def get_absolute_url(self):
+        return reverse('zues:apm', kwargs={'key': self.secret, 'pk': self.pk})
 
 class Modificatie(Stuk):
     WIJZIGEN = 'W'

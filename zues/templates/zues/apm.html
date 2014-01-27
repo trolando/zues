@@ -1,0 +1,19 @@
+{% extends 'zues/base.html' %}
+{% block title %}{{ motie.titel }} - Jonge Democraten Voorstelsysteem{% endblock %}
+{% block content %}
+<h1>Actueel Politieke Motie</h1>
+
+<h3>Motie</h3>
+
+{{ motie.as_html }}
+
+{% if lid %}
+
+<p><a href="{% url 'zues:wijzigapm' pk=motie.pk %}">Wijzigen</a></p>
+<p><a href="{% url 'zues:verwijderapm' pk=motie.pk %}">Verwijderen</a></p>
+
+<p>Deze Actueel Politieke Motie is voor iedereen te zien via <a href="{{ motie.get_absolute_url }}">deze link</a>.</p>
+
+{% endif %}
+
+{% endblock %} 

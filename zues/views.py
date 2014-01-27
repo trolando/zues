@@ -74,7 +74,9 @@ def view_home(request):
         context = {}
         context['lid'] = lid
         context['pm'] = models.PolitiekeMotie.objects.filter(eigenaar=lid).filter(verwijderd=False)
-        context['count'] = len(context['pm'])
+        context['apm'] = models.ActuelePolitiekeMotie.objects.filter(eigenaar=lid).filter(verwijderd=False)
+        context['org'] = models.Organimo.objects.filter(eigenaar=lid).filter(verwijderd=False)
+        context['count'] = len(context['pm'])+len(context['apm'])+len(context['org'])
         return render_to_response("zues/yolo.html", context)
 
     if request.method == 'POST': 
@@ -163,7 +165,7 @@ class PMView(LidMixin, DetailView):
     queryset = models.PolitiekeMotie.objects.filter(verwijderd=False)
 
     def get_object(self, **kwargs):
-        obj = super(DetailView, self).get_object(**kwargs)
+        obj = super(PMView, self).get_object(**kwargs)
         if self.kwargs['key'] != obj.secret:
             raise Http404
         return obj
@@ -178,11 +180,11 @@ class NieuwePM(LoginMixin, CreateView):
             self.object = form.save(commit=False)
             return self.render_to_response(self.get_context_data(form=form, obj=self.object))
         else:
-            pm = form.save(commit=False)
-            pm.secret = base64.urlsafe_b64encode(os.urandom(30))
-            pm.eigenaar = models.Login.objects.filter(lidnummer=self.request.session['lid'])[0]
-            pm.save()
-            return HttpResponseRedirect(pm.get_absolute_url())
+            self.object = form.save(commit=False)
+            self.object.secret = base64.urlsafe_b64encode(os.urandom(30))
+            self.object.eigenaar = models.Login.objects.filter(lidnummer=self.request.session['lid'])[0]
+            self.object.save()
+            return HttpResponseRedirect(self.object.get_absolute_url())
 
 class WijzigPM(LoginMixin, UpdateView):
     model = models.PolitiekeMotie
@@ -199,6 +201,106 @@ class VerwijderPM(LoginMixin, DeleteView):
     model = models.PolitiekeMotie
     template_name = 'zues/pmdel.html'
     queryset = models.PolitiekeMotie.objects.filter(verwijderd=False)
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.object.verwijderd = True
+        self.object.save()
+        return HttpResponseRedirect(reverse_lazy("zues:home"))
+
+class APMView(LidMixin, DetailView):
+    template_name = 'zues/apm.html'
+    context_object_name = "motie"
+    model = models.ActuelePolitiekeMotie
+    queryset = models.ActuelePolitiekeMotie.objects.filter(verwijderd=False)
+
+    def get_object(self, **kwargs):
+        obj = super(APMView, self).get_object(**kwargs)
+        if self.kwargs['key'] != obj.secret:
+            raise Http404
+        return obj
+
+class NieuweAPM(LoginMixin, CreateView):
+    model = models.ActuelePolitiekeMotie
+    form_class = forms.APMForm
+    template_name = 'zues/apmnew.html'
+
+    def form_valid(self, form):
+        if 'preview' not in self.request.POST:
+            self.object = form.save(commit=False)
+            return self.render_to_response(self.get_context_data(form=form, obj=self.object))
+        else:
+            self.object = form.save(commit=False)
+            self.object.secret = base64.urlsafe_b64encode(os.urandom(30))
+            self.object.eigenaar = models.Login.objects.filter(lidnummer=self.request.session['lid'])[0]
+            self.object.save()
+            return HttpResponseRedirect(self.object.get_absolute_url())
+
+class WijzigAPM(LoginMixin, UpdateView):
+    model = models.ActuelePolitiekeMotie
+    form_class = forms.APMForm
+    template_name = 'zues/apmnew.html'
+    queryset = models.ActuelePolitiekeMotie.objects.filter(verwijderd=False)
+
+    def get_context_data(self, **kwargs):
+        context = super(WijzigAPM, self).get_context_data(**kwargs)
+        context['edit'] = 1
+        return context
+
+class VerwijderAPM(LoginMixin, DeleteView):
+    model = models.ActuelePolitiekeMotie
+    template_name = 'zues/apmdel.html'
+    queryset = models.ActuelePolitiekeMotie.objects.filter(verwijderd=False)
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.object.verwijderd = True
+        self.object.save()
+        return HttpResponseRedirect(reverse_lazy("zues:home"))
+
+class ORGView(LidMixin, DetailView):
+    template_name = 'zues/org.html'
+    context_object_name = "motie"
+    model = models.Organimo
+    queryset = models.Organimo.objects.filter(verwijderd=False)
+
+    def get_object(self, **kwargs):
+        obj = super(ORGView, self).get_object(**kwargs)
+        if self.kwargs['key'] != obj.secret:
+            raise Http404
+        return obj
+
+class NieuweORG(LoginMixin, CreateView):
+    model = models.Organimo
+    form_class = forms.ORGForm
+    template_name = 'zues/orgnew.html'
+
+    def form_valid(self, form):
+        if 'preview' not in self.request.POST:
+            self.object = form.save(commit=False)
+            return self.render_to_response(self.get_context_data(form=form, obj=self.object))
+        else:
+            self.object = form.save(commit=False)
+            self.object.secret = base64.urlsafe_b64encode(os.urandom(30))
+            self.object.eigenaar = models.Login.objects.filter(lidnummer=self.request.session['lid'])[0]
+            self.object.save()
+            return HttpResponseRedirect(self.object.get_absolute_url())
+
+class WijzigORG(LoginMixin, UpdateView):
+    model = models.Organimo
+    form_class = forms.ORGForm
+    template_name = 'zues/orgnew.html'
+    queryset = models.Organimo.objects.filter(verwijderd=False)
+
+    def get_context_data(self, **kwargs):
+        context = super(WijzigORG, self).get_context_data(**kwargs)
+        context['edit'] = 1
+        return context
+
+class VerwijderORG(LoginMixin, DeleteView):
+    model = models.Organimo
+    template_name = 'zues/orgdel.html'
+    queryset = models.Organimo.objects.filter(verwijderd=False)
 
     def delete(self, request, *args, **kwargs):
         self.object = self.get_object()

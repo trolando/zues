@@ -10,17 +10,24 @@
 <fieldset>
 {% for m in pm %}
 <div class="row">
-<div class="cell" style="min-width: 300px;">
-<p><a href="{{ m.get_secret_url }}">Politieke Motie '{{m.titel}}'</a></p>
+<div class="cell" style="min-width: 300px;"> <p><a href="{{ m.get_absolute_url }}">Politieke Motie '{{m.titel}}'</a></p></div>
+<div class="cell" style="padding-left:20px;"> <p><a href="{% url 'zues:wijzigpm' pk=m.pk %}">wijzigen</a></p> </div>
+<div class="cell" style="padding-left:20px;"> <p><a href="{% url 'zues:verwijderpm' pk=m.pk %}">verwijderen</a></p> </div>
 </div>
-<div class="cell" style="padding-left:20px;">
-<p><a href="{% url 'zues:wijzigpm' pk=m.pk %}">wijzigen</a></p>
+{% endfor %}
+{% for m in apm %}
+<div class="row">
+<div class="cell" style="min-width: 300px;"> <p><a href="{{ m.get_absolute_url }}">Actueel Politieke Motie '{{m.titel}}'</a></p></div>
+<div class="cell" style="padding-left:20px;"> <p><a href="{% url 'zues:wijzigapm' pk=m.pk %}">wijzigen</a></p> </div>
+<div class="cell" style="padding-left:20px;"> <p><a href="{% url 'zues:verwijderapm' pk=m.pk %}">verwijderen</a></p> </div>
 </div>
-<div class="cell" style="padding-left:20px;">
-<p><a href="{% url 'zues:verwijderpm' pk=m.pk %}">verwijderen</a></p>
+{% endfor %}
+{% for m in org %}
+<div class="row">
+<div class="cell" style="min-width: 300px;"> <p><a href="{{ m.get_absolute_url }}">Organimo '{{m.titel}}'</a></p></div>
+<div class="cell" style="padding-left:20px;"> <p><a href="{% url 'zues:wijzigorg' pk=m.pk %}">wijzigen</a></p> </div>
+<div class="cell" style="padding-left:20px;"> <p><a href="{% url 'zues:verwijderorg' pk=m.pk %}">verwijderen</a></p> </div>
 </div>
-</div>
-<!-- <p><a href="{{ m.get_secret_url }}">Politieke Motie '{{m.titel}}'</a> :: <a href="{% url 'zues:wijzigpm' pk=m.pk %}">wijzigen</a> :: <a href="{% url 'zues:verwijderpm' pk=m.pk %}">verwijderen</a></p> -->
 {% endfor %}
 </fieldset>
 
@@ -29,6 +36,8 @@
 <h3>Voorstellen indienen</h3>
 
 <p><a href="{% url 'zues:nieuwepm' %}">Nieuwe Politieke Motie</a></p>
+<p><a href="{% url 'zues:nieuweapm' %}">Nieuwe Actueel Politieke Motie</a></p>
+<p><a href="{% url 'zues:nieuweorg' %}">Nieuwe Organimo</a></p>
 
 <h3>Uitloggen</h3>
 
