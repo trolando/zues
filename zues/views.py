@@ -1,12 +1,11 @@
 from django.conf import settings
 from django.contrib.sites.models import Site
-from django.contrib.formtools.preview import FormPreview
 from django.core.context_processors import csrf
 from django.core.mail import EmailMessage
 from django.core.urlresolvers import reverse_lazy
 from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import render_to_response
-from django.views.generic import View, FormView, DetailView, UpdateView, DeleteView
+from django.views.generic import View, FormView, DetailView, UpdateView, DeleteView, CreateView
 from zues import models
 from zues import forms
 import base64
@@ -169,37 +168,25 @@ class PMView(LidMixin, DetailView):
             raise Http404
         return obj
 
-class NieuwePMPreview(FormPreview):
-    form_template = 'zues/pmnew.html'
-    preview_template = 'zues/pmnew.html'
+class NieuwePM(LoginMixin, CreateView):
+    model = models.PolitiekeMotie
+    form_class = forms.PMForm
+    template_name = 'zues/pmnew.html'
 
-    def __init__(self):
-        super(NieuwePMPreview, self).__init__(forms.PMForm)
-
-    def __call__(self, request, *args, **kwargs):
-        self.lid = check_login(request)
-        if self.lid == None: raise Http404
-        return super(NieuwePMPreview, self).__call__(request, *args, **kwargs)
-
-    def get_context(self, request, form):
-        context = super(NieuwePMPreview, self).get_context(request, form)
-        context['lid'] = self.lid
-        return context
-
-    def process_preview(self, request, form, context):
-        context['obj'] = form.save(commit=False)
-
-    def done(self, request, cleaned_data):
-        pm = models.PolitiekeMotie(**cleaned_data)
-        pm.secret = base64.urlsafe_b64encode(os.urandom(30))
-        pm.eigenaar = models.Login.objects.filter(lidnummer=request.session['lid'])[0]
-        pm.save()
-        return HttpResponseRedirect('/')
-
+    def form_valid(self, form):
+        if 'preview' not in self.request.POST:
+            self.object = form.save(commit=False)
+            return self.render_to_response(self.get_context_data(form=form, obj=self.object))
+        else:
+            pm = form.save(commit=False)
+            pm.secret = base64.urlsafe_b64encode(os.urandom(30))
+            pm.eigenaar = models.Login.objects.filter(lidnummer=self.request.session['lid'])[0]
+            pm.save()
+            return HttpResponseRedirect(pm.get_absolute_url())
 
 class WijzigPM(LoginMixin, UpdateView):
     model = models.PolitiekeMotie
-    fields = ('titel', 'woordvoerder', 'indieners', 'constateringen', 'overwegingen', 'uitspraken', 'toelichting',)
+    form_class = forms.PMForm
     template_name = 'zues/pmnew.html'
     queryset = models.PolitiekeMotie.objects.filter(verwijderd=False)
 

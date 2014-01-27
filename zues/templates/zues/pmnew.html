@@ -29,6 +29,7 @@
 {% endfor %}
 <input type="hidden" name="{{ stage_field }}" value="2" />
 <input type="hidden" name="{{ hash_field }}" value="{{ hash_value }}" />
+<input type="hidden" name="preview" value="1" />
 <button class="button" type="button" onClick="history.back(1); event.stopPropagation();">Terug</button>
 <button class="button" type="submit">Verzenden</button>
 </form>
