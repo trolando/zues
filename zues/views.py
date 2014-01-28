@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.sites.models import Site
 from django.core.context_processors import csrf
 from django.core.mail import EmailMessage
@@ -118,6 +119,21 @@ def view_home(request):
     context.update(csrf(request))
 
     return render_to_response("zues/home.html", context)
+
+@staff_member_required
+def view_export(request):
+    lid = check_login(request)
+    if not lid: return HttpResponseForbidden()
+
+    context = {}
+    context['lid'] = lid
+    context['pm'] = models.PolitiekeMotie.objects.filter(verwijderd=False)
+    context['apm'] = models.ActuelePolitiekeMotie.objects.filter(verwijderd=False)
+    context['org'] = models.Organimo.objects.filter(verwijderd=False)
+    context['res'] = models.Resolutie.objects.filter(verwijderd=False)
+    context['amres'] = models.AmendementRes.objects.filter(verwijderd=False)
+    context['ampp'] = models.AmendementPP.objects.filter(verwijderd=False)
+    return render_to_response("zues/export.html", context)
 
 def login_verzonden(request):
     return render_to_response("zues/loginverzonden.html")
