@@ -9,8 +9,10 @@
 
 {% if lid %}
 
+{% if mag %}
 <p><a href="{% url 'zues:wijzigorg' pk=motie.pk %}">Wijzigen</a></p>
 <p><a href="{% url 'zues:verwijderorg' pk=motie.pk %}">Verwijderen</a></p>
+{% endif %}
 
 <p>Deze Organimo is voor iedereen te zien via <a href="{{ motie.get_absolute_url }}">deze link</a>.</p>
 

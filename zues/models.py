@@ -1,9 +1,13 @@
+from datetime import datetime
+from django.utils import formats
+from django.utils.timezone import utc, is_aware, now, localtime
 from django.db import models
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from django.utils.safestring import mark_safe
 from django.core.urlresolvers import reverse
 from re import sub
+from solo.models import SingletonModel
 
 class Login(models.Model):
     lidnummer = models.CharField(max_length=250,)
@@ -14,6 +18,71 @@ class Login(models.Model):
 
     def get_secret_url(self):
         return reverse('zues:login', kwargs={'key': self.secret, 'lid': self.lidnummer})
+
+class Tijden(SingletonModel):
+    pm_start = models.DateTimeField(null=True, blank=True)
+    pm_stop = models.DateTimeField(null=True, blank=True)
+    apm_start = models.DateTimeField(null=True, blank=True)
+    apm_stop = models.DateTimeField(null=True, blank=True)
+    org_start = models.DateTimeField(null=True, blank=True)
+    org_stop = models.DateTimeField(null=True, blank=True)
+    res_start = models.DateTimeField(null=True, blank=True)
+    res_stop = models.DateTimeField(null=True, blank=True)
+    amres_start = models.DateTimeField(null=True, blank=True)
+    amres_stop = models.DateTimeField(null=True, blank=True)
+    ampp_start = models.DateTimeField(null=True, blank=True)
+    ampp_stop = models.DateTimeField(null=True, blank=True)
+
+    def _check(self, start, stop):
+        _now = now()
+        if start != None and _now < start: return False
+        if stop != None and _now > stop: return False
+        return True
+
+    def mag_pm(self):
+        return self._check(self.pm_start, self.pm_stop)
+
+    def mag_apm(self):
+        return self._check(self.apm_start, self.apm_stop)
+
+    def mag_org(self):
+        return self._check(self.org_start, self.org_stop)
+
+    def mag_res(self):
+        return self._check(self.res_start, self.res_stop)
+
+    def mag_amres(self):
+        return self._check(self.amres_start, self.amres_stop)
+
+    def mag_ampp(self):
+        return self._check(self.ampp_start, self.ampp_stop)
+
+    def deadline_pm(self):
+        if self.pm_stop == None: return "geen"
+        else: return formats.date_format(localtime(self.pm_stop), "DATETIME_FORMAT")
+
+    def deadline_apm(self):
+        if self.apm_stop == None: return "geen"
+        else: return formats.date_format(localtime(self.apm_stop), "DATETIME_FORMAT")
+
+    def deadline_org(self):
+        if self.org_stop == None: return "geen"
+        else: return formats.date_format(localtime(self.org_stop), "DATETIME_FORMAT")
+
+    def deadline_res(self):
+        if self.res_stop == None: return "geen"
+        else: return formats.date_format(localtime(self.res_stop), "DATETIME_FORMAT")
+
+    def deadline_amres(self):
+        if self.amres_stop == None: return "geen"
+        else: return formats.date_format(localtime(self.amres_stop), "DATETIME_FORMAT")
+
+    def deadline_ampp(self):
+        if self.ampp_stop == None: return "geen"
+        else: return formats.date_format(localtime(self.ampp_stop), "DATETIME_FORMAT")
+
+    class Meta:
+        verbose_name_plural = 'tijden'
 
 class Stuk(models.Model):
     titel = models.CharField(max_length=250,)

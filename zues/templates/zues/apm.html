@@ -9,8 +9,10 @@
 
 {% if lid %}
 
+{% if mag %}
 <p><a href="{% url 'zues:wijzigapm' pk=motie.pk %}">Wijzigen</a></p>
 <p><a href="{% url 'zues:verwijderapm' pk=motie.pk %}">Verwijderen</a></p>
+{% endif %}
 
 <p>Deze Actueel Politieke Motie is voor iedereen te zien via <a href="{{ motie.get_absolute_url }}">deze link</a>.</p>
 

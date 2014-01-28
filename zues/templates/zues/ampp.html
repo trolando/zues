@@ -9,8 +9,10 @@
 
 {% if lid %}
 
+{% if mag %}
 <p><a href="{% url 'zues:wijzigampp' pk=voorstel.pk %}">Wijzigen</a></p>
 <p><a href="{% url 'zues:verwijderampp' pk=voorstel.pk %}">Verwijderen</a></p>
+{% endif %}
 
 <p>Dit Amendement op het Politieke Programma is voor iedereen te zien via <a href="{{ voorstel.get_absolute_url }}">deze link</a>.</p>
 
