@@ -122,11 +122,7 @@ def view_home(request):
 
 @staff_member_required
 def view_export(request):
-    lid = check_login(request)
-    if not lid: return HttpResponseForbidden()
-
     context = {}
-    context['lid'] = lid
     context['pm'] = models.PolitiekeMotie.objects.filter(verwijderd=False)
     context['apm'] = models.ActuelePolitiekeMotie.objects.filter(verwijderd=False)
     context['org'] = models.Organimo.objects.filter(verwijderd=False)

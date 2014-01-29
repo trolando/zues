@@ -1,40 +1,36 @@
 {% extends 'zues/base.html' %}
-{% block terugnaarbegin %}<p>Ingelogd als lid {{ lid.lidnummer }}</p>{% endblock %}
+{% block terugnaarbegin %}{% endblock %}
 {% block content %}
-<h1>Voorstelsysteem Jonge Democraten</h1>
+<p>&nbsp;</p>
 
-<h3>Voorstellen</h3>
-
-<fieldset>
 {% for m in pm %}
-<p><a href="{{ m.get_absolute_url }}">PM '{{m.titel}}'</a> (door lid {{m.eigenaar.lidnummer}})</p>
-{{ m.as_html }}
+{{ m.as_html_table }}
+<p>&nbsp;</p>
 {% endfor %}
 
 {% for m in apm %}
-<p><a href="{{ m.get_absolute_url }}">APM '{{m.titel}}'</a> (door lid {{m.eigenaar.lidnummer}})</p>
-{{ m.as_html }}
+{{ m.as_html_table }}
+<p>&nbsp;</p>
 {% endfor %}
 
 {% for m in org %}
-<p><a href="{{ m.get_absolute_url }}">ORG '{{m.titel}}'</a> (door lid {{m.eigenaar.lidnummer}})</p>
-{{ m.as_html }}
+{{ m.as_html_table }}
+<p>&nbsp;</p>
 {% endfor %}
 
 {% for m in res %}
-<p><a href="{{ m.get_absolute_url }}">RES '{{m.titel}}'</a> (door lid {{m.eigenaar.lidnummer}})</p>
-{{ m.as_html }}
+{{ m.as_html_table }}
+<p>&nbsp;</p>
 {% endfor %}
 
 {% for m in amres %}
-<p><a href="{{ m.get_absolute_url }}">AMRES '{{m.titel}}'</a> (door lid {{m.eigenaar.lidnummer}})</p>
-{{ m.as_html }}
+{{ m.as_html_table }}
+<p>&nbsp;</p>
 {% endfor %}
 
 {% for m in ampp %}
-<p><a href="{{ m.get_absolute_url }}">AMPP '{{m.titel}}'</a> (door lid {{m.eigenaar.lidnummer}})</p>
-{{ m.as_html }}
+{{ m.as_html_table }}
+<p>&nbsp;</p>
 {% endfor %}
-</fieldset>
 
 {% endblock %} 
