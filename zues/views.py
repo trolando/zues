@@ -173,6 +173,12 @@ class LoginMixin(object):
         if self.lid == None: raise Http404
         return super(LoginMixin, self).dispatch(request, *args, **kwargs)
 
+class EigenaarMixin(object):
+    def get_object(self, **kwargs):
+        obj = super(EigenaarMixin, self).get_object(**kwargs)
+        if obj.eigenaar != self.lid: raise Http404
+        return obj
+
 class MagPMMixin(object):
     def dispatch(self, request, *args, **kwargs):
         if not models.Tijden.get_solo().mag_pm(): return HttpResponseForbidden()
@@ -236,7 +242,7 @@ class NieuwePM(LoginMixin, MagPMMixin, CreateView):
             self.object.save()
             return HttpResponseRedirect(self.object.get_absolute_url())
 
-class WijzigPM(LoginMixin, MagPMMixin, UpdateView):
+class WijzigPM(LoginMixin, EigenaarMixin, MagPMMixin, UpdateView):
     model = models.PolitiekeMotie
     form_class = forms.PMForm
     template_name = 'zues/pmnew.html'
@@ -247,7 +253,7 @@ class WijzigPM(LoginMixin, MagPMMixin, UpdateView):
         context['edit'] = 1
         return context
 
-class VerwijderPM(LoginMixin, MagPMMixin, DeleteView):
+class VerwijderPM(LoginMixin, EigenaarMixin, MagPMMixin, DeleteView):
     model = models.PolitiekeMotie
     template_name = 'zues/pmdel.html'
     queryset = models.PolitiekeMotie.objects.filter(verwijderd=False)
@@ -291,7 +297,7 @@ class NieuweAPM(LoginMixin, MagAPMMixin, CreateView):
             self.object.save()
             return HttpResponseRedirect(self.object.get_absolute_url())
 
-class WijzigAPM(LoginMixin, MagAPMMixin, UpdateView):
+class WijzigAPM(LoginMixin, EigenaarMixin, MagAPMMixin, UpdateView):
     model = models.ActuelePolitiekeMotie
     form_class = forms.APMForm
     template_name = 'zues/apmnew.html'
@@ -302,7 +308,7 @@ class WijzigAPM(LoginMixin, MagAPMMixin, UpdateView):
         context['edit'] = 1
         return context
 
-class VerwijderAPM(LoginMixin, MagAPMMixin, DeleteView):
+class VerwijderAPM(LoginMixin, EigenaarMixin, MagAPMMixin, DeleteView):
     model = models.ActuelePolitiekeMotie
     template_name = 'zues/apmdel.html'
     queryset = models.ActuelePolitiekeMotie.objects.filter(verwijderd=False)
@@ -346,7 +352,7 @@ class NieuweORG(LoginMixin, MagORGMixin, CreateView):
             self.object.save()
             return HttpResponseRedirect(self.object.get_absolute_url())
 
-class WijzigORG(LoginMixin, MagORGMixin, UpdateView):
+class WijzigORG(LoginMixin, EigenaarMixin, MagORGMixin, UpdateView):
     model = models.Organimo
     form_class = forms.ORGForm
     template_name = 'zues/orgnew.html'
@@ -357,7 +363,7 @@ class WijzigORG(LoginMixin, MagORGMixin, UpdateView):
         context['edit'] = 1
         return context
 
-class VerwijderORG(LoginMixin, MagORGMixin, DeleteView):
+class VerwijderORG(LoginMixin, EigenaarMixin, MagORGMixin, DeleteView):
     model = models.Organimo
     template_name = 'zues/orgdel.html'
     queryset = models.Organimo.objects.filter(verwijderd=False)
@@ -401,7 +407,7 @@ class NieuweRES(LoginMixin, MagRESMixin, CreateView):
             self.object.save()
             return HttpResponseRedirect(self.object.get_absolute_url())
 
-class WijzigRES(LoginMixin, MagRESMixin, UpdateView):
+class WijzigRES(LoginMixin, EigenaarMixin, MagRESMixin, UpdateView):
     model = models.Resolutie
     form_class = forms.RESForm
     template_name = 'zues/resnew.html'
@@ -412,7 +418,7 @@ class WijzigRES(LoginMixin, MagRESMixin, UpdateView):
         context['edit'] = 1
         return context
 
-class VerwijderRES(LoginMixin, MagRESMixin, DeleteView):
+class VerwijderRES(LoginMixin, EigenaarMixin, MagRESMixin, DeleteView):
     model = models.Resolutie
     template_name = 'zues/resdel.html'
     queryset = models.Resolutie.objects.filter(verwijderd=False)
@@ -456,7 +462,7 @@ class NieuweAMRES(LoginMixin, MagAMRESMixin, CreateView):
             self.object.save()
             return HttpResponseRedirect(self.object.get_absolute_url())
 
-class WijzigAMRES(LoginMixin, MagAMRESMixin, UpdateView):
+class WijzigAMRES(LoginMixin, EigenaarMixin, MagAMRESMixin, UpdateView):
     model = models.AmendementRes
     form_class = forms.AMRESForm
     template_name = 'zues/amresnew.html'
@@ -467,7 +473,7 @@ class WijzigAMRES(LoginMixin, MagAMRESMixin, UpdateView):
         context['edit'] = 1
         return context
 
-class VerwijderAMRES(LoginMixin, MagAMRESMixin, DeleteView):
+class VerwijderAMRES(LoginMixin, EigenaarMixin, MagAMRESMixin, DeleteView):
     model = models.AmendementRes
     template_name = 'zues/amresdel.html'
     queryset = models.AmendementRes.objects.filter(verwijderd=False)
@@ -511,7 +517,7 @@ class NieuweAMPP(LoginMixin, MagAMPPMixin, CreateView):
             self.object.save()
             return HttpResponseRedirect(self.object.get_absolute_url())
 
-class WijzigAMPP(LoginMixin, MagAMPPMixin, UpdateView):
+class WijzigAMPP(LoginMixin, EigenaarMixin, MagAMPPMixin, UpdateView):
     model = models.AmendementPP
     form_class = forms.AMPPForm
     template_name = 'zues/amppnew.html'
@@ -522,7 +528,7 @@ class WijzigAMPP(LoginMixin, MagAMPPMixin, UpdateView):
         context['edit'] = 1
         return context
 
-class VerwijderAMPP(LoginMixin, MagAMPPMixin, DeleteView):
+class VerwijderAMPP(LoginMixin, EigenaarMixin, MagAMPPMixin, DeleteView):
     model = models.AmendementPP
     template_name = 'zues/amppdel.html'
     queryset = models.AmendementPP.objects.filter(verwijderd=False)

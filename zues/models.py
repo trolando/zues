@@ -5,6 +5,7 @@ from django.db import models
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from django.utils.safestring import mark_safe
+from django.utils.html import escape
 from django.core.urlresolvers import reverse
 from re import sub
 from solo.models import SingletonModel
@@ -122,22 +123,22 @@ class Motie(Stuk):
         return "<p>" + "</p><p>".join(str) + "</p>"
 
     def get_content(self):
-        con = self.to_list(self.constateringen)
+        con = self.to_list(escape(self.constateringen))
         if len(con)>1: con = "<p><strong>constaterende dat</strong></p><ul><li>" + "</li><li>".join(con) + "</li></ul>"
         elif len(con): con = "<p><strong>constaterende dat</strong></p><p>" + con[0] + "</p>"
         else: con = ""
 
-        over = self.to_list(self.overwegingen)
+        over = self.to_list(escape(self.overwegingen))
         if len(over)>1: over = "<p><strong>overwegende dat</strong></p><ul><li>" + "</li><li>".join(over) + "</li></ul>"
         elif len(over): over = "<p><strong>overwegende dat</strong></p><p>" + over[0] + "</p>"
         else: over = ""
 
-        uit = self.to_list(self.uitspraken)
+        uit = self.to_list(escape(self.uitspraken))
         if len(uit)>1: uit = "<p><strong>spreekt uit dat</strong></p><ul><li>" + "</li><li>".join(uit) + "</li></ul>"
         elif len(uit): uit = "<p><strong>spreekt uit dat</strong></p><p>" + uit[0] + "</p>"
         else: uit = ""
 
-        toe = self.to_p(self.toelichting)
+        toe = self.to_p(escape(self.toelichting))
         toe = len(toe) and ("<p><strong>Toelichting:</strong></p><p>" + toe + "</p>") or ""
 
         orde = "<p><em>en gaat over tot de orde van de dag.</em></p>"
@@ -150,15 +151,15 @@ class Motie(Stuk):
         html.append("<fieldset>")
         html.append("<div class='row'>")
         html.append("<div class='cell'><p>Titel:</p></div>")
-        html.append("<div class='cell'><p>%s</p></div>" % self.titel)
+        html.append("<div class='cell'><p>%s</p></div>" % escape(self.titel))
         html.append("</div>")
         html.append("<div class='row'>")
         html.append("<div class='cell'><p>Indieners:</p></div>")
-        html.append("<div class='cell'><p>%s</p></div>" % self.indieners)
+        html.append("<div class='cell'><p>%s</p></div>" % escape(self.indieners))
         html.append("</div>")
         html.append("<div class='row'>")
         html.append("<div class='cell'><p>Woordvoerder:</p></div>")
-        html.append("<div class='cell'><p>%s</p></div>" % self.woordvoerder)
+        html.append("<div class='cell'><p>%s</p></div>" % escape(self.woordvoerder))
         html.append("</div>")
         html.append("<div class='row'>")
         html.append("<div class='cell'><p>Inhoud:</p></div>")
@@ -172,19 +173,19 @@ class Motie(Stuk):
         html = []
         html.append("<table border='1' class='export'>")
         html.append("<tr class='exporttitle'>")
-        html.append("<td style='min-width: 140px'><p>%s</p></td>" % ik)
-        html.append("<td style='min-width: 360px'><p>%s</p></td>" % self.titel)
+        html.append("<td><p>%s</p></td>" % ik)
+        html.append("<td><p>%s</p></td>" % escape(self.titel))
         html.append("</tr>")
         html.append("<tr class='exporthead'>")
         html.append("<td><p><strong>Indieners:</strong></p></td>")
-        html.append("<td><p>%s</p></td>" % self.indieners)
+        html.append("<td><p>%s</p></td>" % escape(self.indieners))
         html.append("</tr>")
         html.append("<tr class='exporthead'>")
         html.append("<td><p><strong>Woordvoerder:</strong></p></td>")
-        html.append("<td><p>%s</p></td>" % self.woordvoerder)
+        html.append("<td><p>%s</p></td>" % escape(self.woordvoerder))
         html.append("</tr>")
 
-        con = self.to_list(self.constateringen)
+        con = self.to_list(escape(self.constateringen))
         if len(con):
             if len(con)>1: con = "<ul><li>" + "</li><li>".join(con) + "</li></ul>"
             else: con = "<p>" + con[0] + "</p>"
@@ -193,7 +194,7 @@ class Motie(Stuk):
             html.append("<td>%s</td>" % con)
             html.append("</tr>")
 
-        over = self.to_list(self.overwegingen)
+        over = self.to_list(escape(self.overwegingen))
         if len(over):
             if len(over)>1: over = "<ul><li>" + "</li><li>".join(over) + "</li></ul>"
             else: over = "<p>" + over[0] + "</p>"
@@ -202,7 +203,7 @@ class Motie(Stuk):
             html.append("<td>%s</td>" % over)
             html.append("</tr>")
 
-        uit = self.to_list(self.uitspraken)
+        uit = self.to_list(escape(self.uitspraken))
         if len(uit)>1: uit = "<ul><li>" + "</li><li>".join(uit) + "</li></ul>"
         elif len(uit): uit = "<p>" + uit[0] + "</p>"
         else: uit = ""
@@ -211,7 +212,7 @@ class Motie(Stuk):
         html.append("<td>%s</td>" % uit)
         html.append("</tr>")
 
-        toe = self.to_p(self.toelichting)
+        toe = self.to_p(escape(self.toelichting))
         if len(toe):
             html.append("<tr class='exporttoelichting'>")
             html.append("<td><p><strong>Toelichting:</strong></p></td>")
@@ -227,7 +228,7 @@ class Organimo(Motie):
         verbose_name_plural = 'organimos'
 
     def __unicode__(self):
-        return 'Organimo %s' % self.titel
+        return 'ORG %s' % self.titel
 
     def get_absolute_url(self):
         return reverse('zues:org', kwargs={'key': self.secret, 'pk': self.pk})
@@ -241,7 +242,7 @@ class PolitiekeMotie(Motie):
         verbose_name_plural = 'politieke moties'
 
     def __unicode__(self):
-        return 'Politieke Motie %s' % self.titel
+        return 'PM %s' % self.titel
 
     def get_absolute_url(self):
         return reverse('zues:pm', kwargs={'key': self.secret, 'pk': self.pk})
@@ -255,7 +256,7 @@ class ActuelePolitiekeMotie(Motie):
         verbose_name_plural = 'actuele politieke moties'
 
     def __unicode__(self):
-        return 'Actuele Politieke Motie %s' % self.titel
+        return 'APM %s' % self.titel
 
     def get_absolute_url(self):
         return reverse('zues:apm', kwargs={'key': self.secret, 'pk': self.pk})
@@ -287,13 +288,13 @@ class Modificatie(Stuk):
 
     def get_content(self):
         if self.type == self.SCHRAPPEN:
-            return "<p><strong>Schrap:</strong></p>" + self.to_p(self.tekst1)
+            return "<p><strong>Schrap:</strong></p>" + self.to_p(escape(self.tekst1))
 
         if self.type == self.TOEVOEGEN:
-            return "<p><strong>Voeg toe:</strong></p>" + self.to_p(self.tekst1)
+            return "<p><strong>Voeg toe:</strong></p>" + self.to_p(escape(self.tekst1))
 
         if self.type == self.WIJZIGEN:
-            return "<p><strong>Schrap:</strong></p>" + self.to_p(self.tekst1) + "<p><strong>Vervang door:</strong></p>" + self.to_p(self.tekst2)
+            return "<p><strong>Schrap:</strong></p>" + self.to_p(escape(self.tekst1)) + "<p><strong>Vervang door:</strong></p>" + self.to_p(escape(self.tekst2))
 
         return "Geen inhoud?!"
 
@@ -303,19 +304,19 @@ class Modificatie(Stuk):
         html.append("<fieldset>")
         html.append("<div class='row'>")
         html.append("<div class='cell'><label>Titel:</label></div>")
-        html.append("<div class='cell'><p>%s</p></div>" % self.titel)
+        html.append("<div class='cell'><p>%s</p></div>" % escape(selc.titel))
         html.append("</div>")
         html.append("<div class='row'>")
         html.append("<div class='cell'><label>Indieners:</label></div>")
-        html.append("<div class='cell'><p>%s</p></div>" % self.indieners)
+        html.append("<div class='cell'><p>%s</p></div>" % escape(selc.indieners))
         html.append("</div>")
         html.append("<div class='row'>")
         html.append("<div class='cell'><label>Woordvoerder:</label></div>")
-        html.append("<div class='cell'><p>%s</p></div>" % self.woordvoerder)
+        html.append("<div class='cell'><p>%s</p></div>" % escape(selc.woordvoerder))
         html.append("</div>")
         html.append("<div class='row'>")
         html.append("<div class='cell'><label>Betreft:</label></div>")
-        html.append("<div class='cell'><p>%s</p></div>" % self.betreft)
+        html.append("<div class='cell'><p>%s</p></div>" % escape(selc.betreft))
         html.append("</div>")
         html.append("<div class='row'>")
         html.append("<div class='cell'><label>Inhoud:</label></div>")
@@ -329,44 +330,44 @@ class Modificatie(Stuk):
         html = []
         html.append("<table border='1' class='export'>")
         html.append("<tr class='exporttitle'>")
-        html.append("<td style='min-width: 140px'><p>%s</p></td>" % ik)
-        html.append("<td style='min-width: 360px'><p>%s</p></td>" % self.titel)
+        html.append("<td><p>%s</p></td>" % ik)
+        html.append("<td><p>%s</p></td>" % escape(self.titel))
         html.append("</tr>")
         html.append("<tr class='exporthead'>")
         html.append("<td><p><strong>Indieners:</strong></p></td>")
-        html.append("<td><p>%s</p></td>" % self.indieners)
+        html.append("<td><p>%s</p></td>" % escape(self.indieners))
         html.append("</tr>")
         html.append("<tr class='exporthead'>")
         html.append("<td><p><strong>Woordvoerder:</strong></p></td>")
-        html.append("<td><p>%s</p></td>" % self.woordvoerder)
+        html.append("<td><p>%s</p></td>" % escape(self.woordvoerder))
         html.append("</tr>")
         if len(self.betreft):
             html.append("<tr class='exporthead'>")
             html.append("<td><p><strong>Betreft:</strong></p></td>")
-            html.append("<td><p>%s</p></td>" % self.betreft)
+            html.append("<td><p>%s</p></td>" % escape(self.betreft))
             html.append("</tr>")
 
         if self.type == self.WIJZIGEN:
             html.append("<tr>")
-            html.append("<td><p><strong>Schrap</strong></p></td>")
-            html.append("<td>%s</td>" % self.tekst1)
+            html.append("<td><p><strong>Schrap:</strong></p></td>")
+            html.append("<td>%s</td>" % self.to_p(escape(self.tekst1)))
             html.append("</tr>")
             html.append("<tr>")
-            html.append("<td><p><strong>Vervang door</strong></p></td>")
-            html.append("<td>%s</td>" % self.tekst2)
+            html.append("<td><p><strong>Vervang door:</strong></p></td>")
+            html.append("<td>%s</td>" % self.to_p(escape(self.tekst2)))
             html.append("</tr>")
         elif self.type == self.SCHRAPPEN:
             html.append("<tr>")
-            html.append("<td><p><strong>Schrap</strong></p></td>")
-            html.append("<td>%s</td>" % self.tekst1)
+            html.append("<td><p><strong>Schrap:</strong></p></td>")
+            html.append("<td>%s</td>" % self.to_p(escape(self.tekst1)))
             html.append("</tr>")
         elif self.type == self.TOEVOEGEN:
             html.append("<tr>")
-            html.append("<td><p><strong>Voeg toe</strong></p></td>")
-            html.append("<td>%s</td>" % self.tekst1)
+            html.append("<td><p><strong>Voeg toe:</strong></p></td>")
+            html.append("<td>%s</td>" % self.to_p(escape(self.tekst1)))
             html.append("</tr>")
 
-        toe = self.to_p(self.toelichting)
+        toe = self.to_p(escape(self.toelichting))
         if len(toe):
             html.append("<tr class='exporttoelichting'>")
             html.append("<td><p><strong>Toelichting:</strong></p></td>")
@@ -380,6 +381,9 @@ class Resolutie(Modificatie):
     class Meta:
         verbose_name_plural = 'resoluties'
 
+    def __unicode__(self):
+        return 'RES %s' % self.titel
+
     def get_absolute_url(self):
         return reverse('zues:res', kwargs={'key': self.secret, 'pk': self.pk})
 
@@ -390,6 +394,9 @@ class AmendementRes(Modificatie):
     class Meta:
         verbose_name_plural = 'amendementen op een resolutie'
 
+    def __unicode__(self):
+        return 'AMRES %s' % self.titel
+
     def get_absolute_url(self):
         return reverse('zues:amres', kwargs={'key': self.secret, 'pk': self.pk})
 
@@ -399,6 +406,9 @@ class AmendementRes(Modificatie):
 class AmendementPP(Modificatie):
     class Meta:
         verbose_name_plural = 'amendementen op het politieke programma'
+    
+    def __unicode__(self):
+        return 'AMPP %s' % self.titel
 
     def get_absolute_url(self):
         return reverse('zues:ampp', kwargs={'key': self.secret, 'pk': self.pk})

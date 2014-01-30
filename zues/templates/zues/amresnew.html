@@ -1,7 +1,7 @@
 {% extends 'zues/base.html' %}
 {% block title %}Jonge Democraten Congresvoorbereiding{% endblock %}
 {% block content %}
-<h1>Amendement op het Politieke Programma</h1>
+<h1>Amendement op resolutie</h1>
 
 <h3>Bindende aanwijzingen</h3>
 <ul>
@@ -23,7 +23,7 @@
 {% if obj %}
 
 <h3>Voorbeeld</h3>
-{{ obj.as_html }}
+{{ obj.as_html_table }}
 <div><p>Als het bovenstaande voorbeeld correct is, klik dan op Verzenden. Zo niet, ga dan terug naar de vorige pagina en breng verbeteringen aan.</p></div>
 <form action="" method="post">{% csrf_token %}
 {% for field in form %}{{ field.as_hidden }}

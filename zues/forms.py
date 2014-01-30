@@ -35,7 +35,7 @@ class RESForm(ModelForm):
 
     class Meta:
         model = models.Resolutie
-        fields = ('titel', 'woordvoerder', 'indieners', 'betreft', 'type', 'tekst1', 'tekst2',)
+        fields = ('titel', 'woordvoerder', 'indieners', 'betreft', 'type', 'tekst1', 'tekst2','toelichting',)
 
 class AMRESForm(ModelForm):
     tekst1 = CharField(widget=Textarea, label='Schrap/Voeg toe:')
@@ -43,7 +43,7 @@ class AMRESForm(ModelForm):
 
     class Meta:
         model = models.AmendementRes
-        fields = ('titel', 'woordvoerder', 'indieners', 'betreft', 'type', 'tekst1', 'tekst2',)
+        fields = ('titel', 'woordvoerder', 'indieners', 'betreft', 'type', 'tekst1', 'tekst2','toelichting',)
 
 class AMPPForm(ModelForm):
     tekst1 = CharField(widget=Textarea, label='Schrap/Voeg toe:')
@@ -51,7 +51,7 @@ class AMPPForm(ModelForm):
 
     class Meta:
         model = models.AmendementPP
-        fields = ('titel', 'woordvoerder', 'indieners', 'betreft', 'type', 'tekst1', 'tekst2',)
+        fields = ('titel', 'woordvoerder', 'indieners', 'betreft', 'type', 'tekst1', 'tekst2','toelichting',)
 
 class LidnummerForm(Form):
     lidnummer = IntegerField()
