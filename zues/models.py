@@ -122,6 +122,11 @@ class Motie(Stuk):
         if len(str) == 0: return ""
         return "<p>" + "</p><p>".join(str) + "</p>"
 
+    def to_commas(self, str):
+        if str == None: return None
+        str = ", ".join([s.strip() for s in str.strip().split("\n")])
+        return str
+
     def get_content(self):
         con = self.to_list(escape(self.constateringen))
         if len(con)>1: con = "<p><strong>constaterende dat</strong></p><ul><li>" + "</li><li>".join(con) + "</li></ul>"
@@ -155,7 +160,7 @@ class Motie(Stuk):
         html.append("</div>")
         html.append("<div class='row'>")
         html.append("<div class='cell'><p>Indieners:</p></div>")
-        html.append("<div class='cell'><p>%s</p></div>" % escape(self.indieners))
+        html.append("<div class='cell'><p>%s</p></div>" % escape(self.to_commas(self.indieners)))
         html.append("</div>")
         html.append("<div class='row'>")
         html.append("<div class='cell'><p>Woordvoerder:</p></div>")
@@ -178,7 +183,7 @@ class Motie(Stuk):
         html.append("</tr>")
         html.append("<tr class='exporthead'>")
         html.append("<td><p><strong>Indieners:</strong></p></td>")
-        html.append("<td><p>%s</p></td>" % escape(self.indieners))
+        html.append("<td><p>%s</p></td>" % escape(self.to_commas(self.indieners)))
         html.append("</tr>")
         html.append("<tr class='exporthead'>")
         html.append("<td><p><strong>Woordvoerder:</strong></p></td>")
@@ -304,19 +309,19 @@ class Modificatie(Stuk):
         html.append("<fieldset>")
         html.append("<div class='row'>")
         html.append("<div class='cell'><label>Titel:</label></div>")
-        html.append("<div class='cell'><p>%s</p></div>" % escape(selc.titel))
+        html.append("<div class='cell'><p>%s</p></div>" % escape(self.titel))
         html.append("</div>")
         html.append("<div class='row'>")
         html.append("<div class='cell'><label>Indieners:</label></div>")
-        html.append("<div class='cell'><p>%s</p></div>" % escape(selc.indieners))
+        html.append("<div class='cell'><p>%s</p></div>" % escape(self.indieners))
         html.append("</div>")
         html.append("<div class='row'>")
         html.append("<div class='cell'><label>Woordvoerder:</label></div>")
-        html.append("<div class='cell'><p>%s</p></div>" % escape(selc.woordvoerder))
+        html.append("<div class='cell'><p>%s</p></div>" % escape(self.woordvoerder))
         html.append("</div>")
         html.append("<div class='row'>")
         html.append("<div class='cell'><label>Betreft:</label></div>")
-        html.append("<div class='cell'><p>%s</p></div>" % escape(selc.betreft))
+        html.append("<div class='cell'><p>%s</p></div>" % escape(self.betreft))
         html.append("</div>")
         html.append("<div class='row'>")
         html.append("<div class='cell'><label>Inhoud:</label></div>")

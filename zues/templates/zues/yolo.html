@@ -5,7 +5,7 @@
 
 {% if count %}
 
-<h3>Voorstellen beheren</h3>
+<h3>Eigen voorstellen</h3>
 
 <fieldset>
 {% for m in pm %}
@@ -66,6 +66,8 @@
 
 {% endif %}
 
+{% if magiets %}
+
 <h3>Voorstellen indienen</h3>
 
 <fieldset>
@@ -107,8 +109,27 @@
 {% endif %}
 </fieldset>
 
+{% endif %}
+
+{% if staff %}
+
+<h3>Exporteren</h3>
+
+<fieldset>
+<div class="row">
+<div class="cell" style="min-width: 300px;"><p><a href="{% url 'zues:export' %}">Exporteren</a></p></div>
+</div>
+</fieldset>
+
+
+{% endif %}
+
 <h3>Uitloggen</h3>
 
-<p><a href="{% url 'zues:loguit' %}">Uitloggen</a></p>
+<fieldset>
+<div class="row">
+<div class="cell" style="min-width: 300px;"><p><a href="{% url 'zues:loguit' %}">Uitloggen</a></p></div>
+</div>
+</fieldset>
 
 {% endblock %} 

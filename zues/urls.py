@@ -38,6 +38,6 @@ urlpatterns = patterns('moties.views',
     url(r'^ampp/wijzig/(?P<pk>\d+)/$', views.WijzigAMPP.as_view(), name='wijzigampp'),
     url(r'^ampp/verwijder/(?P<pk>\d+)/$', views.VerwijderAMPP.as_view(), name='verwijderampp'),
 
-    url(r'^export/$', views.view_export),
+    url(r'^export/$', views.view_export, name='export'),
 )
 

@@ -40,7 +40,7 @@
 <h3>Formulier</h3>
 <form action="" method="post">{% csrf_token %}
 <fieldset>
-<div><p>Constateringen, overwegingen en toelichting zijn niet verplicht. <strong>Het formulier maakt automatisch bullets.</strong></p></div>
+<div><p>Constateringen, overwegingen en toelichting zijn niet verplicht. <strong>Het formulier maakt automatisch bullets voor elke regel.</strong></p></div>
 {{ form.non_field_errors }}
 {% for f in form.visible_fields %}
 <div class="row">

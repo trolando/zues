@@ -84,7 +84,10 @@ def view_home(request):
         context['amres'] = models.AmendementRes.objects.filter(eigenaar=lid).filter(verwijderd=False)
         context['ampp'] = models.AmendementPP.objects.filter(eigenaar=lid).filter(verwijderd=False)
         context['count'] = len(context['pm'])+len(context['apm'])+len(context['org'])+len(context['res'])+len(context['amres'])+len(context['ampp'])
-        context['tijden'] = models.Tijden.get_solo()
+        tijden = models.Tijden.get_solo()
+        context['tijden'] = tijden
+        context['magiets'] = tijden.mag_pm() or tijden.mag_apm() or tijden.mag_org() or tijden.mag_res() or tijden.mag_amres() or tijden.mag_ampp()
+        context['staff'] = request.user.is_active and request.user.is_staff
         return render_to_response("zues/yolo.html", context)
 
     if request.method == 'POST': 
