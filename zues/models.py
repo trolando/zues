@@ -29,10 +29,8 @@ class Tijden(SingletonModel):
     org_stop = models.DateTimeField(null=True, blank=True)
     res_start = models.DateTimeField(null=True, blank=True)
     res_stop = models.DateTimeField(null=True, blank=True)
-    amres_start = models.DateTimeField(null=True, blank=True)
-    amres_stop = models.DateTimeField(null=True, blank=True)
-    ampp_start = models.DateTimeField(null=True, blank=True)
-    ampp_stop = models.DateTimeField(null=True, blank=True)
+    am_start = models.DateTimeField(null=True, blank=True)
+    am_stop = models.DateTimeField(null=True, blank=True)
 
     def _check(self, start, stop):
         _now = now()
@@ -52,11 +50,8 @@ class Tijden(SingletonModel):
     def mag_res(self):
         return self._check(self.res_start, self.res_stop)
 
-    def mag_amres(self):
-        return self._check(self.amres_start, self.amres_stop)
-
-    def mag_ampp(self):
-        return self._check(self.ampp_start, self.ampp_stop)
+    def mag_am(self):
+        return self._check(self.am_start, self.am_stop)
 
     def deadline_pm(self):
         if self.pm_stop == None: return "geen"
@@ -74,13 +69,9 @@ class Tijden(SingletonModel):
         if self.res_stop == None: return "geen"
         else: return formats.date_format(localtime(self.res_stop), "DATETIME_FORMAT")
 
-    def deadline_amres(self):
-        if self.amres_stop == None: return "geen"
-        else: return formats.date_format(localtime(self.amres_stop), "DATETIME_FORMAT")
-
-    def deadline_ampp(self):
-        if self.ampp_stop == None: return "geen"
-        else: return formats.date_format(localtime(self.ampp_stop), "DATETIME_FORMAT")
+    def deadline_am(self):
+        if self.am_stop == None: return "geen"
+        else: return formats.date_format(localtime(self.am_stop), "DATETIME_FORMAT")
 
     class Meta:
         verbose_name_plural = 'tijden'
@@ -396,29 +387,15 @@ class Resolutie(Modificatie):
     def as_html_table(self):
         return super(Resolutie, self).as_html_table('RES')
 
-class AmendementRes(Modificatie):
+class Amendement(Modificatie):
     class Meta:
-        verbose_name_plural = 'amendementen op een resolutie'
+        verbose_name_plural = 'amendementen'
 
     def __unicode__(self):
-        return 'AMRES %s' % self.titel
+        return 'AM %s' % self.titel
 
     def get_absolute_url(self):
-        return reverse('zues:amres', kwargs={'key': self.secret, 'pk': self.pk})
+        return reverse('zues:am', kwargs={'key': self.secret, 'pk': self.pk})
 
     def as_html_table(self):
-        return super(AmendementRes, self).as_html_table('AMRES')
-
-class AmendementPP(Modificatie):
-    class Meta:
-        verbose_name_plural = 'amendementen op het politieke programma'
-    
-    def __unicode__(self):
-        return 'AMPP %s' % self.titel
-
-    def get_absolute_url(self):
-        return reverse('zues:ampp', kwargs={'key': self.secret, 'pk': self.pk})
-
-    def as_html_table(self):
-        return super(AmendementPP, self).as_html_table('AMPP')
-
+        return super(Amendement, self).as_html_table('AM')

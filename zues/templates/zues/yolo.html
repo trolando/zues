@@ -5,11 +5,7 @@
 
 {% if allcount %}
 
-{% if staff %}
-<h3>Alle voorstellen</h3>
-{% else %}
 <h3>Alle zichtbare voorstellen</h3>
-{% endif %}
 
 <fieldset>
 {% for m in allpm %}
@@ -32,14 +28,9 @@
 <div class="cell" style="min-width: 300px;"> <p><a href="{{ m.get_absolute_url }}">RES '{{m.titel}}'</a></p></div>
 </div>
 {% endfor %}
-{% for m in allamres %}
+{% for m in allam %}
 <div class="row">
-<div class="cell" style="min-width: 300px;"> <p><a href="{{ m.get_absolute_url }}">AMRES '{{m.titel}}'</a></p></div>
-</div>
-{% endfor %}
-{% for m in allampp %}
-<div class="row">
-<div class="cell" style="min-width: 300px;"> <p><a href="{{ m.get_absolute_url }}">AMPP '{{m.titel}}'</a></p></div>
+<div class="cell" style="min-width: 300px;"> <p><a href="{{ m.get_absolute_url }}">AM '{{m.titel}}'</a></p></div>
 </div>
 {% endfor %}
 </fieldset>
@@ -89,21 +80,12 @@
 {% endif %}
 </div>
 {% endfor %}
-{% for m in amres %}
+{% for m in am %}
 <div class="row">
-<div class="cell" style="min-width: 300px;"> <p><a href="{{ m.get_absolute_url }}">AMRES '{{m.titel}}'</a></p></div>
-{% if tijden.mag_amres %}
-<div class="cell" style="padding-left:20px;"> <p><a href="{% url 'zues:wijzigamres' pk=m.pk %}">wijzigen</a></p></div>
-<div class="cell" style="padding-left:20px;"> <p><a href="{% url 'zues:verwijderamres' pk=m.pk %}">verwijderen</a></p></div>
-{% endif %}
-</div>
-{% endfor %}
-{% for m in ampp %}
-<div class="row">
-<div class="cell" style="min-width: 300px;"> <p><a href="{{ m.get_absolute_url }}">AMPP '{{m.titel}}'</a></p></div>
-{% if tijden.mag_ampp %}
-<div class="cell" style="padding-left:20px;"> <p><a href="{% url 'zues:wijzigampp' pk=m.pk %}">wijzigen</a></p></div>
-<div class="cell" style="padding-left:20px;"> <p><a href="{% url 'zues:verwijderampp' pk=m.pk %}">verwijderen</a></p></div>
+<div class="cell" style="min-width: 300px;"> <p><a href="{{ m.get_absolute_url }}">AM '{{m.titel}}'</a></p></div>
+{% if tijden.mag_am %}
+<div class="cell" style="padding-left:20px;"> <p><a href="{% url 'zues:wijzigam' pk=m.pk %}">wijzigen</a></p></div>
+<div class="cell" style="padding-left:20px;"> <p><a href="{% url 'zues:verwijderam' pk=m.pk %}">verwijderen</a></p></div>
 {% endif %}
 </div>
 {% endfor %}
@@ -140,16 +122,10 @@
 <div class="cell" style="padding-left:20px;"><p>deadline: {{ tijden.deadline_res }}</p></div>
 </div>
 {% endif %}
-{% if tijden.mag_amres %}
+{% if tijden.mag_am %}
 <div class="row">
-<div class="cell" style="min-width: 300px;"><p><a href="{% url 'zues:nieuweamres' %}">Nieuw Amendement op resolutie</a></p></div>
-<div class="cell" style="padding-left:20px;"><p>deadline: {{ tijden.deadline_amres }}</p></div>
-</div>
-{% endif %}
-{% if tijden.mag_ampp %}
-<div class="row">
-<div class="cell" style="min-width: 300px;"><p><a href="{% url 'zues:nieuweampp' %}">Nieuw Amendement op het Politieke Programma</a></p></div>
-<div class="cell" style="padding-left:20px;"><p>deadline: {{ tijden.deadline_ampp }}</p></div>
+<div class="cell" style="min-width: 300px;"><p><a href="{% url 'zues:nieuweam' %}">Nieuw Amendement</a></p></div>
+<div class="cell" style="padding-left:20px;"><p>deadline: {{ tijden.deadline_am }}</p></div>
 </div>
 {% endif %}
 </fieldset>

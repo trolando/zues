@@ -19,7 +19,7 @@ class ResolutieForm(ModelForm):
         self.fields['titel'].widget.attrs.update({'placeholder': 'Titel van het voorstel'})
         self.fields['woordvoerder'].widget.attrs.update({'placeholder': 'Naam van de woordvoerder'})
         self.fields['indieners'].widget.attrs.update({'placeholder': '"[JD Afdeling] Voorzitter, Secretaris" of "Naam 1, Naam 2, etc... (minimaal 5)"'})
-        self.fields['betreft'].widget.attrs.update({'placeholder': 'Hoofdstuk N, pagina M, regels X-Y'})
+        self.fields['betreft'].widget.attrs.update({'placeholder': 'Resolutie/Voorstel/Hoofdstuk N, pagina M, regels X-Y'})
         self.fields['tekst1'].widget.attrs.update({'placeholder': 'Volledige tekst die geschrapt of toegevoegd wordt...'})
         self.fields['tekst2'].widget.attrs.update({'placeholder': 'Volledige tekst die de geschrapte tekst vervangt... (alleen gebruiken bij type Wijzigen)'})
         self.fields['toelichting'].widget.attrs.update({'placeholder': 'Optionele toelichting van maximaal 250 woorden...'})
@@ -59,21 +59,21 @@ class RESForm(ResolutieForm):
         model = models.Resolutie
         fields = ('titel', 'woordvoerder', 'indieners', 'betreft', 'type', 'tekst1', 'tekst2','toelichting',)
 
-class AMRESForm(ResolutieForm):
+    def __init__(self, *args, **kwargs):
+        super(RESForm, self).__init__(*args, **kwargs)
+        self.fields['betreft'].widget.attrs.update({'placeholder': 'Hoofdstuk N, pagina M, regels X-Y'})
+ 
+class AMForm(ResolutieForm):
     tekst1 = CharField(widget=Textarea, label='Schrap/Voeg toe:')
     tekst2 = CharField(widget=Textarea, label='Vervang door:', required=False)
 
     class Meta:
-        model = models.AmendementRes
+        model = models.Amendement
         fields = ('titel', 'woordvoerder', 'indieners', 'betreft', 'type', 'tekst1', 'tekst2','toelichting',)
 
-class AMPPForm(ResolutieForm):
-    tekst1 = CharField(widget=Textarea, label='Schrap/Voeg toe:')
-    tekst2 = CharField(widget=Textarea, label='Vervang door:', required=False)
-
-    class Meta:
-        model = models.AmendementPP
-        fields = ('titel', 'woordvoerder', 'indieners', 'betreft', 'type', 'tekst1', 'tekst2','toelichting',)
+    def __init__(self, *args, **kwargs):
+        super(AMForm, self).__init__(*args, **kwargs)
+        self.fields['betreft'].widget.attrs.update({'placeholder': 'Voorstel/Resolutie N, pagina M, regels X-Y'})
 
 class LidnummerForm(Form):
     lidnummer = IntegerField(label='Lidnummer:')
