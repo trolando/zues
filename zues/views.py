@@ -42,6 +42,24 @@ def retrieve_attributes(lidnummer):
     except ldap.LDAPError:
         return None
 
+def retrieve_lidnummers(email):
+    l = ldap_connect()
+    baseDN = "ou=users,dc=jd,dc=nl"
+    searchFilter = "(mail="+str(email)+")"
+
+    try:
+        ldap_result_id = l.search(baseDN, ldap.SCOPE_SUBTREE, searchFilter, None)
+        while True:
+            result_type, result_data = l.result(ldap_result_id, 1)
+            if (result_data == []): return ()
+            elif result_type == ldap.RES_SEARCH_RESULT:
+                result = []
+                for userDN, userAttrs in result_data:
+                    result.append((userAttrs['cn'][0], userAttrs['sn'][0]))
+                return tuple(result)
+    except ldap.LDAPError:
+        return ()
+
 def get_lid(lidnummer):
     lid = models.Login.objects.filter(lidnummer=lidnummer)
     if len(lid):
@@ -71,6 +89,48 @@ def check_login(request):
             pass
         return None
     return leden[0]
+
+def view_lidnummer(request):
+    if request.method == 'POST':
+        if getattr(settings, 'SKIP_RECAPTCHA', False):
+            form = forms.HelpLidnummerForm(request.POST)
+        else:
+            form = forms.HelpLidnummerRecaptchaForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            if getattr(settings, 'SKIP_EMAIL', False):
+                return HttpResponseRedirect('/lidnummerverzonden/')
+
+            for lidnummer, naam in retrieve_lidnummers(email):
+                subject = '[JD] Lidnummer'
+                from_email = 'noreply@jongedemocraten.nl'
+
+                inhoud = []
+                inhoud.append('Beste %s,' % naam)
+                inhoud.append('')
+                inhoud.append('Je hebt via de site van de Jonge Democraten je lidnummer opgevraagd. Je lidnummer is ' + str(lidnummer) + '.')
+                inhoud.append('')
+                inhoud.append('Met vrijzinnige groet,')
+                inhoud.append('De Jonge Democraten.')
+                inhoud = '\n'.join(inhoud)
+
+                msg = EmailMessage(subject, inhoud, from_email=from_email, to=[email])
+                msg.send()
+
+            return HttpResponseRedirect('/lidnummerverzonden/')
+    else:
+        if getattr(settings, 'SKIP_RECAPTCHA', False):
+            form = forms.HelpLidnummerForm()
+        else:
+            form = forms.HelpLidnummerRecaptchaForm()
+
+    context = {'form': form, }
+    context.update(csrf(request))
+
+    return render_to_response("zues/lidnummer.html", context)
+
+def lidnummer_verzonden(request):
+    return render_to_response("zues/lidnummerverzonden.html")
 
 def view_home(request):
     lid = check_login(request)

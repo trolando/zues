@@ -1,4 +1,4 @@
-from django.forms import Form, ModelForm, CharField, IntegerField, Textarea
+from django.forms import Form, ModelForm, CharField, IntegerField, Textarea, EmailField
 from captcha.fields import ReCaptchaField
 from zues import models
 
@@ -80,4 +80,11 @@ class LidnummerForm(Form):
 
 class LidnummerRecaptchaForm(LidnummerForm):
     captcha = ReCaptchaField()
+
+class HelpLidnummerForm(Form):
+    email = EmailField(max_length=254, label='Emailadres:')
+
+class HelpLidnummerRecaptchaForm(HelpLidnummerForm):
+    captcha = ReCaptchaField()
+
 

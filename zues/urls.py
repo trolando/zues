@@ -39,5 +39,7 @@ urlpatterns = patterns('moties.views',
     url(r'^ampp/verwijder/(?P<pk>\d+)/$', views.VerwijderAMPP.as_view(), name='verwijderampp'),
 
     url(r'^export/$', views.view_export, name='export'),
+    url(r'^lidnummer/$', views.view_lidnummer, name='lidnummer'),
+    url(r'^lidnummerverzonden/$', views.lidnummer_verzonden),
 )
 

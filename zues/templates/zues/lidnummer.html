@@ -4,11 +4,11 @@
 {% block content %}
 <h1>Voorstelsysteem Jonge Democraten</h1>
 
-<h3>Toegang tot het systeem</h3>
+<h3>Lidnummer opvragen</h3>
 
 <form action="" method="post">{% csrf_token %}
 <fieldset>
-<div><p>Vul hieronder je lidnummer van de Jonge Democraten in. Je krijgt vervolgens een e-mail op het bij ons bekende e-mailadres.</p></div>
+<div><p>Vul hieronder het e-mailadres in dat bij de Jonge Democraten bekend is. Je krijgt vervolgens een e-mail op dit adres met je lidnummer. Dit kun je gebruiken om toegang te krijgen tot het systeem.</p></div>
 {{ form.non_field_errors }}
 {% for f in form.visible_fields %}
 <div class="row">
@@ -23,8 +23,7 @@
 </div>
 </div>
 {% endfor %}
-<button class="button" type="submit">Aanvragen</button>
-<button class="button" type="button" style='width:200px' onClick='window.location="{% url 'zues:lidnummer' %}"; event.stopPropagation();'>Help, wat is mijn lidnummer?</button>
+<button class="button" type="submit">Opvragen</button>
 </fieldset>
 </form>
 </div>
