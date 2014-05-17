@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth import logout
 from django.contrib.sites.models import Site
 from django.core.context_processors import csrf
 from django.core.mail import EmailMessage
@@ -166,6 +167,8 @@ def loguit(request):
         del request.session['key']
     except KeyError:
         pass
+    # ook uitloggen bij admin
+    logout(request)
     return HttpResponseRedirect('/')
 
 class LidMixin(object):
