@@ -53,6 +53,7 @@
       <div id="homeDiv">
       {% block logo %}<a href="{% url 'zues:home' %}"><img src="{% static 'zues/images/JD-Logo.png' %}" border="0" /></a>{% endblock %}
       {% block terugnaarbegin %}<p><a href="{% url 'zues:home' %}">Terug naar begin</a>{% if lid %} (ingelogd als lid {{ lid.lidnummer }}) {% endif %}</p>{% endblock %}
+      {% block mededeling %}<p style='color: red; font-size: 140%; line-height: 120%'>Komend congres: Zomercongres 2014<br/>Dit is een TESTSITE! Deze voorstellen worden NIET behandeld!!</p>{% endblock %}
       {% block content %}{% endblock %}
       </div>
     </div>
