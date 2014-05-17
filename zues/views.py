@@ -22,6 +22,9 @@ def ldap_connect():
     return l
 
 def retrieve_attributes(lidnummer):
+    if getattr(settings, 'SKIP_LDAP', False):
+        return '','Lid %d' % lidnummer
+
     l = ldap_connect()
     baseDN = "cn="+str(int(lidnummer))+",ou=users,dc=jd,dc=nl"
     retrieveAttributes = None
@@ -85,7 +88,10 @@ def view_home(request):
         return render_to_response("zues/yolo.html", context)
 
     if request.method == 'POST': 
-        form = forms.LidnummerForm(request.POST)
+        if getattr(settings, 'SKIP_RECAPTCHA', False):
+            form = forms.LidnummerForm(request.POST)
+        else:
+            form = forms.LidnummerRecaptchaForm(request.POST)
         if form.is_valid():
             lidnummer = form.cleaned_data['lidnummer']
 
@@ -93,6 +99,10 @@ def view_home(request):
             result = get_lid(int(lidnummer))
             if result != None:
                 lid, to, naam = result
+
+                if getattr(settings, 'SKIP_EMAIL', False):
+                    return HttpResponseRedirect(lid.get_secret_url())
+
                 subject = '[JD] Toegang voorstelsysteem'
                 from_email = 'noreply@jongedemocraten.nl'
 
@@ -113,9 +123,12 @@ def view_home(request):
 
             return HttpResponseRedirect('/loginverzonden/')
     else:
-        form = forms.LidnummerForm()
+        if getattr(settings, 'SKIP_RECAPTCHA', False):
+            form = forms.LidnummerForm()
+        else:
+            form = forms.LidnummerRecaptchaForm()
 
-    context = {'form': form}
+    context = {'form': form, }
     context.update(csrf(request))
 
     return render_to_response("zues/home.html", context)

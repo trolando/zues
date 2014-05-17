@@ -55,12 +55,13 @@ class AMPPForm(ModelForm):
 
 class LidnummerForm(Form):
     lidnummer = IntegerField()
-    captcha = ReCaptchaField()
 
     def __init__(self, *args, **kwargs):
         super(LidnummerForm, self).__init__(*args, **kwargs)
         self.fields['lidnummer'].label = "Lidnummer:"
 
-    def is_valid(self):
-        if not super(LidnummerForm, self).is_valid(): return False
-        return True
+class LidnummerRecaptchaForm(LidnummerForm):
+    captcha = ReCaptchaField()
+
+    def __init__(self, *args, **kwargs):
+        super(LidnummerForm, self).__init__(*args, **kwargs)
