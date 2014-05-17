@@ -96,6 +96,7 @@ class Stuk(models.Model):
     toelichting = models.TextField(blank=True, help_text='Gebruik een dubbele enter voor de volgende paragraaf')
     eigenaar = models.ForeignKey(Login)
     verwijderd = models.BooleanField(default=False)
+    publiek = models.BooleanField(default=False)
 
     class Meta:
         abstract = True

@@ -4,7 +4,8 @@ from zues.models import PolitiekeMotie, ActuelePolitiekeMotie, Organimo, Resolut
 from solo.admin import SingletonModelAdmin
 
 class MotieAdmin(admin.ModelAdmin):
-    list_display = ('titel', 'verwijderd', 'woordvoerder', 'indienmoment', 'laatsteupdate')
+    list_display = ('titel', 'publiek', 'verwijderd', 'woordvoerder', 'indienmoment', 'laatsteupdate')
+    list_editable = ('verwijderd', 'publiek',)
 
 admin.site.register(Login)
 admin.site.register(Tijden, SingletonModelAdmin)

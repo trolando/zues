@@ -76,14 +76,8 @@ class AMPPForm(ResolutieForm):
         fields = ('titel', 'woordvoerder', 'indieners', 'betreft', 'type', 'tekst1', 'tekst2','toelichting',)
 
 class LidnummerForm(Form):
-    lidnummer = IntegerField()
-
-    def __init__(self, *args, **kwargs):
-        super(LidnummerForm, self).__init__(*args, **kwargs)
-        self.fields['lidnummer'].label = "Lidnummer:"
+    lidnummer = IntegerField(label='Lidnummer:')
 
 class LidnummerRecaptchaForm(LidnummerForm):
     captcha = ReCaptchaField()
 
-    def __init__(self, *args, **kwargs):
-        super(LidnummerForm, self).__init__(*args, **kwargs)

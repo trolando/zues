@@ -1,7 +1,52 @@
 {% extends 'zues/base.html' %}
-{% block terugnaarbegin %}<p>Ingelogd als lid {{ lid.lidnummer }}</p>{% endblock %}
+{% block terugnaarbegin %}<p>Ingelogd als lid {{ lid.lidnummer }} (<a href="{% url 'zues:loguit' %}">uitloggen</a>)</p>{% endblock %}
 {% block content %}
 <h1>Voorstelsysteem Jonge Democraten</h1>
+
+{% if allcount %}
+
+{% if staff %}
+<h3>Alle voorstellen</h3>
+{% else %}
+<h3>Alle zichtbare voorstellen</h3>
+{% endif %}
+
+<fieldset>
+{% for m in allpm %}
+<div class="row">
+<div class="cell" style="min-width: 300px;"> <p><a href="{{ m.get_absolute_url }}">PM '{{m.titel}}'</a></p></div>
+</div>
+{% endfor %}
+{% for m in allapm %}
+<div class="row">
+<div class="cell" style="min-width: 300px;"> <p><a href="{{ m.get_absolute_url }}">APM '{{m.titel}}'</a></p></div>
+</div>
+{% endfor %}
+{% for m in allorg %}
+<div class="row">
+<div class="cell" style="min-width: 300px;"> <p><a href="{{ m.get_absolute_url }}">ORG '{{m.titel}}'</a></p></div>
+</div>
+{% endfor %}
+{% for m in allres %}
+<div class="row">
+<div class="cell" style="min-width: 300px;"> <p><a href="{{ m.get_absolute_url }}">RES '{{m.titel}}'</a></p></div>
+</div>
+{% endfor %}
+{% for m in allamres %}
+<div class="row">
+<div class="cell" style="min-width: 300px;"> <p><a href="{{ m.get_absolute_url }}">AMRES '{{m.titel}}'</a></p></div>
+</div>
+{% endfor %}
+{% for m in allampp %}
+<div class="row">
+<div class="cell" style="min-width: 300px;"> <p><a href="{{ m.get_absolute_url }}">AMPP '{{m.titel}}'</a></p></div>
+</div>
+{% endfor %}
+</fieldset>
+
+{% endif %}
+
+
 
 {% if count %}
 

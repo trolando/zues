@@ -28,7 +28,6 @@ def retrieve_attributes(lidnummer):
 
     l = ldap_connect()
     baseDN = "cn="+str(int(lidnummer))+",ou=users,dc=jd,dc=nl"
-    retrieveAttributes = None
     try:
         ldap_result_id = l.search(baseDN, ldap.SCOPE_BASE)
         result_type, result_data = l.result(ldap_result_id, 1)
@@ -38,10 +37,10 @@ def retrieve_attributes(lidnummer):
             if result_type == ldap.RES_SEARCH_RESULT:
                 userDN, userAttrs = result_data[0]
                 return userAttrs["mail"][0], userAttrs["sn"][0]
-    except ldap.NO_SUCH_OBJECT, e:
+    except ldap.NO_SUCH_OBJECT:
         return None
-    except ldap.LDAPError, e:
-        pass
+    except ldap.LDAPError:
+        return None
 
 def get_lid(lidnummer):
     lid = models.Login.objects.filter(lidnummer=lidnummer)
@@ -89,6 +88,13 @@ def view_home(request):
         context['tijden'] = tijden
         context['magiets'] = tijden.mag_pm() or tijden.mag_apm() or tijden.mag_org() or tijden.mag_res() or tijden.mag_amres() or tijden.mag_ampp()
         context['staff'] = request.user.is_active and request.user.is_staff
+        context['allpm'] = models.PolitiekeMotie.objects.filter(verwijderd=False).filter(publiek=True)
+        context['allapm'] = models.ActuelePolitiekeMotie.objects.filter(verwijderd=False).filter(publiek=True)
+        context['allorg'] = models.Organimo.objects.filter(verwijderd=False).filter(publiek=True)
+        context['allres'] = models.Resolutie.objects.filter(verwijderd=False).filter(publiek=True)
+        context['allamres'] = models.AmendementRes.objects.filter(verwijderd=False).filter(publiek=True)
+        context['allampp'] = models.AmendementPP.objects.filter(verwijderd=False).filter(publiek=True)
+        context['allcount'] = len(context['allpm'])+len(context['allapm'])+len(context['allorg'])+len(context['allres'])+len(context['allamres'])+len(context['allampp'])
         return render_to_response("zues/yolo.html", context)
 
     if request.method == 'POST': 
@@ -242,7 +248,7 @@ class PMView(LidMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(PMView, self).get_context_data(**kwargs)
-        context['mag'] = models.Tijden.get_solo().mag_pm()
+        context['mag'] = models.Tijden.get_solo().mag_pm() and self.lid == context['motie'].eigenaar
         return context
 
 class NieuwePM(LoginMixin, MagPMMixin, CreateView):
@@ -297,7 +303,7 @@ class APMView(LidMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(APMView, self).get_context_data(**kwargs)
-        context['mag'] = models.Tijden.get_solo().mag_apm()
+        context['mag'] = models.Tijden.get_solo().mag_apm() and self.lid == context['motie'].eigenaar
         return context
 
 class NieuweAPM(LoginMixin, MagAPMMixin, CreateView):
@@ -352,7 +358,7 @@ class ORGView(LidMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(ORGView, self).get_context_data(**kwargs)
-        context['mag'] = models.Tijden.get_solo().mag_org()
+        context['mag'] = models.Tijden.get_solo().mag_org() and self.lid == context['motie'].eigenaar
         return context
 
 class NieuweORG(LoginMixin, MagORGMixin, CreateView):
@@ -407,7 +413,7 @@ class RESView(LidMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(RESView, self).get_context_data(**kwargs)
-        context['mag'] = models.Tijden.get_solo().mag_res()
+        context['mag'] = models.Tijden.get_solo().mag_res() and self.lid == context['voorstel'].eigenaar
         return context
 
 class NieuweRES(LoginMixin, MagRESMixin, CreateView):
@@ -462,7 +468,7 @@ class AMRESView(LidMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(AMRESView, self).get_context_data(**kwargs)
-        context['mag'] = models.Tijden.get_solo().mag_amres()
+        context['mag'] = models.Tijden.get_solo().mag_amres() and self.lid == context['voorstel'].eigenaar
         return context
 
 class NieuweAMRES(LoginMixin, MagAMRESMixin, CreateView):
@@ -517,7 +523,7 @@ class AMPPView(LidMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(AMPPView, self).get_context_data(**kwargs)
-        context['mag'] = models.Tijden.get_solo().mag_ampp()
+        context['mag'] = models.Tijden.get_solo().mag_ampp() and self.lid == context['voorstel'].eigenaar
         return context
 
 class NieuweAMPP(LoginMixin, MagAMPPMixin, CreateView):
