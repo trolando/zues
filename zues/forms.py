@@ -75,6 +75,18 @@ class AMForm(ResolutieForm):
         super(AMForm, self).__init__(*args, **kwargs)
         self.fields['betreft'].widget.attrs.update({'placeholder': 'Voorstel/Resolutie N, pagina M, regels X-Y'})
 
+class HRForm(ResolutieForm):
+    tekst1 = CharField(widget=Textarea, label='Schrap/Voeg toe:')
+    tekst2 = CharField(widget=Textarea, label='Vervang door:', required=False)
+
+    class Meta:
+        model = models.HRWijziging
+        fields = ('titel', 'woordvoerder', 'indieners', 'betreft', 'type', 'tekst1', 'tekst2', 'toelichting',)
+
+    def __init__(self, *args, **kwargs):
+        super(HRForm, self).__init__(*args, **kwargs)
+        self.fields['betreft'].widget.attrs.update({'placeholder': 'Hoofdstuk N, pagina M, regels X-Y'})
+
 class LidnummerForm(Form):
     lidnummer = IntegerField(label='Lidnummer:')
 

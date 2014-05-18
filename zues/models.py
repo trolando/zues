@@ -31,6 +31,8 @@ class Tijden(SingletonModel):
     res_stop = models.DateTimeField(null=True, blank=True)
     am_start = models.DateTimeField(null=True, blank=True)
     am_stop = models.DateTimeField(null=True, blank=True)
+    hr_start = models.DateTimeField(null=True, blank=True)
+    hr_stop = models.DateTimeField(null=True, blank=True)
 
     def _check(self, start, stop):
         _now = now()
@@ -53,6 +55,9 @@ class Tijden(SingletonModel):
     def mag_am(self):
         return self._check(self.am_start, self.am_stop)
 
+    def mag_hr(self):
+        return self._check(self.hr_start, self.hr_stop)
+
     def deadline_pm(self):
         if self.pm_stop == None: return "geen"
         else: return formats.date_format(localtime(self.pm_stop), "DATETIME_FORMAT")
@@ -72,6 +77,10 @@ class Tijden(SingletonModel):
     def deadline_am(self):
         if self.am_stop == None: return "geen"
         else: return formats.date_format(localtime(self.am_stop), "DATETIME_FORMAT")
+
+    def deadline_hr(self):
+        if self.hr_stop == None: return "geen"
+        else: return formats.date_format(localtime(self.hr_stop), "DATETIME_FORMAT")
 
     class Meta:
         verbose_name_plural = 'tijden'
@@ -399,3 +408,16 @@ class Amendement(Modificatie):
 
     def as_html_table(self):
         return super(Amendement, self).as_html_table('AM')
+
+class HRWijziging(Modificatie):
+    class Meta:
+        verbose_name_plural = "HR-wijzigingen"
+
+    def __unicode__(self):
+        return 'HR %s' % self.titel
+
+    def get_absolute_url(self):
+        return reverse('zues:hr', kwargs={'key': self.secret, 'pk': self.pk})
+
+    def as_html_table(self):
+        return super(HRWijziging, self).as_html_table('HR')

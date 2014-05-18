@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.contenttypes.generic import GenericTabularInline
-from zues.models import PolitiekeMotie, ActuelePolitiekeMotie, Organimo, Resolutie, Amendement, Login, Tijden
+from zues.models import PolitiekeMotie, ActuelePolitiekeMotie, Organimo, Resolutie, Amendement, HRWijziging, Login, Tijden
 from solo.admin import SingletonModelAdmin
 
 class MotieAdmin(admin.ModelAdmin):
@@ -14,3 +14,4 @@ admin.site.register(ActuelePolitiekeMotie, MotieAdmin)
 admin.site.register(Organimo, MotieAdmin)
 admin.site.register(Resolutie, MotieAdmin)
 admin.site.register(Amendement, MotieAdmin)
+admin.site.register(HRWijziging, MotieAdmin)

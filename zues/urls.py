@@ -33,6 +33,11 @@ urlpatterns = patterns('moties.views',
     url(r'^am/wijzig/(?P<pk>\d+)/$', views.WijzigAM.as_view(), name='wijzigam'),
     url(r'^am/verwijder/(?P<pk>\d+)/$', views.VerwijderAM.as_view(), name='verwijderam'),
 
+    url(r'^hr/(?P<pk>\d+)/(?P<key>.+)/$', views.HRView.as_view(), name='hr'),
+    url(r'^hr/nieuw/', views.NieuweHR.as_view(), name='nieuwehr'),
+    url(r'^hr/wijzig/(?P<pk>\d+)/$', views.WijzigHR.as_view(), name='wijzighr'),
+    url(r'^hr/verwijder/(?P<pk>\d+)/$', views.VerwijderHR.as_view(), name='verwijderhr'),
+
     url(r'^export/$', views.view_export, name='export'),
     url(r'^lidnummer/$', views.view_lidnummer, name='lidnummer'),
     url(r'^lidnummerverzonden/$', views.lidnummer_verzonden),

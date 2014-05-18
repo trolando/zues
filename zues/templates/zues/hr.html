@@ -1,0 +1,16 @@
+{% extends 'zues/base.html' %}
+{% block title %}{{ voorstel.titel }} - Jonge Democraten Voorstelsysteem{% endblock %}
+{% block content %}
+<h1>HR-wijziging</h1>
+
+{{ voorstel.as_html_table }}
+
+{% if lid %}
+{% if mag %}
+<p><a href="{% url 'zues:wijzighr' pk=voorstel.pk %}">Wijzigen</a></p>
+<p><a href="{% url 'zues:verwijderhr' pk=voorstel.pk %}">Verwijderen</a></p>
+{% endif %}
+<p>Deze HR-wijziging is voor iedereen te zien via <a href="{{ voorstel.get_absolute_url }}">deze link</a>.</p>
+{% endif %}
+
+{% endblock %} 

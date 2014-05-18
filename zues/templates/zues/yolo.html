@@ -33,6 +33,11 @@
 <div class="cell" style="min-width: 300px;"> <p><a href="{{ m.get_absolute_url }}">AM '{{m.titel}}'</a></p></div>
 </div>
 {% endfor %}
+{% for m in allhr %}
+<div class="row">
+<div class="cell" style="min-width: 300px;"> <p><a href="{{ m.get_absolute_url }}">HR '{{m.titel}}'</a></p></div>
+</div>
+{% endfor %}
 </fieldset>
 
 {% endif %}
@@ -89,6 +94,15 @@
 {% endif %}
 </div>
 {% endfor %}
+{% for m in hr %}
+<div class="row">
+<div class="cell" style="min-width: 300px;"> <p><a href="{{ m.get_absolute_url }}">HR '{{m.titel}}'</a></p></div>
+{% if tijden.mag_hr %}
+<div class="cell" style="padding-left:20px;"> <p><a href="{% url 'zues:wijzighr' pk=m.pk %}">wijzigen</a></p></div>
+<div class="cell" style="padding-left:20px;"> <p><a href="{% url 'zues:verwijderhr' pk=m.pk %}">verwijderen</a></p></div>
+{% endif %}
+</div>
+{% endfor %}
 </fieldset>
 
 {% endif %}
@@ -126,6 +140,12 @@
 <div class="row">
 <div class="cell" style="min-width: 300px;"><p><a href="{% url 'zues:nieuweam' %}">Nieuw Amendement</a></p></div>
 <div class="cell" style="padding-left:20px;"><p>deadline: {{ tijden.deadline_am }}</p></div>
+</div>
+{% endif %}
+{% if tijden.mag_hr %}
+<div class="row">
+<div class="cell" style="min-width: 300px;"><p><a href="{% url 'zues:nieuwehr' %}">Nieuwe HR-wijziging</a></p></div>
+<div class="cell" style="padding-left:20px;"><p>deadline: {{ tijden.deadline_hr }}</p></div>
 </div>
 {% endif %}
 </fieldset>
