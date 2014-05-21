@@ -10,49 +10,49 @@
     <!-- <script src="{% static 'zues/js/jquery.steps.min.js' %}"></script>-->
     <style>
       .container { width: 605px; margin: 30px auto; }
-      .pol_motie { background: #ebebeb; padding: 10px; font-size: 12px; line-height: 16px; }
 
-      .pol_tags { width: 150px; font-size: 12px; }
+      #content h1 { font-weight: bold; font-size: 26px; line-height: 30px; letter-spacing: 1px; margin-top: 24px; margin-bottom: 4px; }
+      #content h3 { font-weight: bold; font-size: 16px; line-height: 18px; margin-bottom: 4px; }
+      #content h1 { color: #578439; } 
+      #content h3 { color: #888; } 
 
-      h2 { margin-bottom: 4px; }
-      h3 { background-color: #578439; background-image: url('https://jongedemocraten.nl/templates/jd/images/TitleBackground.png'); background-repeat: repeat-x; color: white; font-size: 14px; line-height: 20px; font-weight: bold; display: inline; padding: 2px 10px 2px 10px; margin: 0; vertical-align: middle; }
+      #content fieldset { margin: 5px 0; }
+      #content fieldset label { display: block; margin: 0; padding: 0; float: none; }
+      #content fieldset textarea { margin-bottom: 3px; }
+      #content fieldset button { margin-left: 0; }
+      #content fieldset button { background: #578439 url('https://jongedemocraten.nl/templates/jd/images/TitleBackground.png'); background-repeat: repeat-x;
+                        border-radius: 3px; border: 1px solid #303060;
+                        display: inline-block;
+                        text-shadow: 1px 1px 0px #000033; font-size: 14px; font-weight: bold;
+                        height: 30px; width: 120px;
+                        padding: 4px 16px;
+                        color: white; }
 
-      #menu_div { height: 30px; background-image: url('http://jongedemocraten.nl/templates/jd/images/MenuBackground.png'); border-left: 1px solid #E2E2E1; border-right: 1px solid #E2E2E1; margin: 20px 0 10px 0; }
-      #menu_div ul { margin: 0px; padding: 0px; height: 30px; }
-      #menu_div ul li { margin: 0px; display: inline-block; line-height: 32px; height: 30px; padding: 0 20px; border-right: 1px solid #E2E2E1; }
-      #menu_div ul li a { text-decoration: none; color: #4D4D4D; }
-      #menu_div ul li a:hover { color: #99B44A; }
+      #content fieldset select { margin-bottom: 3px; min-width: 200px;}
+      #content fieldset .cell > input { min-width: 300px;}
+      #content fieldset p { margin-top: 0; padding-top: 0; }
+      #content fieldset .row { display: table-row; margin: 0; padding: 1em 0; }
+      #content fieldset .cell { display: table-cell; margin: 0; padding: 0; vertical-align: top; }
+      #content fieldset .errors { display: block; color: red; margin: 0; padding: 0; }
 
-      #homeDiv fieldset { margin: 5px 0; }
-      #homeDiv fieldset label { display: block; margin: 0; padding: 0; float: none; }
-      #homeDiv fieldset textarea { margin-bottom: 3px; }
-      #homeDiv fieldset button { margin-left: 0; }
-      #homeDiv fieldset select { margin-bottom: 3px; min-width: 200px;}
-      #homeDiv fieldset .cell > input { min-width: 300px;}
-      #homeDiv fieldset p { margin-top: 0; padding-top: 0; }
-      #homeDiv fieldset .row { display: table-row; margin: 0; padding: 1em 0; }
-      #homeDiv fieldset .cell { display: table-cell; margin: 0; padding: 0; vertical-align: top; }
-      #homeDiv fieldset .errors { display: block; color: red; margin: 0; padding: 0; }
+      #content .export * { margin: 0; padding: 0; }
+      #content .export { margin: 10px 0; }
+      #content .export td { padding: 2px 4px 4px 4px; }
+      #content .export p, #homeDiv .export li { text-align: justify; }
+      #content .export ul { list-style-position: inside; list-style-type: square; }
+      #content .export tr > td:first-child { width: 120px; }
+      #content .export tr > td:first-child+td { width: 520px; }
+      #content .exporttitle { background: #000; }
+      #content .exporttitle * { color: #fff; }
+      #content .exporthead, #homeDiv .exporttoelichting { background: #ccc; }
 
-      #homeDiv .export * { margin: 0; padding: 0; }
-      #homeDiv .export { margin: 10px 0; }
-      #homeDiv .export td { padding: 2px 4px 4px 4px; }
-      #homeDiv .export p, #homeDiv .export li { text-align: justify; }
-      #homeDiv .export ul { list-style-position: inside; list-style-type: square; }
-      #homeDiv .export tr > td:first-child { width: 120px; }
-      #homeDiv .export tr > td:first-child+td { width: 520px; }
-      #homeDiv .exporttitle { background: #000; }
-      #homeDiv .exporttitle * { color: #fff; }
-      #homeDiv .exporthead, #homeDiv .exporttoelichting { background: #ccc; }
-
-      h1 { line-height: 1em; }
     </style>
 {% block head %}{% endblock %}
   </head>
   <body>
     <div class="container">
-      <div id="homeDiv">
-      {% block logo %}<a href="{% url 'zues:home' %}"><img src="{% static 'zues/images/JD-Logo.png' %}" border="0" /></a>{% endblock %}
+      <div id="content">
+      {% block logo %}<div style="display: block; margin-bottom: 8px;"><a href="{% url 'zues:home' %}"><img src="{% static 'zues/images/JD_Logo.png' %}" width="100px"  border="0" /></a></div>{% endblock %}
       {% block mededeling %}<p style='color: #cc0000; font-size: 120%; line-height: 120%'>{% mededeling %}</p>{% endblock %}
       {% block terugnaarbegin %}<p><a href="{% url 'zues:home' %}">Terug naar begin</a>{% if lid %} (ingelogd als lid {{ lid.lidnummer }} - <a href="{% url 'zues:loguit' %}">uitloggen</a>) {% endif %}</p>{% endblock %}
       {% block content %}{% endblock %}
