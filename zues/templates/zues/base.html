@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 {% load staticfiles %}
+{% load settings %}
 <html lang="nl">
   <head>
     <meta charset="utf-8" />
@@ -52,7 +53,7 @@
     <div class="container">
       <div id="homeDiv">
       {% block logo %}<a href="{% url 'zues:home' %}"><img src="{% static 'zues/images/JD-Logo.png' %}" border="0" /></a>{% endblock %}
-      {% block mededeling %}<p style='color: red; font-size: 140%; line-height: 120%'>Komend congres: Zomercongres 2014<br/>Dit is een TESTSITE! Deze voorstellen worden NIET behandeld!!</p>{% endblock %}
+      {% block mededeling %}<p style='color: #cc0000; font-size: 120%; line-height: 120%'>{% mededeling %}</p>{% endblock %}
       {% block terugnaarbegin %}<p><a href="{% url 'zues:home' %}">Terug naar begin</a>{% if lid %} (ingelogd als lid {{ lid.lidnummer }} - <a href="{% url 'zues:loguit' %}">uitloggen</a>) {% endif %}</p>{% endblock %}
       {% block content %}{% endblock %}
       </div>
