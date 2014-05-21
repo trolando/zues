@@ -1,11 +1,11 @@
 {% extends 'zues/base.html' %}
 {% block title %}Jonge Democraten Congresvoorbereiding{% endblock %}
 {% block content %}
-<h1>Organimo</h1>
+<h1>Organimo verwijderen</h1>
 
 <div class="jdform">
-<h3>Organimo verwijderen</h3>
 <form action="" method="post">{% csrf_token %}
+<fieldset>
 <p>Weet je zeker dat je de {{ object }} wilt verwijderen?</p>
 <div class="row">
 <div class="cell">&nbsp;</div>
