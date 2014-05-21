@@ -20,9 +20,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 SECRET_KEY = '001_d%l*ljj#$a5*+i*+*1(8u%4)r*rbs9(h6swnoevl7=ta02'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-TEMPLATE_DEBUG = True
+TEMPLATE_DEBUG = False
 
 ALLOWED_HOSTS = []
 
@@ -86,16 +86,17 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-# EMAIL_HOST = ''
-# EMAIL_HOST_USER = ''
-# EMAIL_HOST_PASSWORD = ''
-# EMAIL_PORT = 0
-# EMAIL_USE_TLS = True
+EMAIL_HOST = 'localhost'
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''
+EMAIL_PORT = 587
 
-# RECAPTCHA_PUBLIC_KEY = '6Lc1lu0SAAAAANm3LcaA6OSjbNgnLF_tE_K1mcfi'
-# RECAPTCHA_PRIVATE_KEY = '6Lc1lu0SAAAAAEgYNds2IaTOfz5E21aTY4rspdqj'
+# RECAPTCHA_PUBLIC_KEY = 
+# RECAPTCHA_PRIVATE_KEY = 
 # RECAPTCHA_USE_SSL = True
 
-# LDAP_NAME="ldap://127.0.0.1:389/"
-# LDAP_DN="cn=writeuser,ou=sysUsers,dc=jd,dc=nl"
-# LDAP_PASS="..."
+# LDAP_NAME = "ldap://127.0.0.1:389/"
+# LDAP_DN = "cn=readuser,ou=sysUsers,dc=jd,dc=nl"
+# LDAP_PASS = "..."
+
+MEDEDELING = "Komende congres: <b>niet ingevuld!</b>"
