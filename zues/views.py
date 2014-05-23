@@ -61,6 +61,7 @@ def retrieve_lidnummers(email):
         return ()
 
 def get_lid(lidnummer):
+    lidnummer = int(lidnummer)
     res = retrieve_attributes(lidnummer)
     if res == None: return None
     email, naam = res
@@ -80,7 +81,7 @@ def get_lid(lidnummer):
 def check_login(request):
     if 'lid' not in request.session: return None
     if 'key' not in request.session: return None
-    leden = models.Login.objects.filter(lidnummer=request.session['lid']).filter(secret=request.session['key'])
+    leden = models.Login.objects.filter(lidnummer=int(request.session['lid'])).filter(secret=request.session['key'])
     if len(leden) == 0:
         try:
             del request.session['lid']

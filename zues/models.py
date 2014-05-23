@@ -12,7 +12,7 @@ from solo.models import SingletonModel
 
 class Login(models.Model):
     naam = models.CharField(max_length=250,)
-    lidnummer = models.CharField(max_length=250,)
+    lidnummer = models.IntegerField(primary_key=True,)
     secret = models.CharField(max_length=250,)
 
     def __unicode__(self):
