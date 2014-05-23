@@ -95,7 +95,7 @@ class Stuk(models.Model):
     admin_opmerkingen = models.TextField(blank=True, help_text='Opmerkingen van de beheerder')
     secret = models.CharField(max_length=250,)
     toelichting = models.TextField(blank=True, help_text='Gebruik een dubbele enter voor de volgende paragraaf')
-    eigenaar = models.ForeignKey(Login)
+    eigenaar = models.ForeignKey(Login, blank=True, null=True, on_delete=models.SET_NULL) # bij verwijderen eigenaar, verliest eigenaar
     verwijderd = models.BooleanField(default=False)
     publiek = models.BooleanField(default=False)
 
