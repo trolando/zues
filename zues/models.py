@@ -11,6 +11,7 @@ from re import sub
 from solo.models import SingletonModel
 
 class Login(models.Model):
+    naam = models.CharField(max_length=250,)
     lidnummer = models.CharField(max_length=250,)
     secret = models.CharField(max_length=250,)
 

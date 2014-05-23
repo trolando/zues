@@ -61,6 +61,10 @@ def retrieve_lidnummers(email):
         return ()
 
 def get_lid(lidnummer):
+    res = retrieve_attributes(lidnummer)
+    if res == None: return None
+    email, naam = res
+
     lid = models.Login.objects.filter(lidnummer=lidnummer)
     if len(lid):
         # lid bestaat al
@@ -68,13 +72,9 @@ def get_lid(lidnummer):
     else:
         # lid bestaat nog njet
         code = base64.urlsafe_b64encode(os.urandom(32))
-        lid = models.Login(lidnummer=lidnummer, secret=code)
+        lid = models.Login(naam=naam, lidnummer=lidnummer, secret=code)
         lid.save()
 
-    res = retrieve_attributes(lidnummer)
-    if res == None: return None
-
-    email, naam = res
     return (lid, email, naam)
 
 def check_login(request):

@@ -1,5 +1,5 @@
 {% extends 'zues/base.html' %}
-{% block terugnaarbegin %}<p>Ingelogd als lid {{ lid.lidnummer }} (<a href="{% url 'zues:loguit' %}">uitloggen</a>)</p>{% endblock %}
+{% block terugnaarbegin %}<p>Ingelogd als {{ lid.naam }} (<a href="{% url 'zues:loguit' %}">uitloggen</a>)</p>{% endblock %}
 {% block content %}
 <h1>Overzicht</h1>
 
