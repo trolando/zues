@@ -18,9 +18,6 @@ class Login(models.Model):
     def __unicode__(self):
         return "Login {0} ({1})".format(self.lidnummer, self.naam)
 
-    def get_secret_url(self):
-        return reverse('zues:login', kwargs={'key': self.secret, 'lid': self.lidnummer})
-
 class Tijden(SingletonModel):
     pm_start = models.DateTimeField(null=True, blank=True)
     pm_stop = models.DateTimeField(null=True, blank=True)

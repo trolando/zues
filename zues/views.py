@@ -4,6 +4,7 @@ from django.contrib.auth import logout
 from django.contrib.sites.models import Site
 from django.core.context_processors import csrf
 from django.core.mail import EmailMessage
+from django.core.urlresolvers import reverse
 from django.core.urlresolvers import reverse_lazy
 from django.http import HttpResponseRedirect, Http404, HttpResponseForbidden
 from django.shortcuts import render_to_response
@@ -11,6 +12,7 @@ from django.views.generic import View, FormView, DetailView, UpdateView, DeleteV
 from zues import models
 from zues import forms
 import base64
+import hashlib
 import ldap
 import os
 
@@ -60,28 +62,30 @@ def retrieve_lidnummers(email):
     except ldap.LDAPError:
         return ()
 
-def get_lid(lidnummer):
+def generate_lid(lidnummer):
     lidnummer = int(lidnummer)
     res = retrieve_attributes(lidnummer)
     if res == None: return None
     email, naam = res
+        
+    code = hashlib.sha256(base64.urlsafe_b64encode(os.urandom(64))).hexdigest()
 
     lid = models.Login.objects.filter(lidnummer=lidnummer)
     if len(lid):
         # lid bestaat al
         lid = lid[0]
+        lid.secret = hashlib.sha256(code).hexdigest()
     else:
         # lid bestaat nog njet
-        code = base64.urlsafe_b64encode(os.urandom(32))
-        lid = models.Login(naam=naam, lidnummer=lidnummer, secret=code)
-        lid.save()
+        lid = models.Login(naam=naam, lidnummer=lidnummer, secret=hashlib.sha256(code).hexdigest()) 
 
-    return (lid, email, naam)
+    lid.save()
+    return (lid, email, naam, code)
 
 def check_login(request):
     if 'lid' not in request.session: return None
     if 'key' not in request.session: return None
-    leden = models.Login.objects.filter(lidnummer=int(request.session['lid'])).filter(secret=request.session['key'])
+    leden = models.Login.objects.filter(lidnummer=int(request.session['lid'])).filter(secret=hashlib.sha256(request.session['key']).hexdigest())
     if len(leden) == 0:
         try:
             del request.session['lid']
@@ -167,12 +171,14 @@ def view_home(request):
             lidnummer = form.cleaned_data['lidnummer']
 
             # opzoeken email
-            result = get_lid(int(lidnummer))
+            result = generate_lid(int(lidnummer))
             if result != None:
-                lid, to, naam = result
+                lid, to, naam, key = result
+
+                secret_url = reverse('zues:login', kwargs={'key': key, 'lid': lid.lidnummer})
 
                 if getattr(settings, 'SKIP_EMAIL', False):
-                    return HttpResponseRedirect(lid.get_secret_url())
+                    return HttpResponseRedirect(secret_url)
 
                 subject = '[JD] Toegang voorstelsysteem'
                 from_email = 'noreply@jongedemocraten.nl'
@@ -181,7 +187,7 @@ def view_home(request):
                 inhoud.append('Beste %s,' % naam)
                 inhoud.append('')
                 inhoud.append('Om het voorstelsysteem van de Jonge Democraten te gebruiken, gebruik de volgende persoonlijke geheime URL:')
-                inhoud.append(request.build_absolute_uri(lid.get_secret_url()))
+                inhoud.append(request.build_absolute_uri(secret_url))
                 inhoud.append('')
                 inhoud.append('Deze URL kun je ook gebruiken om jouw ingediende voorstellen in te zien, te wijzigen en terug te trekken. Deel deze URL dus niet met anderen!')
                 inhoud.append('')
@@ -220,12 +226,11 @@ def login_verzonden(request):
 
 def login(request, lid, key):
     # controleer login
-    hetlid = models.Login.objects.filter(lidnummer=lid)
+    hetlid = models.Login.objects.filter(lidnummer=lid).filter(secret=hashlib.sha256(key).hexdigest())
     if len(hetlid):
-        if hetlid[0].secret == key:
-            request.session['lid'] = lid
-            request.session['key'] = key
-            return HttpResponseRedirect('/')
+        request.session['lid'] = lid
+        request.session['key'] = key
+        return HttpResponseRedirect('/')
     raise Http404
 
 def loguit(request):
