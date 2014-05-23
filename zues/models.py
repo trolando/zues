@@ -16,7 +16,7 @@ class Login(models.Model):
     secret = models.CharField(max_length=250,)
 
     def __unicode__(self):
-        return "Login %s" % self.lidnummer
+        return "Login {0} ({1})".format(self.lidnummer, self.naam)
 
     def get_secret_url(self):
         return reverse('zues:login', kwargs={'key': self.secret, 'lid': self.lidnummer})
