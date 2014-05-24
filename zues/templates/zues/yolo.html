@@ -5,9 +5,12 @@
 
 {% if allcount %}
 
-<h3>Alle zichtbare voorstellen</h3>
+<h3>Alle publieke voorstellen</h3>
 
 <fieldset>
+<div class="row">
+<p>Deze voorstellen zijn door de beheerders publiek zichtbaar gemaakt.</p>
+</div>
 {% for m in allpm %}
 <div class="row">
 <div class="cell" style="min-width: 300px;"> <p><a href="{{ m.get_absolute_url }}">PM '{{m.titel}}'</a></p></div>
