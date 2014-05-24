@@ -15,6 +15,7 @@ import base64
 import hashlib
 import ldap
 import os
+import re
 
 def ldap_connect():
     l = ldap.initialize(settings.LDAP_NAME)
@@ -176,6 +177,8 @@ def view_home(request):
                 lid, to, naam, key = result
 
                 secret_url = reverse('zues:login', kwargs={'key': key, 'lid': lid.lidnummer})
+		secret_url = request.build_absolute_uri(secret_url)
+		secret_url = re.sub(r'^http://', r'https://', secret_url)
 
                 if getattr(settings, 'SKIP_EMAIL', False):
                     return HttpResponseRedirect(secret_url)
@@ -187,7 +190,7 @@ def view_home(request):
                 inhoud.append('Beste %s,' % naam)
                 inhoud.append('')
                 inhoud.append('Om het voorstelsysteem van de Jonge Democraten te gebruiken, gebruik de volgende persoonlijke geheime URL:')
-                inhoud.append(request.build_absolute_uri(secret_url))
+                inhoud.append(secret_url)
                 inhoud.append('')
                 inhoud.append('Deze URL kun je ook gebruiken om jouw ingediende voorstellen in te zien, te wijzigen en terug te trekken. Deel deze URL dus niet met anderen!')
                 inhoud.append('')
