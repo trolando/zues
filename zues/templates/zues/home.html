@@ -7,6 +7,9 @@
 <form action="" method="post">{% csrf_token %}
 <fieldset>
 <div><p>Vul hieronder je lidnummer van de Jonge Democraten in. Je krijgt vervolgens een e-mail op het bij ons bekende e-mailadres.</p></div>
+<div style="margin-bottom: 20px">
+<button class="button" type="button" style="width:260px" onClick='window.location="{% url 'zues:lidnummer' %}"; event.stopPropagation();'>Help, wat is mijn lidnummer?</button>
+</div>
 {{ form.non_field_errors }}
 {% for f in form.visible_fields %}
 <div class="row">
@@ -23,7 +26,6 @@
 {% endfor %}
 <div style="margin-top: 4px">
 <button class="button" type="submit">Aanvragen</button>
-<button class="button" type="button" style="width:260px" onClick='window.location="{% url 'zues:lidnummer' %}"; event.stopPropagation();'>Help, wat is mijn lidnummer?</button>
 </div>
 </fieldset>
 </form>
