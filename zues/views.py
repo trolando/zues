@@ -12,61 +12,16 @@ from django.shortcuts import render_to_response
 from django.views.generic import View, FormView, DetailView, UpdateView, DeleteView, CreateView
 from zues import models
 from zues import forms
+from zues import jdldap
 import base64
 import hashlib
 import ldap
 import os
 import re
 
-def ldap_connect():
-    l = ldap.initialize(settings.LDAP_NAME)
-    try:
-        l.simple_bind_s(settings.LDAP_DN, settings.LDAP_PASS)
-    except ldap.LDAPError, e:
-        print e
-    return l
-
-def retrieve_attributes(lidnummer):
-    if getattr(settings, 'SKIP_LDAP', False):
-        return '','Lid %d' % lidnummer
-
-    l = ldap_connect()
-    baseDN = "cn="+str(int(lidnummer))+",ou=users,dc=jd,dc=nl"
-    try:
-        ldap_result_id = l.search(baseDN, ldap.SCOPE_BASE)
-        result_type, result_data = l.result(ldap_result_id, 1)
-        if (result_data == []):
-            return None
-        else:
-            if result_type == ldap.RES_SEARCH_RESULT:
-                userDN, userAttrs = result_data[0]
-                return userAttrs["mail"][0], userAttrs["sn"][0]
-    except ldap.NO_SUCH_OBJECT:
-        return None
-    except ldap.LDAPError:
-        return None
-
-def retrieve_lidnummers(email):
-    l = ldap_connect()
-    baseDN = "ou=users,dc=jd,dc=nl"
-    searchFilter = "(mail="+str(email)+")"
-
-    try:
-        ldap_result_id = l.search(baseDN, ldap.SCOPE_SUBTREE, searchFilter, None)
-        while True:
-            result_type, result_data = l.result(ldap_result_id, 1)
-            if (result_data == []): return ()
-            elif result_type == ldap.RES_SEARCH_RESULT:
-                result = []
-                for userDN, userAttrs in result_data:
-                    result.append((userAttrs['cn'][0], userAttrs['sn'][0]))
-                return tuple(result)
-    except ldap.LDAPError:
-        return ()
-
 def generate_lid(lidnummer):
     lidnummer = int(lidnummer)
-    res = retrieve_attributes(lidnummer)
+    res = jdldap.attributes(lidnummer)
     if res == None: return None
     email, naam = res
         
@@ -108,7 +63,7 @@ def view_lidnummer(request):
             if getattr(settings, 'SKIP_EMAIL', False):
                 return HttpResponseRedirect('/lidnummerverzonden/')
 
-            for lidnummer, naam in retrieve_lidnummers(email):
+            for lidnummer, naam in jdldap.lidnummers(email):
                 subject = '[JD] Lidnummer'
                 from_email = 'noreply@jongedemocraten.nl'
 
