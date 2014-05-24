@@ -3,6 +3,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import logout
 from django.contrib.sites.models import Site
 from django.core.context_processors import csrf
+from django.core.exceptions import PermissionDenied
 from django.core.mail import EmailMessage
 from django.core.urlresolvers import reverse
 from django.core.urlresolvers import reverse_lazy
@@ -234,7 +235,7 @@ def login(request, lid, key):
         request.session['lid'] = lid
         request.session['key'] = key
         return HttpResponseRedirect('/')
-    raise Http404
+    return render_to_response("zues/loginfout.html")
 
 def loguit(request):
     try:
@@ -264,14 +265,20 @@ class LoginMixin(object):
 
     def dispatch(self, request, *args, **kwargs):
         self.lid = check_login(request)
-        if self.lid == None: raise Http404
+        if self.lid == None: return HttpResponseForbidden()
         return super(LoginMixin, self).dispatch(request, *args, **kwargs)
 
 class EigenaarMixin(object):
     def get_object(self, **kwargs):
         obj = super(EigenaarMixin, self).get_object(**kwargs)
-        if obj.eigenaar != self.lid: raise Http404
+        if obj.eigenaar != self.lid: raise PermissionDenied()
         return obj
+
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            return super(EigenaarMixin, self).dispatch(request, *args, **kwargs)
+        except PermissionDenied:
+            return HttpResponseForbidden()
 
 class MagPMMixin(object):
     def dispatch(self, request, *args, **kwargs):
