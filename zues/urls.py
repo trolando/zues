@@ -39,6 +39,7 @@ urlpatterns = patterns('moties.views',
     url(r'^hr/verwijder/(?P<pk>\d+)/$', views.VerwijderHR.as_view(), name='verwijderhr'),
 
     url(r'^export/$', views.view_export, name='export'),
+    url(r'^export/Voorstellen.txt$', views.view_export_txt, name='export_txt'),
     url(r'^lidnummer/$', views.view_lidnummer, name='lidnummer'),
     url(r'^lidnummerverzonden/$', views.lidnummer_verzonden),
 )

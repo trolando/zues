@@ -149,6 +149,50 @@ class Motie(Stuk):
 
         return "<p>De ALV der Jonge Democraten,</p>" + con + over + uit + orde + toe
 
+    def as_csv(self, typje):
+        # Raar bestandsformaatje voor de congresapp
+        res = []
+        res.append('"' + typje + '"') # id
+        res.append('\t')
+        res.append('"' + escape(self.titel) + '"')
+        res.append('\t')
+        res.append('""') # lege betreft
+        res.append('\t')
+        res.append('"' + typje + '"') # groep
+        res.append('\t')
+        res.append('"' + escape(self.woordvoerder) + '"')
+        res.append('\t')
+        res.append('"' + escape(self.to_commas(self.indieners)) + '"')
+        res.append('\t')
+        res.append('"Constaterende dat"')
+        res.append('\t')
+        con = self.to_list(escape(self.constateringen))
+        if con:
+            if len(con)>1: res.append('"' + "\r\n".join(['* '+c for c in con]) + '"')
+            else: res.append('"' + con[0] + '"')
+        else: res.append('""')
+        res.append('\t')
+        res.append('"Overwegende dat"')
+        res.append('\t')
+        over = self.to_list(escape(self.overwegingen))
+        if over:
+            if len(over)>1: res.append('"'+ "\r\n".join(['* '+o for o in over]) + '"')
+            else: res.append('"' + over[0] + '"')
+        else: res.append('""')
+        res.append('\t')
+        res.append('"Spreekt uit dat"')
+        res.append('\t')
+        uit = self.to_list(escape(self.uitspraken))
+        if uit:
+            if len(uit)>1: res.append('"'+ "\r\n".join(['* '+u for u in uit]) + '"')
+            else: res.append('"' + uit[0] + '"')
+        else: res.append('""')
+        res.append('\t')
+        res.append('"' + escape(self.toelichting) + '"')
+        res.append('\t')
+        res.append('"Excel"')
+        return mark_safe("".join(res))
+
     def as_html(self):
         html = []
         html.append("<div class='pm'>")
@@ -237,6 +281,9 @@ class Organimo(Motie):
     def get_absolute_url(self):
         return reverse('zues:org', kwargs={'key': self.secret, 'pk': self.pk})
 
+    def as_csv(self):
+        return super(Organimo, self).as_csv('ORG')
+
     def as_html_table(self):
         return super(Organimo, self).as_html_table('ORG')
 
@@ -251,6 +298,9 @@ class PolitiekeMotie(Motie):
     def get_absolute_url(self):
         return reverse('zues:pm', kwargs={'key': self.secret, 'pk': self.pk})
 
+    def as_csv(self):
+        return super(PolitiekeMotie, self).as_csv('PM')
+
     def as_html_table(self):
         return super(PolitiekeMotie, self).as_html_table('PM')
 
@@ -264,6 +314,9 @@ class ActuelePolitiekeMotie(Motie):
 
     def get_absolute_url(self):
         return reverse('zues:apm', kwargs={'key': self.secret, 'pk': self.pk})
+
+    def as_csv(self):
+        return super(ActuelePolitiekeMotie, self).as_csv('APM')
 
     def as_html_table(self):
         return super(ActuelePolitiekeMotie, self).as_html_table('APM')
@@ -281,6 +334,11 @@ class Modificatie(Stuk):
 
     class Meta:
         abstract = True
+
+    def to_commas(self, str):
+        if str == None: return None
+        str = ", ".join([s.strip() for s in str.strip().split("\n")])
+        return str
 
     def to_p(self, str):
         if str == None: return ""
@@ -302,6 +360,39 @@ class Modificatie(Stuk):
 
         return "Geen inhoud?!"
 
+    def as_csv(self, typje):
+        # Raar bestandsformaatje voor de congresapp
+        res = []
+        res.append('"'+typje+'"')
+        res.append('\t')
+        res.append('"' + escape(self.titel) + '"')
+        res.append('\t')
+        res.append('"' + escape(self.betreft) + '"')
+        res.append('\t')
+        res.append('"'+typje+'"') # groep
+        res.append('\t')
+        res.append('"' + escape(self.woordvoerder) + '"')
+        res.append('\t')
+        res.append('"' + escape(self.to_commas(self.indieners)) + '"')
+        res.append('\t')
+        if self.type == self.SCHRAPPEN or self.type == self.WIJZIGEN: res.append('"Schrap"')
+        elif self.type == self.TOEVOEGEN: res.append('"Voeg toe"')
+        else: res.append('""')
+        res.append('\t')
+        res.append('"' + escape(self.tekst1) + '"')
+        res.append('\t')
+        if self.type == self.WIJZIGEN: res.append('"Vervang door"')
+        else: res.append('""')
+        res.append('\t')
+        res.append('"' + escape(self.tekst2) + '"')
+        res.append('\t')
+        res.append('\t')
+        res.append('\t')
+        res.append('"' + escape(self.toelichting) + '"')
+        res.append('\t')
+        res.append('"Excel"')
+        return mark_safe("".join(res))
+
     def as_html(self):
         html = []
         html.append("<div class='pm'>")
@@ -312,7 +403,7 @@ class Modificatie(Stuk):
         html.append("</div>")
         html.append("<div class='row'>")
         html.append("<div class='cell'><label>Indieners:</label></div>")
-        html.append("<div class='cell'><p>%s</p></div>" % escape(self.indieners))
+        html.append("<div class='cell'><p>%s</p></div>" % escape(self.to_commas(self.indieners)))
         html.append("</div>")
         html.append("<div class='row'>")
         html.append("<div class='cell'><label>Woordvoerder:</label></div>")
@@ -339,7 +430,7 @@ class Modificatie(Stuk):
         html.append("</tr>")
         html.append("<tr class='exporthead'>")
         html.append("<td><p><strong>Indieners:</strong></p></td>")
-        html.append("<td><p>%s</p></td>" % escape(self.indieners))
+        html.append("<td><p>%s</p></td>" % escape(self.to_commas(self.indieners)))
         html.append("</tr>")
         html.append("<tr class='exporthead'>")
         html.append("<td><p><strong>Woordvoerder:</strong></p></td>")
@@ -391,6 +482,9 @@ class Resolutie(Modificatie):
     def get_absolute_url(self):
         return reverse('zues:res', kwargs={'key': self.secret, 'pk': self.pk})
 
+    def as_csv(self):
+        return super(Resolutie, self).as_csv('RES')
+
     def as_html_table(self):
         return super(Resolutie, self).as_html_table('RES')
 
@@ -404,6 +498,9 @@ class Amendement(Modificatie):
     def get_absolute_url(self):
         return reverse('zues:am', kwargs={'key': self.secret, 'pk': self.pk})
 
+    def as_csv(self):
+        return super(Amendement, self).as_csv('AM')
+
     def as_html_table(self):
         return super(Amendement, self).as_html_table('AM')
 
@@ -416,6 +513,9 @@ class HRWijziging(Modificatie):
 
     def get_absolute_url(self):
         return reverse('zues:hr', kwargs={'key': self.secret, 'pk': self.pk})
+
+    def as_csv(self):
+        return super(HRWijziging, self).as_csv('HR')
 
     def as_html_table(self):
         return super(HRWijziging, self).as_html_table('HR')

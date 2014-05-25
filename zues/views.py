@@ -7,8 +7,9 @@ from django.core.exceptions import PermissionDenied
 from django.core.mail import EmailMessage
 from django.core.urlresolvers import reverse
 from django.core.urlresolvers import reverse_lazy
-from django.http import HttpResponseRedirect, Http404, HttpResponseForbidden
+from django.http import HttpResponseRedirect, Http404, HttpResponseForbidden, HttpResponse
 from django.shortcuts import render_to_response
+from django.template.loader import render_to_string
 from django.views.generic import View, FormView, DetailView, UpdateView, DeleteView, CreateView
 from zues import models
 from zues import forms
@@ -182,6 +183,18 @@ def view_export(request):
     context['am'] = models.Amendement.objects.filter(verwijderd=False)
     context['hr'] = models.HRWijziging.objects.filter(verwijderd=False)
     return render_to_response("zues/export.html", context)
+
+@staff_member_required
+def view_export_txt(request):
+    context = {}
+    context['pm'] = models.PolitiekeMotie.objects.filter(verwijderd=False)
+    context['apm'] = models.ActuelePolitiekeMotie.objects.filter(verwijderd=False)
+    context['org'] = models.Organimo.objects.filter(verwijderd=False)
+    context['res'] = models.Resolutie.objects.filter(verwijderd=False)
+    context['am'] = models.Amendement.objects.filter(verwijderd=False)
+    context['hr'] = models.HRWijziging.objects.filter(verwijderd=False)
+    s = render_to_string("zues/export_txt.html", context)
+    return HttpResponse(s.encode("utf-8-sig"), mimetype='text/csv')
 
 def login_verzonden(request):
     return render_to_response("zues/loginverzonden.html")
