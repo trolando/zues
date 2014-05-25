@@ -20,7 +20,7 @@ def attributes(lidnummer):
     try:
         with _connection() as l:
             baseDN = "cn="+str(int(lidnummer))+",ou=users,dc=jd,dc=nl"
-            result_data = l.search_st(baseDN, ldap.SCOPE_BASE, attrlist=['sn','mail'], timeout=1)
+            result_data = l.search_st(baseDN, ldap.SCOPE_BASE, timeout=1)
             if len(result_data) == 1:
                 dn, attrs = result_data[0]
                 return attrs['mail'][0], attrs['sn'][0]
@@ -43,7 +43,7 @@ def lidnummers(email):
         with _connection() as l:
             baseDN = "ou=users,dc=jd,dc=nl"
             searchFilter = filter_format('(mail=%s)', (str(email),))
-            for dn, attrs in l.search_st(baseDN, ldap.SCOPE_ONELEVEL, searchFilter, ['cn','sn'], timeout=3):
+            for dn, attrs in l.search_st(baseDN, ldap.SCOPE_ONELEVEL, searchFilter, timeout=3):
                 yield int(attrs['cn'][0]), attrs['sn'][0]
     except ldap.INVALID_CREDENTIALS:
         pass
