@@ -2,15 +2,12 @@ from contextlib import contextmanager
 from django.conf import settings
 import ldap
 from ldap.filter import filter_format
+from zues.ldappool import LDAPPool
 
 @contextmanager
 def _connection():
-    l = ldap.initialize(settings.LDAP_NAME)
-    l.simple_bind_s(settings.LDAP_DN, settings.LDAP_PASS)
-    try:
-        yield l
-    finally:
-        l.unbind_s()
+    with LDAPPool().connection(settings.LDAP_NAME, settings.LDAP_DN, settings.LDAP_PASS) as conn:
+        yield conn
 
 def attributes(lidnummer):
     """Vraag emailadres en naam van lid met lidnummer op.
