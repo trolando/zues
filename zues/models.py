@@ -9,6 +9,7 @@ from django.utils.html import escape
 from django.core.urlresolvers import reverse
 from re import sub
 from solo.models import SingletonModel
+import json
 
 class Login(models.Model):
     naam = models.CharField(max_length=250,)
@@ -193,6 +194,37 @@ class Motie(Stuk):
         res.append('"Excel"')
         return mark_safe("".join(res))
 
+    def as_json(self, typje):
+        # JSON-formaat voor de nieuwe HTML5-congresapp 
+        res = {}
+        res['id'] = typje
+        res['titel'] = self.titel
+        res['groep'] = typje
+        res['woordvoerder'] = self.woordvoerder
+        res['indieners'] = self.to_commas(self.indieners)
+        res['actie1'] = "Constaterende dat"
+        con = self.to_list(escape(self.constateringen))
+        if con:
+            if len(con)>1: 
+                res['tekst1'] = "\r\n".join(['* '+c for c in con])
+            else: 
+                res['tekst1'] = con[0]
+        res['actie2'] = "Overwegende dat"
+        over = self.to_list(escape(self.overwegingen))
+        if over:
+            if len(over)>1: 
+                res['tekst2'] = "\r\n".join(['* '+o for o in over])
+            else: res['tekst2'] = over[0]
+        res['actie3'] = "Spreekt uit dat"
+        uit = self.to_list(escape(self.uitspraken))
+        if uit:
+            if len(uit)>1: 
+                res['tekst3'] = "\r\n".join(['* '+u for u in uit])
+            else: 
+                res['tekst3'] = uit[0]
+        res['toelichting'] = self.toelichting
+        return json.dumps(res)
+
     def as_html(self):
         html = []
         html.append("<div class='pm'>")
@@ -284,6 +316,9 @@ class Organimo(Motie):
     def as_csv(self):
         return super(Organimo, self).as_csv('ORG')
 
+    def as_json(self):
+        return super(Organimo, self).as_json('ORG')
+
     def as_html_table(self):
         return super(Organimo, self).as_html_table('ORG')
 
@@ -301,6 +336,9 @@ class PolitiekeMotie(Motie):
     def as_csv(self):
         return super(PolitiekeMotie, self).as_csv('PM')
 
+    def as_json(self):
+        return super(PolitiekeMotie, self).as_json('PM')
+
     def as_html_table(self):
         return super(PolitiekeMotie, self).as_html_table('PM')
 
@@ -317,6 +355,9 @@ class ActuelePolitiekeMotie(Motie):
 
     def as_csv(self):
         return super(ActuelePolitiekeMotie, self).as_csv('APM')
+
+    def as_json(self):
+        return super(ActuelePolitiekeMotie, self).as_json('APM')
 
     def as_html_table(self):
         return super(ActuelePolitiekeMotie, self).as_html_table('APM')
@@ -392,6 +433,26 @@ class Modificatie(Stuk):
         res.append('\t')
         res.append('"Excel"')
         return mark_safe("".join(res))
+
+    def as_json(self, typje):
+        # JSON-formaat voor de nieuwe HTML5-congresapp 
+        res = {}
+        res['id'] = typje
+        res['titel'] = self.titel
+        res['betreft'] = self.betreft
+        res['groep'] = typje
+        res['woordvoerder'] = self.woordvoerder
+        res['indieners'] = self.to_commas(self.indieners)
+        if self.type == self.SCHRAPPEN or self.type == self.WIJZIGEN:
+            res['actie1'] = "Schrap"
+        elif self.type == self.TOEVOEGEN:
+            res['actie1'] = "Voeg toe"
+        res['tekst1'] = self.tekst1
+        if self.type == self.WIJZIGEN:
+            res['actie2'] = "Vervang door"
+        res['tekst2'] = self.tekst2
+        res['toelichting'] = self.toelichting
+        return json.dumps(res)
 
     def as_html(self):
         html = []
@@ -485,6 +546,9 @@ class Resolutie(Modificatie):
     def as_csv(self):
         return super(Resolutie, self).as_csv('RES')
 
+    def as_json(self):
+        return super(Resolutie, self).as_json('RES')
+
     def as_html_table(self):
         return super(Resolutie, self).as_html_table('RES')
 
@@ -501,6 +565,9 @@ class Amendement(Modificatie):
     def as_csv(self):
         return super(Amendement, self).as_csv('AM')
 
+    def as_json(self):
+        return super(Amendement, self).as_json('AM')
+
     def as_html_table(self):
         return super(Amendement, self).as_html_table('AM')
 
@@ -516,6 +583,9 @@ class HRWijziging(Modificatie):
 
     def as_csv(self):
         return super(HRWijziging, self).as_csv('HR')
+
+    def as_json(self):
+        return super(HRWijziging, self).as_json('HR')
 
     def as_html_table(self):
         return super(HRWijziging, self).as_html_table('HR')

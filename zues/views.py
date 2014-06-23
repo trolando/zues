@@ -196,6 +196,18 @@ def view_export_txt(request):
     s = render_to_string("zues/export_txt.html", context)
     return HttpResponse(s.encode("utf-8-sig"), mimetype='text/csv')
 
+@staff_member_required
+def view_export_json(request):
+    context = {}
+    context['pm'] = models.PolitiekeMotie.objects.filter(verwijderd=False)
+    context['apm'] = models.ActuelePolitiekeMotie.objects.filter(verwijderd=False)
+    context['org'] = models.Organimo.objects.filter(verwijderd=False)
+    context['res'] = models.Resolutie.objects.filter(verwijderd=False)
+    context['am'] = models.Amendement.objects.filter(verwijderd=False)
+    context['hr'] = models.HRWijziging.objects.filter(verwijderd=False)
+    s = render_to_string("zues/export_json.html", context)
+    return HttpResponse(s.encode("utf-8-sig"), mimetype='application/json')
+
 def login_verzonden(request):
     return render_to_response("zues/loginverzonden.html")
 
