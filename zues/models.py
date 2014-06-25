@@ -206,24 +206,24 @@ class Motie(Stuk):
         con = self.to_list(escape(self.constateringen))
         if con:
             if len(con)>1: 
-                res['tekst1'] = "\r\n".join(['* '+c for c in con])
+                res['tekst1'] = con
             else: 
                 res['tekst1'] = con[0]
         res['actie2'] = "Overwegende dat"
         over = self.to_list(escape(self.overwegingen))
         if over:
             if len(over)>1: 
-                res['tekst2'] = "\r\n".join(['* '+o for o in over])
+                res['tekst2'] = over
             else: res['tekst2'] = over[0]
         res['actie3'] = "Spreekt uit dat"
         uit = self.to_list(escape(self.uitspraken))
         if uit:
             if len(uit)>1: 
-                res['tekst3'] = "\r\n".join(['* '+u for u in uit])
+                res['tekst3'] = uit
             else: 
                 res['tekst3'] = uit[0]
         res['toelichting'] = self.toelichting
-        return json.dumps(res)
+        return mark_safe(json.dumps(res))
 
     def as_html(self):
         html = []
@@ -452,7 +452,7 @@ class Modificatie(Stuk):
             res['actie2'] = "Vervang door"
         res['tekst2'] = self.tekst2
         res['toelichting'] = self.toelichting
-        return json.dumps(res)
+        return mark_safe(json.dumps(res))
 
     def as_html(self):
         html = []
