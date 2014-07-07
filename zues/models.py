@@ -17,7 +17,7 @@ class Login(models.Model):
     secret = models.CharField(max_length=250,)
 
     def __unicode__(self):
-        return "Login {0} ({1})".format(self.lidnummer, self.naam)
+        return unicode("Login {0} ({1})".format(self.lidnummer, self.naam))
 
 class Tijden(SingletonModel):
     pm_start = models.DateTimeField(null=True, blank=True)
@@ -194,8 +194,8 @@ class Motie(Stuk):
         res.append('"Excel"')
         return mark_safe("".join(res))
 
-    def as_json(self, typje):
-        # JSON-formaat voor de nieuwe HTML5-congresapp 
+    def as_dict(self, typje):
+        # Dict-output, kan hergebruikt worden om JSON te genereren
         res = {}
         res['id'] = typje
         res['titel'] = self.titel
@@ -223,7 +223,7 @@ class Motie(Stuk):
             else: 
                 res['tekst3'] = uit[0]
         res['toelichting'] = self.toelichting
-        return mark_safe(json.dumps(res))
+        return res
 
     def as_html(self):
         html = []
@@ -316,8 +316,8 @@ class Organimo(Motie):
     def as_csv(self):
         return super(Organimo, self).as_csv('ORG')
 
-    def as_json(self):
-        return super(Organimo, self).as_json('ORG')
+    def as_dict(self):
+        return super(Organimo, self).as_dict('ORG')
 
     def as_html_table(self):
         return super(Organimo, self).as_html_table('ORG')
@@ -336,8 +336,8 @@ class PolitiekeMotie(Motie):
     def as_csv(self):
         return super(PolitiekeMotie, self).as_csv('PM')
 
-    def as_json(self):
-        return super(PolitiekeMotie, self).as_json('PM')
+    def as_dict(self):
+        return super(PolitiekeMotie, self).as_dict('PM')
 
     def as_html_table(self):
         return super(PolitiekeMotie, self).as_html_table('PM')
@@ -356,8 +356,8 @@ class ActuelePolitiekeMotie(Motie):
     def as_csv(self):
         return super(ActuelePolitiekeMotie, self).as_csv('APM')
 
-    def as_json(self):
-        return super(ActuelePolitiekeMotie, self).as_json('APM')
+    def as_dict(self):
+        return super(ActuelePolitiekeMotie, self).as_dict('APM')
 
     def as_html_table(self):
         return super(ActuelePolitiekeMotie, self).as_html_table('APM')
@@ -434,8 +434,8 @@ class Modificatie(Stuk):
         res.append('"Excel"')
         return mark_safe("".join(res))
 
-    def as_json(self, typje):
-        # JSON-formaat voor de nieuwe HTML5-congresapp 
+    def as_dict(self, typje):
+        # Dict-output, kan hergebruikt worden om JSON te genereren
         res = {}
         res['id'] = typje
         res['titel'] = self.titel
@@ -452,7 +452,7 @@ class Modificatie(Stuk):
             res['actie2'] = "Vervang door"
         res['tekst2'] = self.tekst2
         res['toelichting'] = self.toelichting
-        return mark_safe(json.dumps(res))
+        return res
 
     def as_html(self):
         html = []
@@ -546,8 +546,8 @@ class Resolutie(Modificatie):
     def as_csv(self):
         return super(Resolutie, self).as_csv('RES')
 
-    def as_json(self):
-        return super(Resolutie, self).as_json('RES')
+    def as_dict(self):
+        return super(Resolutie, self).as_dict('RES')
 
     def as_html_table(self):
         return super(Resolutie, self).as_html_table('RES')
@@ -565,8 +565,8 @@ class Amendement(Modificatie):
     def as_csv(self):
         return super(Amendement, self).as_csv('AM')
 
-    def as_json(self):
-        return super(Amendement, self).as_json('AM')
+    def as_dict(self):
+        return super(Amendement, self).as_dict('AM')
 
     def as_html_table(self):
         return super(Amendement, self).as_html_table('AM')
@@ -584,8 +584,8 @@ class HRWijziging(Modificatie):
     def as_csv(self):
         return super(HRWijziging, self).as_csv('HR')
 
-    def as_json(self):
-        return super(HRWijziging, self).as_json('HR')
+    def as_dict(self):
+        return super(HRWijziging, self).as_dict('HR')
 
     def as_html_table(self):
         return super(HRWijziging, self).as_html_table('HR')
