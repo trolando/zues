@@ -16,8 +16,8 @@ class Activiteit(models.Model):
     def __unicode__(self):
         return self.naam
     naam = models.CharField(max_length=200)
-    begintijd = models.TimeField()
-    eindtijd = models.TimeField()
+    begintijd = models.DateTimeField()
+    eindtijd = models.DateTimeField()
     dag = models.ForeignKey(Dag)
     locatie = models.ForeignKey(Locatie)
 

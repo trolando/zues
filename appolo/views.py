@@ -19,14 +19,14 @@ def agenda():
     allActiviteiten = []
     for dag in agendaList:
         dagEntry = {
-            'datum': dag.__dict__['datum'].strftime('%d %b %Y'), 
+            'datum': dag.__dict__['datum'].isoformat(), 
             'items': []
         }
         activiteitenList = dag.activiteit_set.all()
         for activiteit in activiteitenList:
             activiteitEntry = {
-                'tijd': unicode(activiteit.__dict__['begintijd']),
-                'eindtijd': unicode(activiteit.__dict__['eindtijd']),
+                'tijd': activiteit.__dict__['begintijd'].isoformat(),
+                'eindtijd': activiteit.__dict__['eindtijd'].isoformat(),
                 'titel': activiteit.__dict__['naam'],
                 'locatie': activiteit.locatie.__dict__['naam'] 
             }
