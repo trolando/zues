@@ -202,26 +202,26 @@ class Motie(Stuk):
         res['groep'] = typje
         res['woordvoerder'] = self.woordvoerder
         res['indieners'] = self.to_commas(self.indieners)
-        res['actie1'] = "Constaterende dat"
+        inhoud = []
         con = self.to_list(escape(self.constateringen))
         if con:
             if len(con)>1: 
-                res['tekst1'] = con
+                inhoud.append("Constaterende dat", con)
             else: 
-                res['tekst1'] = con[0]
-        res['actie2'] = "Overwegende dat"
+                inhoud.append("Constaterende dat", con[0])
         over = self.to_list(escape(self.overwegingen))
         if over:
             if len(over)>1: 
-                res['tekst2'] = over
+                inhoud.append("Overwegende dat", over)
             else: res['tekst2'] = over[0]
-        res['actie3'] = "Spreekt uit dat"
+                inhoud.append("Overwegende dat", over[0])
         uit = self.to_list(escape(self.uitspraken))
         if uit:
             if len(uit)>1: 
-                res['tekst3'] = uit
+                inhoud.append("Spreekt uit dat", uit)
             else: 
-                res['tekst3'] = uit[0]
+                inhoud.append("Spreekt uit dat", uit[0])
+        res['inhoud'] = inhoud
         res['toelichting'] = self.toelichting
         return res
 
@@ -443,14 +443,14 @@ class Modificatie(Stuk):
         res['groep'] = typje
         res['woordvoerder'] = self.woordvoerder
         res['indieners'] = self.to_commas(self.indieners)
+        inhoud = []
         if self.type == self.SCHRAPPEN or self.type == self.WIJZIGEN:
-            res['actie1'] = "Schrap"
+            inhoud.append(["Schrap", self.tekst1])
         elif self.type == self.TOEVOEGEN:
-            res['actie1'] = "Voeg toe"
-        res['tekst1'] = self.tekst1
+            inhoud.append(["Voeg toe", self.tekst1])
         if self.type == self.WIJZIGEN:
-            res['actie2'] = "Vervang door"
-        res['tekst2'] = self.tekst2
+            inhoud.append(["Vervang door", self.tekst2])
+        res['inhoud'] = inhoud
         res['toelichting'] = self.toelichting
         return res
 
