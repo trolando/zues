@@ -100,3 +100,4 @@ EMAIL_PORT = 587
 # LDAP_PASS = "..."
 
 MEDEDELING = "Komende congres: <b>niet ingevuld!</b>"
+NAAMKORT = "Congres ..."

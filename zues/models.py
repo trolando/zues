@@ -96,6 +96,7 @@ class Stuk(models.Model):
     eigenaar = models.ForeignKey(Login, blank=True, null=True, on_delete=models.SET_NULL) # bij verwijderen eigenaar, verliest eigenaar
     verwijderd = models.BooleanField(default=False)
     publiek = models.BooleanField(default=False)
+    boeknummer = models.CharField(max_length=250, blank=True,)
 
     class Meta:
         abstract = True
