@@ -214,7 +214,7 @@ class Motie(Stuk):
         if over:
             if len(over)>1: 
                 inhoud.append("Overwegende dat", over)
-            else: res['tekst2'] = over[0]
+            else: 
                 inhoud.append("Overwegende dat", over[0])
         uit = self.to_list(escape(self.uitspraken))
         if uit:
