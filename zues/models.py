@@ -251,7 +251,7 @@ class Motie(Stuk):
 
     def as_html_table(self, ik):
         html = []
-        html.append("<table border='1' class='export pk-{}-{}'>".format(ik, self.pk))
+        html.append("<table border='1' class='export pk-{0}-{1}'>".format(ik, self.pk))
         html.append("<tr class='exporttitle'>")
         html.append("<td><p>%s</p></td>" % escape(self.boeknummer))
         html.append("<td><p>%s</p></td>" % escape(self.titel))
@@ -483,7 +483,7 @@ class Modificatie(Stuk):
 
     def as_html_table(self, ik):
         html = []
-        html.append("<table border='1' class='export pk-{}-{}'>".format(ik, self.pk))
+        html.append("<table border='1' class='export pk-{0}-{1}'>".format(ik, self.pk))
         html.append("<tr class='exporttitle'>")
         html.append("<td><p>%s</p></td>" % escape(self.boeknummer))
         html.append("<td><p>%s</p></td>" % escape(self.titel))
