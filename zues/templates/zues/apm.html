@@ -2,14 +2,14 @@
 {% block content %}
 <h1>Actueel Politieke Motie</h1>
 
-{{ motie.as_html_table }}
+{{ voorstel.as_html_table }}
 
 {% if lid %}
 {% if mag %}
-<p><a href="{% url 'zues:wijzigapm' pk=motie.pk %}">Wijzigen</a></p>
-<p><a href="{% url 'zues:verwijderapm' pk=motie.pk %}">Verwijderen</a></p>
+<button class='jdbutton' onclick="location.href='{% url 'zues:wijzigapm' pk=voorstel.pk %}';">Wijzigen</button>
+<button class='jdbutton' onclick="location.href='{% url 'zues:verwijderapm' pk=voorstel.pk %}';">Intrekken</button>
 {% endif %}
-<p>Deze Actueel Politieke Motie is voor iedereen te zien via <a href="{{ motie.get_absolute_url }}">deze link</a>.</p>
+<p>Deze Actueel Politieke Motie is voor iedereen te zien via <a href="{{ voorstel.get_absolute_url }}">deze link</a>.</p>
 {% endif %}
 
 {% endblock %} 

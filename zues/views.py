@@ -348,7 +348,7 @@ class MagHRMixin(object):
 
 class PMView(LidMixin, DetailView):
     template_name = 'zues/pm.html'
-    context_object_name = "motie"
+    context_object_name = "voorstel"
     model = models.PolitiekeMotie
     queryset = models.PolitiekeMotie.objects.filter(verwijderd=False)
 
@@ -360,7 +360,7 @@ class PMView(LidMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(PMView, self).get_context_data(**kwargs)
-        context['mag'] = models.Tijden.get_solo().mag_pm() and self.lid == context['motie'].eigenaar
+        context['mag'] = models.Tijden.get_solo().mag_pm() and self.lid == context['voorstel'].eigenaar
         return context
 
 class NieuwePM(LoginMixin, MagPMMixin, CreateView):
@@ -403,7 +403,7 @@ class VerwijderPM(LoginMixin, EigenaarMixin, MagPMMixin, DeleteView):
 
 class APMView(LidMixin, DetailView):
     template_name = 'zues/apm.html'
-    context_object_name = "motie"
+    context_object_name = "voorstel"
     model = models.ActuelePolitiekeMotie
     queryset = models.ActuelePolitiekeMotie.objects.filter(verwijderd=False)
 
@@ -415,7 +415,7 @@ class APMView(LidMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(APMView, self).get_context_data(**kwargs)
-        context['mag'] = models.Tijden.get_solo().mag_apm() and self.lid == context['motie'].eigenaar
+        context['mag'] = models.Tijden.get_solo().mag_apm() and self.lid == context['voorstel'].eigenaar
         return context
 
 class NieuweAPM(LoginMixin, MagAPMMixin, CreateView):
@@ -458,7 +458,7 @@ class VerwijderAPM(LoginMixin, EigenaarMixin, MagAPMMixin, DeleteView):
 
 class ORGView(LidMixin, DetailView):
     template_name = 'zues/org.html'
-    context_object_name = "motie"
+    context_object_name = "voorstel"
     model = models.Organimo
     queryset = models.Organimo.objects.filter(verwijderd=False)
 
@@ -470,7 +470,7 @@ class ORGView(LidMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(ORGView, self).get_context_data(**kwargs)
-        context['mag'] = models.Tijden.get_solo().mag_org() and self.lid == context['motie'].eigenaar
+        context['mag'] = models.Tijden.get_solo().mag_org() and self.lid == context['voorstel'].eigenaar
         return context
 
 class NieuweORG(LoginMixin, MagORGMixin, CreateView):

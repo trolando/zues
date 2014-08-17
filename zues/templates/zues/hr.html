@@ -6,8 +6,8 @@
 
 {% if lid %}
 {% if mag %}
-<p><a href="{% url 'zues:wijzighr' pk=voorstel.pk %}">Wijzigen</a></p>
-<p><a href="{% url 'zues:verwijderhr' pk=voorstel.pk %}">Verwijderen</a></p>
+<button class='jdbutton' onclick="location.href='{% url 'zues:wijzighr' pk=voorstel.pk %}';">Wijzigen</button>
+<button class='jdbutton' onclick="location.href='{% url 'zues:verwijderhr' pk=voorstel.pk %}';">Intrekken</button>
 {% endif %}
 <p>Deze HR-wijziging is voor iedereen te zien via <a href="{{ voorstel.get_absolute_url }}">deze link</a>.</p>
 {% endif %}
