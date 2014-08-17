@@ -134,12 +134,16 @@ $(function() {
         });
         $.post("{% url 'zues:reorder' %}", res);
     });
+    function pad(str, max) {
+        str = str.toString();
+        return str.length < max ? pad("0"+str, max) : str;
+    }
     $.fn.reorder = function() {
         this.each(function() {
             var txt = $('.title span:nth-child(2)', this).text();
             var c = $('table tr:first-child td:first-child', this);
             if (c.length == 1) c.text(txt);
-            else c.each(function (i) {$(this).text(txt+(i+1));});
+            else c.each(function (i) {$(this).text(txt+' '+pad(i+1,2));});
         });
         return this;
     };
