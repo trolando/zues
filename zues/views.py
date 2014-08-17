@@ -174,6 +174,27 @@ def view_home(request):
 
     return render_to_response("zues/home.html", context)
 
+def verzamel_op_boeknummer(voorstellen, stukken, default):
+    for x in stukken:
+        m = re.match(r"([a-zA-Z]+)([0-9]*)", x.boeknummer)
+        if m is not None:
+            grp = m.group(1)
+            if m.group(2) == '': idx = ''
+            else: idx = int(m.group(2))
+        else:
+            grp = default
+            idx = "rest"
+        if grp not in voorstellen: voorstellen[grp] = {}
+        if idx not in voorstellen[grp]: voorstellen[grp][idx] = []
+        voorstellen[grp][idx].append(x);
+
+def geplet(s):
+    keys = s.keys()
+    keys.sort()
+    res = []
+    for k in keys: res = res + s[k]
+    return res
+
 @staff_member_required
 def view_export(request):
     context = {}
@@ -208,26 +229,6 @@ def view_export_json(request):
     voorstellen['HR-wijzigingen'] = [x.as_dict() for x in models.HRWijziging.objects.filter(verwijderd=False)]
     output = json.dumps(voorstellen, indent=4, separators=(',', ': '))
     return HttpResponse(output, mimetype='application/json')
-
-def verzamel_op_boeknummer(voorstellen, stukken, default):
-    for x in stukken:
-        m = re.match(r"([a-zA-Z]+)([0-9]+)", x.boeknummer)
-        if m is not None:
-            grp = m.group(1)
-            idx = int(m.group(2))
-        else:
-            grp = default
-            idx = "rest"
-        if grp not in voorstellen: voorstellen[grp] = {}
-        if idx not in voorstellen[grp]: voorstellen[grp][idx] = []
-        voorstellen[grp][idx].append(x);
-
-def geplet(s):
-    keys = s.keys()
-    keys.sort()
-    res = []
-    for k in keys: res = res + s[k]
-    return res
 
 @staff_member_required
 def view_reorder(request):
