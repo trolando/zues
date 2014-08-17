@@ -213,30 +213,6 @@ def view_export(request):
     return render_to_response("zues/export.html", context)
 
 @staff_member_required
-def view_export_txt(request):
-    context = {}
-    context['pm'] = models.PolitiekeMotie.objects.filter(verwijderd=False)
-    context['apm'] = models.ActuelePolitiekeMotie.objects.filter(verwijderd=False)
-    context['org'] = models.Organimo.objects.filter(verwijderd=False)
-    context['res'] = models.Resolutie.objects.filter(verwijderd=False)
-    context['am'] = models.Amendement.objects.filter(verwijderd=False)
-    context['hr'] = models.HRWijziging.objects.filter(verwijderd=False)
-    s = render_to_string("zues/export_txt.html", context)
-    return HttpResponse(s.encode("utf-8-sig"), mimetype='text/csv')
-
-@staff_member_required
-def view_export_json(request):
-    voorstellen = {}
-    voorstellen['Politieke Moties'] = [x.as_dict() for x in models.PolitiekeMotie.objects.filter(verwijderd=False)]
-    voorstellen["Organimo's"] = [x.as_dict() for x in models.Organimo.objects.filter(verwijderd=False)]
-    voorstellen['Actuele Politieke Moties'] = [x.as_dict() for x in models.ActuelePolitiekeMotie.objects.filter(verwijderd=False)]
-    voorstellen['Resoluties'] = [x.as_dict() for x in models.Resolutie.objects.filter(verwijderd=False)]
-    voorstellen['Amendementen'] = [x.as_dict() for x in models.Amendement.objects.filter(verwijderd=False)]
-    voorstellen['HR-wijzigingen'] = [x.as_dict() for x in models.HRWijziging.objects.filter(verwijderd=False)]
-    output = json.dumps(voorstellen, indent=4, separators=(',', ': '))
-    return HttpResponse(output, mimetype='application/json')
-
-@staff_member_required
 def view_reorder(request):
     if request.method == 'POST':
         for k in request.POST:
