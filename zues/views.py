@@ -176,11 +176,18 @@ def view_home(request):
 
 def verzamel_op_boeknummer(voorstellen, stukken, default):
     for x in stukken:
-        m = re.match(r"([a-zA-Z]+)([0-9]*)", x.boeknummer)
-        if m is not None:
-            grp = m.group(1)
-            if m.group(2) == '': idx = ''
-            else: idx = int(m.group(2))
+        if len(x.boeknummer) > 0:
+            i = x.boeknummer.rfind(' ')
+            if i != -1:
+                try:
+                    grp = x.boeknummer[:i]
+                    idx = int(x.boeknummer[i+1:])
+                except ValueError:
+                    grp = x.boeknummer
+                    idx = ''
+            else:
+                grp = x.boeknummer
+                idx = ''
         else:
             grp = default
             idx = "rest"
