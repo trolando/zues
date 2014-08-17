@@ -22,6 +22,17 @@
         width: 20px;
         padding-right: 4px;
     }
+    .cat .minibutton {
+        background:url('{% static 'zues/images/plusminus.png' %}') no-repeat top left;
+        /*background-position-y: -10px;*/
+        background-size: 75%;
+        display: inline-block;
+        /*position: relative;
+        top: 0px;*/
+        height: 15px;
+        width: 20px;
+        cursor: pointer;
+    }
     .cat {
         padding: 10px;
         border-radius: 6px;
@@ -142,8 +153,13 @@ $(function() {
         this.each(function() {
             var txt = $('.title span:nth-child(2)', this).text();
             var c = $('table tr:first-child td:first-child', this);
-            if (c.length == 1) c.text(txt);
-            else c.each(function (i) {$(this).text(txt+' '+pad(i+1,2));});
+            if (c.length == 1) c.html('<span class="minibutton">&nbsp;</span>'+txt);
+            else c.each(function (i) {$(this).html('<span class="minibutton">&nbsp;</span>'+txt+' '+pad(i+1,2));});
+        });
+        $('.minibutton').click(function() {
+            var y = -15 - parseInt($(this).css('background-position-y'));
+            $(this).css({backgroundPositionY: ''+y+'px'});
+            $('tr:not(.exporttitle)',$(this).parent().parent().parent()).toggle();
         });
         return this;
     };
@@ -209,6 +225,7 @@ $(function() {
     };
     $('.cat').makeInteractive();
     $('.cat').reorder();
+    $('.cat tr:not(.exporttitle)').toggle();
 });
 
 </script>
