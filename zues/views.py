@@ -23,7 +23,10 @@ import json
 
 def generate_lid(lidnummer):
     lidnummer = int(lidnummer)
-    res = jdldap.attributes(lidnummer)
+    if getattr(settings, 'SKIP_LDAP', False):
+        res = ('', 'Onbekend lid')
+    else:
+        res = jdldap.attributes(lidnummer)
     if res == None: return None
     email, naam = res
         
@@ -63,6 +66,8 @@ def view_lidnummer(request):
         if form.is_valid():
             email = form.cleaned_data['email']
             if getattr(settings, 'SKIP_EMAIL', False):
+                return HttpResponseRedirect('/lidnummerverzonden/')
+            if getattr(settings, 'SKIP_LDAP', False):
                 return HttpResponseRedirect('/lidnummerverzonden/')
 
             for lidnummer, naam in jdldap.lidnummers(email):
