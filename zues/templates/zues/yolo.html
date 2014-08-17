@@ -57,7 +57,7 @@
 <div class="cell" style="min-width: 300px;"> <p><a href="{{ m.get_absolute_url }}">PM '{{m.titel}}'</a></p></div>
 {% if tijden.mag_pm %}
 <div class="cell" style="padding-left:20px;"> <p><a href="{% url 'zues:wijzigpm' pk=m.pk %}">wijzigen</a></p></div>
-<div class="cell" style="padding-left:20px;"> <p><a href="{% url 'zues:verwijderpm' pk=m.pk %}">verwijderen</a></p></div>
+<div class="cell" style="padding-left:20px;"> <p><a href="{% url 'zues:verwijderpm' pk=m.pk %}">intrekken</a></p></div>
 {% endif %}
 </div>
 {% endfor %}
@@ -66,7 +66,7 @@
 <div class="cell" style="min-width: 300px;"> <p><a href="{{ m.get_absolute_url }}">APM '{{m.titel}}'</a></p></div>
 {% if tijden.mag_apm %}
 <div class="cell" style="padding-left:20px;"> <p><a href="{% url 'zues:wijzigapm' pk=m.pk %}">wijzigen</a></p></div>
-<div class="cell" style="padding-left:20px;"> <p><a href="{% url 'zues:verwijderapm' pk=m.pk %}">verwijderen</a></p></div>
+<div class="cell" style="padding-left:20px;"> <p><a href="{% url 'zues:verwijderapm' pk=m.pk %}">intrekken</a></p></div>
 {% endif %}
 </div>
 {% endfor %}
@@ -75,7 +75,7 @@
 <div class="cell" style="min-width: 300px;"> <p><a href="{{ m.get_absolute_url }}">ORG '{{m.titel}}'</a></p></div>
 {% if tijden.mag_org %}
 <div class="cell" style="padding-left:20px;"> <p><a href="{% url 'zues:wijzigorg' pk=m.pk %}">wijzigen</a></p></div>
-<div class="cell" style="padding-left:20px;"> <p><a href="{% url 'zues:verwijderorg' pk=m.pk %}">verwijderen</a></p></div>
+<div class="cell" style="padding-left:20px;"> <p><a href="{% url 'zues:verwijderorg' pk=m.pk %}">intrekken</a></p></div>
 {% endif %}
 </div>
 {% endfor %}
@@ -84,7 +84,7 @@
 <div class="cell" style="min-width: 300px;"> <p><a href="{{ m.get_absolute_url }}">RES '{{m.titel}}'</a></p></div>
 {% if tijden.mag_res %}
 <div class="cell" style="padding-left:20px;"> <p><a href="{% url 'zues:wijzigres' pk=m.pk %}">wijzigen</a></p></div>
-<div class="cell" style="padding-left:20px;"> <p><a href="{% url 'zues:verwijderres' pk=m.pk %}">verwijderen</a></p></div>
+<div class="cell" style="padding-left:20px;"> <p><a href="{% url 'zues:verwijderres' pk=m.pk %}">intrekken</a></p></div>
 {% endif %}
 </div>
 {% endfor %}
@@ -93,7 +93,7 @@
 <div class="cell" style="min-width: 300px;"> <p><a href="{{ m.get_absolute_url }}">AM '{{m.titel}}'</a></p></div>
 {% if tijden.mag_am %}
 <div class="cell" style="padding-left:20px;"> <p><a href="{% url 'zues:wijzigam' pk=m.pk %}">wijzigen</a></p></div>
-<div class="cell" style="padding-left:20px;"> <p><a href="{% url 'zues:verwijderam' pk=m.pk %}">verwijderen</a></p></div>
+<div class="cell" style="padding-left:20px;"> <p><a href="{% url 'zues:verwijderam' pk=m.pk %}">intrekken</a></p></div>
 {% endif %}
 </div>
 {% endfor %}
@@ -102,7 +102,7 @@
 <div class="cell" style="min-width: 300px;"> <p><a href="{{ m.get_absolute_url }}">HR '{{m.titel}}'</a></p></div>
 {% if tijden.mag_hr %}
 <div class="cell" style="padding-left:20px;"> <p><a href="{% url 'zues:wijzighr' pk=m.pk %}">wijzigen</a></p></div>
-<div class="cell" style="padding-left:20px;"> <p><a href="{% url 'zues:verwijderhr' pk=m.pk %}">verwijderen</a></p></div>
+<div class="cell" style="padding-left:20px;"> <p><a href="{% url 'zues:verwijderhr' pk=m.pk %}">intrekken</a></p></div>
 {% endif %}
 </div>
 {% endfor %}

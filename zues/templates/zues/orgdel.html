@@ -1,16 +1,16 @@
 {% extends 'zues/base.html' %}
 {% block content %}
-<h1>Organimo verwijderen</h1>
+<h1>Organimo intrekken</h1>
 
 <div class="jdform">
 <form action="" method="post">{% csrf_token %}
 <fieldset>
-<p>Weet je zeker dat je de {{ object }} wilt verwijderen?</p>
+<p>Weet je zeker dat je de {{ object }} wilt intrekken?</p>
 <div class="row">
 <div class="cell">&nbsp;</div>
 <div class="cell">
 <button class="button" type="button" onClick="history.back(1); event.stopPropagation();">Terug</button>
-<button class="button" type="submit">Verwijderen</button>
+<button class="button" type="submit">Intrekken</button>
 </div>
 </div>
 </fieldset>
