@@ -9,7 +9,6 @@ from django.utils.html import escape
 from django.core.urlresolvers import reverse
 from re import sub
 from solo.models import SingletonModel
-import json
 
 class Login(models.Model):
     naam = models.CharField(max_length=250,)
