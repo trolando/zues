@@ -207,21 +207,21 @@ class Motie(Stuk):
         con = self.to_list(escape(self.constateringen))
         if con:
             if len(con)>1: 
-                inhoud.append("Constaterende dat", con)
+                inhoud.append(["Constaterende dat", con])
             else: 
-                inhoud.append("Constaterende dat", con[0])
+                inhoud.append(["Constaterende dat", con[0]])
         over = self.to_list(escape(self.overwegingen))
         if over:
             if len(over)>1: 
-                inhoud.append("Overwegende dat", over)
+                inhoud.append(["Overwegende dat", over])
             else: 
-                inhoud.append("Overwegende dat", over[0])
+                inhoud.append(["Overwegende dat", over[0]])
         uit = self.to_list(escape(self.uitspraken))
         if uit:
             if len(uit)>1: 
-                inhoud.append("Spreekt uit dat", uit)
+                inhoud.append(["Spreekt uit dat", uit])
             else: 
-                inhoud.append("Spreekt uit dat", uit[0])
+                inhoud.append(["Spreekt uit dat", uit[0]])
         res['inhoud'] = inhoud
         res['toelichting'] = self.toelichting
         return res
