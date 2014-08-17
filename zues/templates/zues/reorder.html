@@ -154,9 +154,9 @@ $(function() {
     $.fn.reorder = function() {
         this.each(function() {
             var txt = $('.title span:nth-child(2)', this).text();
-            $('table tr:first-child td:first-child', this).each(function (i) {
-                $(this).text(txt+(i+1));
-            });
+            var c = $('table tr:first-child td:first-child', this);
+            if (c.length == 1) c.text(txt);
+            else c.each(function (i) {$(this).text(txt+(i+1));});
         });
         return this;
     };
