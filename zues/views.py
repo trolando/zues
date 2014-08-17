@@ -197,13 +197,19 @@ def geplet(s):
 
 @staff_member_required
 def view_export(request):
-    context = {}
-    context['pm'] = models.PolitiekeMotie.objects.filter(verwijderd=False)
-    context['apm'] = models.ActuelePolitiekeMotie.objects.filter(verwijderd=False)
-    context['org'] = models.Organimo.objects.filter(verwijderd=False)
-    context['res'] = models.Resolutie.objects.filter(verwijderd=False)
-    context['am'] = models.Amendement.objects.filter(verwijderd=False)
-    context['hr'] = models.HRWijziging.objects.filter(verwijderd=False)
+    voorstellen = {}
+    verzamel_op_boeknummer(voorstellen, models.PolitiekeMotie.objects.filter(verwijderd=False), "PM")
+    verzamel_op_boeknummer(voorstellen, models.ActuelePolitiekeMotie.objects.filter(verwijderd=False), "APM")
+    verzamel_op_boeknummer(voorstellen, models.Organimo.objects.filter(verwijderd=False), "ORG")
+    verzamel_op_boeknummer(voorstellen, models.Resolutie.objects.filter(verwijderd=False), "RES")
+    verzamel_op_boeknummer(voorstellen, models.Amendement.objects.filter(verwijderd=False), "AM")
+    verzamel_op_boeknummer(voorstellen, models.HRWijziging.objects.filter(verwijderd=False), "HR")
+    # oke, pletten en sorteren
+    for k in voorstellen:
+        voorstellen[k] = geplet(voorstellen[k])
+    keys = voorstellen.keys()
+    keys.sort()
+    context = {'categories': keys, 'voorstellen': voorstellen}
     return render_to_response("zues/export.html", context)
 
 @staff_member_required

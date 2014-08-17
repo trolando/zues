@@ -1,31 +1,17 @@
 {% extends 'zues/base.html' %}
 {% block terugnaarbegin %}{% endblock %}
 {% block mededeling %}{% endblock %}
+{% block logo %}{% endblock %}
 {% block content %}
-<p>&nbsp;</p>
 
-{% for m in pm %}
+{% for k in categories %}
+{% for l,v in voorstellen.items %}
+{% if l == k %}
+{% for m in v %}
 {{ m.as_html_table }}
 {% endfor %}
-
-{% for m in apm %}
-{{ m.as_html_table }}
+{% endif %}
 {% endfor %}
-
-{% for m in org %}
-{{ m.as_html_table }}
-{% endfor %}
-
-{% for m in res %}
-{{ m.as_html_table }}
-{% endfor %}
-
-{% for m in am %}
-{{ m.as_html_table }}
-{% endfor %}
-
-{% for m in hr %}
-{{ m.as_html_table }}
 {% endfor %}
 
 {% endblock %} 
