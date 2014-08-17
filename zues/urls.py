@@ -2,7 +2,7 @@ from django.conf.urls import patterns, url, include
 from django.views.generic import DetailView, ListView
 from zues import views
 
-urlpatterns = patterns('moties.views',
+urlpatterns = [
     url(r'^$', views.view_home, name='home'),
     url(r'^loginverzonden/$', views.login_verzonden),
     url(r'^login/(?P<lid>\d+)/(?P<key>.+)/$', views.login, name='login'),
@@ -43,5 +43,5 @@ urlpatterns = patterns('moties.views',
 
     url(r'^lidnummer/$', views.view_lidnummer, name='lidnummer'),
     url(r'^lidnummerverzonden/$', views.lidnummer_verzonden),
-)
+]
 
