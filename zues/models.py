@@ -56,29 +56,37 @@ class Tijden(SingletonModel):
     def mag_hr(self):
         return self._check(self.hr_start, self.hr_stop)
 
+    def _deadline(self, start, stop):
+        _now = now()
+        if stop == None:
+            if start == None or start < _now:
+                return "geen deadline"
+            else:
+                return "vanaf "+formats.date_format(localtime(start), "DATETIME_FORMAT")
+        elif stop > _now:
+            if start == None or start < _now:
+                return "tot "+formats.date_format(localtime(stop), "DATETIME_FORMAT")
+            else:
+                return "vanaf "+formats.date_format(localtime(start), "DATETIME_FORMAT")
+        else: return "deadline verlopen"
+
     def deadline_pm(self):
-        if self.pm_stop == None: return "geen"
-        else: return formats.date_format(localtime(self.pm_stop), "DATETIME_FORMAT")
+        return self._deadline(self.pm_start, self.pm_stop)
 
     def deadline_apm(self):
-        if self.apm_stop == None: return "geen"
-        else: return formats.date_format(localtime(self.apm_stop), "DATETIME_FORMAT")
+        return self._deadline(self.apm_start, self.apm_stop)
 
     def deadline_org(self):
-        if self.org_stop == None: return "geen"
-        else: return formats.date_format(localtime(self.org_stop), "DATETIME_FORMAT")
+        return self._deadline(self.org_start, self.org_stop)
 
     def deadline_res(self):
-        if self.res_stop == None: return "geen"
-        else: return formats.date_format(localtime(self.res_stop), "DATETIME_FORMAT")
+        return self._deadline(self.res_start, self.res_stop)
 
     def deadline_am(self):
-        if self.am_stop == None: return "geen"
-        else: return formats.date_format(localtime(self.am_stop), "DATETIME_FORMAT")
+        return self._deadline(self.am_start, self.am_stop)
 
     def deadline_hr(self):
-        if self.hr_stop == None: return "geen"
-        else: return formats.date_format(localtime(self.hr_stop), "DATETIME_FORMAT")
+        return self._deadline(self.hr_start, self.hr_stop)
 
     class Meta:
         verbose_name_plural = 'tijden'
