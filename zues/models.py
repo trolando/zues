@@ -254,7 +254,7 @@ class Motie(Stuk):
         html = []
         html.append("<table border='1' class='export'>")
         html.append("<tr class='exporttitle'>")
-        html.append("<td><p>%s</p></td>" % ik)
+        html.append("<td><p>%s</p></td>" % escape(self.boeknummer))
         html.append("<td><p>%s</p></td>" % escape(self.titel))
         html.append("</tr>")
         html.append("<tr class='exporthead'>")
@@ -486,7 +486,7 @@ class Modificatie(Stuk):
         html = []
         html.append("<table border='1' class='export'>")
         html.append("<tr class='exporttitle'>")
-        html.append("<td><p>%s</p></td>" % ik)
+        html.append("<td><p>%s</p></td>" % escape(self.boeknummer))
         html.append("<td><p>%s</p></td>" % escape(self.titel))
         html.append("</tr>")
         html.append("<tr class='exporthead'>")
