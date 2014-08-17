@@ -262,7 +262,9 @@ def view_reorder(request):
     # oke, pletten en sorteren
     for k in voorstellen:
         voorstellen[k] = geplet(voorstellen[k])
-    context = {'voorstellen': voorstellen}
+    keys = voorstellen.keys()
+    keys.sort()
+    context = {'categories': keys, 'voorstellen': voorstellen}
     return render_to_response("zues/reorder.html", context)
 
 def login_verzonden(request):
