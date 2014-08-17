@@ -115,7 +115,6 @@ def view_home(request):
         context['count'] = len(context['pm'])+len(context['apm'])+len(context['org'])+len(context['res'])+len(context['am'])+len(context['hr'])
         tijden = models.Tijden.get_solo()
         context['tijden'] = tijden
-        context['magiets'] = tijden.mag_pm() or tijden.mag_apm() or tijden.mag_org() or tijden.mag_res() or tijden.mag_am() or tijden.mag_hr()
         context['staff'] = request.user.is_active and request.user.is_staff
         context['allpm'] = models.PolitiekeMotie.objects.filter(verwijderd=False).filter(publiek=True)
         context['allapm'] = models.ActuelePolitiekeMotie.objects.filter(verwijderd=False).filter(publiek=True)
