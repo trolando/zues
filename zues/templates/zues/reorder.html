@@ -195,6 +195,13 @@ $(function() {
             onDrag: function ($item, position) {
                 $item.css({left: position.left - adjustment.left,
                            top: position.top - adjustment.top})
+                var top = $(window).scrollTop();
+                var bottom = top + $(window).innerHeight();
+                if (position.top > bottom - 150) {
+                    $(window).scrollTop(top+20);
+                } else if (position.top < top + 150) {
+                    $(window).scrollTop(top-20);
+                }
             },
         });
         });
