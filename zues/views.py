@@ -209,6 +209,61 @@ def view_export_json(request):
     output = json.dumps(voorstellen, indent=4, separators=(',', ': '))
     return HttpResponse(output, mimetype='application/json')
 
+def verzamel_op_boeknummer(voorstellen, stukken, default):
+    for x in stukken:
+        m = re.match(r"([a-zA-Z]+)([0-9]+)", x.boeknummer)
+        if m is not None:
+            grp = m.group(1)
+            idx = int(m.group(2))
+        else:
+            grp = default
+            idx = "rest"
+        if grp not in voorstellen: voorstellen[grp] = {}
+        if idx not in voorstellen[grp]: voorstellen[grp][idx] = []
+        voorstellen[grp][idx].append(x);
+
+def geplet(s):
+    keys = s.keys()
+    keys.sort()
+    res = []
+    for k in keys: res = res + s[k]
+    return res
+
+@staff_member_required
+def view_reorder(request):
+    if request.method == 'POST':
+        for k in request.POST:
+            try:
+                if k.startswith("PM-"):
+                    o = models.PolitiekeMotie.objects.get(pk=int(k[3:]))
+                elif k.startswith("APM-"):
+                    o = models.ActuelePolitiekeMotie.objects.get(pk=int(k[4:]))
+                elif k.startswith("ORG-"):
+                    o = models.Organimo.objects.get(pk=int(k[4:]))
+                elif k.startswith("RES-"):
+                    o = models.Resolutie.objects.get(pk=int(k[4:]))
+                elif k.startswith("AM-"):
+                    o = models.Amendement.objects.get(pk=int(k[3:]))
+                elif k.startswith("HR-"):
+                    o = models.HRWijziging.objects.get(pk=int(k[3:]))
+                o.boeknummer = request.POST[k]
+                o.save()
+            except ObjectDoesNotExist:
+                pass # huh? whatever.
+            
+    voorstellen = {}
+    verzamel_op_boeknummer(voorstellen, models.PolitiekeMotie.objects.filter(verwijderd=False), "PM")
+    verzamel_op_boeknummer(voorstellen, models.ActuelePolitiekeMotie.objects.filter(verwijderd=False), "APM")
+    verzamel_op_boeknummer(voorstellen, models.Organimo.objects.filter(verwijderd=False), "ORG")
+    verzamel_op_boeknummer(voorstellen, models.Resolutie.objects.filter(verwijderd=False), "RES")
+    verzamel_op_boeknummer(voorstellen, models.Amendement.objects.filter(verwijderd=False), "AM")
+    verzamel_op_boeknummer(voorstellen, models.HRWijziging.objects.filter(verwijderd=False), "HR")
+    # oke, pletten en sorteren
+    for k in voorstellen:
+        voorstellen[k] = geplet(voorstellen[k])
+    context = {'voorstellen': voorstellen}
+    return render_to_response("zues/reorder.html", context)
+
 def login_verzonden(request):
     return render_to_response("zues/loginverzonden.html")
 

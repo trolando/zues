@@ -1,0 +1,222 @@
+{% extends 'zues/base.html' %}
+{% load staticfiles %}
+{% block head %}
+<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+<script src="{% static 'zues/js/jquery-sortable-min.js' %}"></script>
+<style>
+    body.dragging, body.dragging * {
+        cursor: move !important;
+    }
+    .dragged {
+        position: absolute;
+        opacity: 0.5;
+        z-index: 2000;
+    }
+    .cat .button {
+        background:url('{% static 'zues/images/plusminus.png' %}') no-repeat top left;
+        background-position-y: -20px;
+        display: inline-block;
+        position: relative;
+        top: -2px;
+        height: 20px;
+        width: 20px;
+        padding-right: 4px;
+    }
+    .cat {
+        padding: 10px;
+        border-radius: 6px;
+        border: 1px solid black;
+    }
+    .cat .title {
+        font-size: 20px;
+        cursor: pointer;
+    }
+    .sortable {
+        margin: 0 0 9px 0;
+        min-height: 20px;
+        padding: 0;
+    }
+    .sortable li {
+        list-style: none;
+        cursor: move;
+    }
+    .sortable li.placeholder {
+        display: block;
+        position: relative;
+    }
+    .sortable li.placeholder:before {
+        position: absolute;
+        content: "";
+        width: 0;
+        height: 0;
+        margin-top: -5px;
+        left: -5px;
+        top: -4px;
+        border: 5px solid transparent;
+        border-left-color: red;
+        border-right: none;
+    }
+</style>
+{% endblock %}
+{% block terugnaarbegin %}{% endblock %}
+{% block mededeling %}{% endblock %}
+{% block content %}
+<p>&nbsp;</p>
+
+<span style="display: block;">
+<button class='jdbutton' id="toevoegen" style='width: 200px'>Categorie toevoegen</button>
+&nbsp;
+<button class='jdbutton' id="opslaan" style='width: 100px'>Opslaan</button>
+</span>
+
+{% for k,v in voorstellen.items %}
+<span>&nbsp;</span>
+<div class="cat">
+<div class="title"><span class="button">&nbsp;</span><span>{{ k }}</span></div>
+<ul class="sortable">
+{% for m in v %}
+<li>{{ m.as_html_table }}</li>
+{% endfor %}
+</ul>
+</div>
+{% endfor %}
+
+<script>
+$.ajaxSetup({ 
+     beforeSend: function(xhr, settings) {
+         function getCookie(name) {
+             var cookieValue = null;
+             if (document.cookie && document.cookie != '') {
+                 var cookies = document.cookie.split(';');
+                 for (var i = 0; i < cookies.length; i++) {
+                     var cookie = jQuery.trim(cookies[i]);
+                     // Does this cookie string begin with the name we want?
+                 if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                     cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                     break;
+                 }
+             }
+         }
+         return cookieValue;
+         }
+         if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+             // Only send the token to relative URLs i.e. locally.
+             xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+         }
+     } 
+});
+$(function() {
+    stringify = function stringify(obj) {
+        var t = typeof (obj);
+        if (t != "object" || obj === null) {
+            // simple data type
+            if (t == "string") obj = '"' + obj + '"';
+            return String(obj);
+        } else {
+            // recurse array or object
+            var n, v, json = [], arr = (obj && obj.constructor == Array);
+ 
+            for (n in obj) {
+                v = obj[n];
+                t = typeof(v);
+                if (obj.hasOwnProperty(n)) {
+                    if (t == "string") v = '"' + v + '"'; else if (t == "object" && v !== null) v = jQuery.stringify(v);
+                    json.push((arr ? "" : '"' + n + '":') + String(v));
+                }
+            }
+            return (arr ? "[" : "{") + String(json) + (arr ? "]" : "}");
+        }
+    };
+    $.fn.gather_pks = function(callback) {
+        var pks = [];
+        $.each(this, function(i, v) {
+            var splitClassName = v.className.split(/\s+/);
+            for (var j in splitClassName) {
+                var className = splitClassName[j];
+                if (className.indexOf('pk-')===0) {
+                    pk = className.substr(3);
+                    if (-1 === pks.indexOf(pk)) pks.push(pk);
+                }
+            }
+        });
+        if ('function' === typeof callback) {
+            for (var i in pks) callback(pks[i]);
+        }
+        return pks;
+    };
+    $('#opslaan').click(function() {
+        var res = {};
+        $('.cat table').gather_pks(function(pk) {
+            res[pk] = $('.cat table.pk-'+pk+' td:first').text();
+        });
+        $.post("{% url 'zues:reorder' %}", res);
+    });
+    $.fn.reorder = function() {
+        this.each(function() {
+            var txt = $('.title span:nth-child(2)', this).text();
+            $('table tr:first-child td:first-child', this).each(function (i) {
+                $(this).text(txt+(i+1));
+            });
+        });
+        return this;
+    };
+    $.fn.add_cat = function(cat) {
+        var str = '<span>&nbsp;</span><div class="cat"><div class="title"><span class="button">&nbsp;</span><span>'+cat+'</span></div><ul class="sortable"></ul></div>'
+        var item = $($.parseHTML(str)).appendTo(this);
+        item.makeInteractive();
+    };
+    $('#toevoegen').click(function() {
+        var input = prompt('Geef een nieuwe (unieke) prefix:');
+        if (input === null) return;
+        $('#content').add_cat(input);
+    });
+    $.fn.makeInteractive = function() {
+        this.each(function() {
+        $('.title', this).click(function() {
+            var y = -20 - parseInt($(this).children(".button").css('background-position-y'));
+            $(this).children(".button").css({backgroundPositionY: ''+y+'px'});
+            $(this).parent().children("ul").slideToggle();
+        });
+        $('.sortable', this).sortable({
+            group: 'sortable',
+            pullPlaceholder: false,
+            // animation on drop
+            onDrop: function  (item, targetContainer, _super) {
+                var clonedItem = $('<li/>').css({height: 0})
+                item.before(clonedItem)
+                clonedItem.animate({'height': item.height()})
+
+                item.animate(clonedItem.position(), function  () {
+                    clonedItem.detach()
+                    _super(item)
+                })
+
+                // reorder on drop
+                $('.cat').reorder();
+            },
+            // set item relative to cursor position
+            onDragStart: function ($item, container, _super) {
+                var offset = $item.offset(),
+                pointer = container.rootGroup.pointer
+
+                adjustment = {
+                    left: pointer.left - offset.left,
+                    top: pointer.top - offset.top
+                }
+                _super($item, container)
+            },
+            onDrag: function ($item, position) {
+                $item.css({left: position.left - adjustment.left,
+                           top: position.top - adjustment.top})
+            },
+        });
+        });
+        return this;
+    };
+    $('.cat').makeInteractive();
+    $('.cat').reorder();
+});
+
+</script>
+
+{% endblock %} 

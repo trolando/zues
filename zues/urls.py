@@ -41,6 +41,9 @@ urlpatterns = patterns('moties.views',
     url(r'^export/$', views.view_export, name='export'),
     url(r'^export/Voorstellen.txt$', views.view_export_txt, name='export_txt'),
     url(r'^export/Voorstellen.json$', views.view_export_json, name='export_json'),
+
+    url(r'^reorder/$', views.view_reorder, name='reorder'),
+
     url(r'^lidnummer/$', views.view_lidnummer, name='lidnummer'),
     url(r'^lidnummerverzonden/$', views.lidnummer_verzonden),
 )
