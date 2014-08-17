@@ -19,6 +19,7 @@ import hashlib
 import ldap
 import os
 import re
+import json
 
 def generate_lid(lidnummer):
     lidnummer = int(lidnummer)
@@ -198,15 +199,15 @@ def view_export_txt(request):
 
 @staff_member_required
 def view_export_json(request):
-    context = {}
-    context['pm'] = models.PolitiekeMotie.objects.filter(verwijderd=False)
-    context['apm'] = models.ActuelePolitiekeMotie.objects.filter(verwijderd=False)
-    context['org'] = models.Organimo.objects.filter(verwijderd=False)
-    context['res'] = models.Resolutie.objects.filter(verwijderd=False)
-    context['am'] = models.Amendement.objects.filter(verwijderd=False)
-    context['hr'] = models.HRWijziging.objects.filter(verwijderd=False)
-    s = render_to_string("zues/export_json.html", context)
-    return HttpResponse(s.encode("utf-8-sig"), mimetype='application/json')
+    voorstellen = {}
+    voorstellen['Politieke Moties'] = [x.as_dict() for x in models.PolitiekeMotie.objects.filter(verwijderd=False)]
+    voorstellen["Organimo's"] = [x.as_dict() for x in models.Organimo.objects.filter(verwijderd=False)]
+    voorstellen['Actuele Politieke Moties'] = [x.as_dict() for x in models.ActuelePolitiekeMotie.objects.filter(verwijderd=False)]
+    voorstellen['Resoluties'] = [x.as_dict() for x in models.Resolutie.objects.filter(verwijderd=False)]
+    voorstellen['Amendementen'] = [x.as_dict() for x in models.Amendement.objects.filter(verwijderd=False)]
+    voorstellen['HR-wijzigingen'] = [x.as_dict() for x in models.HRWijziging.objects.filter(verwijderd=False)]
+    output = json.dumps(voorstellen, indent=4, separators=(',', ': '))
+    return HttpResponse(output, mimetype='application/json')
 
 def login_verzonden(request):
     return render_to_response("zues/loginverzonden.html")
