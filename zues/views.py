@@ -229,7 +229,7 @@ def get_categorieen():
         categories.append(c)
     else: c=c[0]
     c['items'] += models.Amendement.objects.filter(verwijderd=False).filter(categorie=None)
-    return categories
+    return [c for c in categories if len(c['items'])>0]
 
 @staff_member_required
 def view_export(request):
