@@ -103,23 +103,47 @@ class Categorie(models.Model):
         verbose_name_plural = u'categorieen'
 
 class Stuk(models.Model):
+    INGEDIEND = 1
+    VERWIJDERD = 2
+    REPAREREN = 3
+    GEACCEPTEERD = 4
+    PUBLIEK = 5
+    STATUS_CHOICES = (
+        (INGEDIEND, 'Ingediend'),
+        (VERWIJDERD, 'Verwijderd'),
+        (REPAREREN, 'Repareren'),
+        (GEACCEPTEERD, 'Geaccepteerd'),
+        (PUBLIEK, 'Publiek'),
+    )
+
     titel = models.CharField(max_length=250,)
-    indieners = models.TextField()
-    woordvoerder = models.CharField(max_length=250,)
+    eigenaar = models.ForeignKey(Login, blank=True, null=True, on_delete=models.SET_NULL) # bij verwijderen eigenaar, verliest eigenaar
+    status = models.IntegerField(choices=STATUS_CHOICES, default=INGEDIEND)
+    admin_opmerkingen = models.TextField(blank=True, help_text='Opmerkingen van de beheerder')
+    categorie = models.ForeignKey(Categorie, blank=True, null=True, on_delete=models.SET_NULL) # bij verwijderen categorie, doei categorie
+    boeknummer = models.IntegerField(blank=True)
     indienmoment = models.DateField(auto_now_add=True)
     laatsteupdate = models.DateField(auto_now=True)
-    admin_opmerkingen = models.TextField(blank=True, help_text='Opmerkingen van de beheerder')
     secret = models.CharField(max_length=250,)
+    indieners = models.TextField()
+    woordvoerder = models.CharField(max_length=250,)
     toelichting = models.TextField(blank=True, help_text='Gebruik een dubbele enter voor de volgende paragraaf')
-    eigenaar = models.ForeignKey(Login, blank=True, null=True, on_delete=models.SET_NULL) # bij verwijderen eigenaar, verliest eigenaar
-    verwijderd = models.BooleanField(default=False)
-    publiek = models.BooleanField(default=False)
-    boeknummer = models.IntegerField(blank=True)
-    categorie = models.ForeignKey(Categorie, blank=True, null=True, on_delete=models.SET_NULL) # bij verwijderen categorie, doei categorie
 
     def format_boeknummer(self):
-        if self.categorie == None: return ""
+        if self.categorie == None: return self.stuk_type()
         return escape("%s%.02d" % (self.categorie.prefix, self.boeknummer))
+
+    def is_verwijderd(self):
+        return self.status == Stuk.VERWIJDERD
+
+    def in_reorder(self):
+        return self.status == Stuk.GEACCEPTEERD or self.status == Stuk.PUBLIEK
+
+    def mag_wijzigen(self):
+        return self.status == Stuk.REPAREREN or (self.status == Stuk.INGEDIEND and self.mag())
+
+    def mag_verwijderen(self):
+        return self.status == Stuk.INGEDIEND and self.mag()
 
     class Meta:
         abstract = True
@@ -278,6 +302,12 @@ class Organimo(Motie):
     def as_html_table(self):
         return super(Organimo, self).as_html_table('ORG')
 
+    def stuk_type(self):
+        return 'ORG'
+
+    def mag(self):
+        return Tijden.get_solo().mag_org()
+
 class PolitiekeMotie(Motie):
     class Meta:
         ordering = ('-laatsteupdate',)
@@ -295,6 +325,12 @@ class PolitiekeMotie(Motie):
     def as_html_table(self):
         return super(PolitiekeMotie, self).as_html_table('PM')
 
+    def stuk_type(self):
+        return 'PM'
+
+    def mag(self):
+        return Tijden.get_solo().mag_pm()
+
 class ActuelePolitiekeMotie(Motie):
     class Meta:
         ordering = ('-laatsteupdate',)
@@ -311,6 +347,12 @@ class ActuelePolitiekeMotie(Motie):
 
     def as_html_table(self):
         return super(ActuelePolitiekeMotie, self).as_html_table('APM')
+
+    def stuk_type(self):
+        return 'APM'
+
+    def mag(self):
+        return Tijden.get_solo().mag_apm()
 
 class Modificatie(Stuk):
     WIJZIGEN = 'W'
@@ -440,6 +482,12 @@ class Resolutie(Modificatie):
     def as_html_table(self):
         return super(Resolutie, self).as_html_table('RES')
 
+    def stuk_type(self):
+        return 'RES'
+
+    def mag(self):
+        return Tijden.get_solo().mag_res()
+
 class Amendement(Modificatie):
     class Meta:
         verbose_name_plural = 'amendementen'
@@ -456,6 +504,12 @@ class Amendement(Modificatie):
     def as_html_table(self):
         return super(Amendement, self).as_html_table('AM')
 
+    def stuk_type(self):
+        return 'AM'
+
+    def mag(self):
+        return Tijden.get_solo().mag_am()
+
 class HRWijziging(Modificatie):
     class Meta:
         verbose_name_plural = "HR-wijzigingen"
@@ -471,3 +525,9 @@ class HRWijziging(Modificatie):
 
     def as_html_table(self):
         return super(HRWijziging, self).as_html_table('HR')
+
+    def stuk_type(self):
+        return 'HR'
+
+    def mag(self):
+        return Tijden.get_solo().mag_hr()

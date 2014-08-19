@@ -25,32 +25,32 @@ Deze URL zie je in de adresbalk van de browser als je het voorstel bekijkt.
 </div>
 {% for m in allpm %}
 <div class="row">
-<div class="cell" style="min-width: 300px;"> <p><a href="{{ m.get_absolute_url }}">PM '{{m.titel}}'</a></p></div>
+<div class="cell" style="min-width: 300px;"> <p><a href="{{ m.get_absolute_url }}">{{ m.format_boeknummer }} '{{m.titel}}'</a></p></div>
 </div>
 {% endfor %}
 {% for m in allapm %}
 <div class="row">
-<div class="cell" style="min-width: 300px;"> <p><a href="{{ m.get_absolute_url }}">APM '{{m.titel}}'</a></p></div>
+<div class="cell" style="min-width: 300px;"> <p><a href="{{ m.get_absolute_url }}">{{ m.format_boeknummer }} '{{m.titel}}'</a></p></div>
 </div>
 {% endfor %}
 {% for m in allorg %}
 <div class="row">
-<div class="cell" style="min-width: 300px;"> <p><a href="{{ m.get_absolute_url }}">ORG '{{m.titel}}'</a></p></div>
+<div class="cell" style="min-width: 300px;"> <p><a href="{{ m.get_absolute_url }}">{{ m.format_boeknummer }} '{{m.titel}}'</a></p></div>
 </div>
 {% endfor %}
 {% for m in allres %}
 <div class="row">
-<div class="cell" style="min-width: 300px;"> <p><a href="{{ m.get_absolute_url }}">RES '{{m.titel}}'</a></p></div>
+<div class="cell" style="min-width: 300px;"> <p><a href="{{ m.get_absolute_url }}">{{ m.format_boeknummer }} '{{m.titel}}'</a></p></div>
 </div>
 {% endfor %}
 {% for m in allam %}
 <div class="row">
-<div class="cell" style="min-width: 300px;"> <p><a href="{{ m.get_absolute_url }}">AM '{{m.titel}}'</a></p></div>
+<div class="cell" style="min-width: 300px;"> <p><a href="{{ m.get_absolute_url }}">{{ m.format_boeknummer }} '{{m.titel}}'</a></p></div>
 </div>
 {% endfor %}
 {% for m in allhr %}
 <div class="row">
-<div class="cell" style="min-width: 300px;"> <p><a href="{{ m.get_absolute_url }}">HR '{{m.titel}}'</a></p></div>
+<div class="cell" style="min-width: 300px;"> <p><a href="{{ m.get_absolute_url }}">{{ m.format_boeknummer }} '{{m.titel}}'</a></p></div>
 </div>
 {% endfor %}
 </fieldset>
@@ -67,9 +67,11 @@ Deze URL zie je in de adresbalk van de browser als je het voorstel bekijkt.
 {% for m in pm %}
 <div class="row">
 <div class="cell" style="min-width: 300px;"> <p><a href="{{ m.get_absolute_url }}">PM '{{m.titel}}'</a></p></div>
-{% if tijden.mag_pm %}
+{% if m.mag_wijzigen %}
 <div class="cell" style="padding-left:20px;"> <p><a href="{% url 'zues:wijzigpm' pk=m.pk %}">wijzigen</a></p></div>
+{% if m.mag_verwijderen %}
 <div class="cell" style="padding-left:20px;"> <p><a href="{% url 'zues:verwijderpm' pk=m.pk %}">intrekken</a></p></div>
+{% endif %}
 {% else %}
 <div class="cell" style="padding-left: 20px;"><p>definitief ingediend</p></div>
 {% endif %}
@@ -78,9 +80,11 @@ Deze URL zie je in de adresbalk van de browser als je het voorstel bekijkt.
 {% for m in apm %}
 <div class="row">
 <div class="cell" style="min-width: 300px;"> <p><a href="{{ m.get_absolute_url }}">APM '{{m.titel}}'</a></p></div>
-{% if tijden.mag_apm %}
+{% if m.mag_wijzigen %}
 <div class="cell" style="padding-left:20px;"> <p><a href="{% url 'zues:wijzigapm' pk=m.pk %}">wijzigen</a></p></div>
+{% if m.mag_verwijderen %}
 <div class="cell" style="padding-left:20px;"> <p><a href="{% url 'zues:verwijderapm' pk=m.pk %}">intrekken</a></p></div>
+{% endif %}
 {% else %}
 <div class="cell" style="padding-left: 20px;"><p>definitief ingediend</p></div>
 {% endif %}
@@ -89,9 +93,11 @@ Deze URL zie je in de adresbalk van de browser als je het voorstel bekijkt.
 {% for m in org %}
 <div class="row">
 <div class="cell" style="min-width: 300px;"> <p><a href="{{ m.get_absolute_url }}">ORG '{{m.titel}}'</a></p></div>
-{% if tijden.mag_org %}
+{% if m.mag_wijzigen %}
 <div class="cell" style="padding-left:20px;"> <p><a href="{% url 'zues:wijzigorg' pk=m.pk %}">wijzigen</a></p></div>
+{% if m.mag_verwijderen %}
 <div class="cell" style="padding-left:20px;"> <p><a href="{% url 'zues:verwijderorg' pk=m.pk %}">intrekken</a></p></div>
+{% endif %}
 {% else %}
 <div class="cell" style="padding-left: 20px;"><p>definitief ingediend</p></div>
 {% endif %}
@@ -100,9 +106,11 @@ Deze URL zie je in de adresbalk van de browser als je het voorstel bekijkt.
 {% for m in res %}
 <div class="row">
 <div class="cell" style="min-width: 300px;"> <p><a href="{{ m.get_absolute_url }}">RES '{{m.titel}}'</a></p></div>
-{% if tijden.mag_res %}
+{% if m.mag_wijzigen %}
 <div class="cell" style="padding-left:20px;"> <p><a href="{% url 'zues:wijzigres' pk=m.pk %}">wijzigen</a></p></div>
+{% if m.mag_verwijderen %}
 <div class="cell" style="padding-left:20px;"> <p><a href="{% url 'zues:verwijderres' pk=m.pk %}">intrekken</a></p></div>
+{% endif %}
 {% else %}
 <div class="cell" style="padding-left: 20px;"><p>definitief ingediend</p></div>
 {% endif %}
@@ -111,9 +119,11 @@ Deze URL zie je in de adresbalk van de browser als je het voorstel bekijkt.
 {% for m in am %}
 <div class="row">
 <div class="cell" style="min-width: 300px;"> <p><a href="{{ m.get_absolute_url }}">AM '{{m.titel}}'</a></p></div>
-{% if tijden.mag_am %}
+{% if m.mag_wijzigen %}
 <div class="cell" style="padding-left:20px;"> <p><a href="{% url 'zues:wijzigam' pk=m.pk %}">wijzigen</a></p></div>
+{% if m.mag_verwijderen %}
 <div class="cell" style="padding-left:20px;"> <p><a href="{% url 'zues:verwijderam' pk=m.pk %}">intrekken</a></p></div>
+{% endif %}
 {% else %}
 <div class="cell" style="padding-left: 20px;"><p>definitief ingediend</p></div>
 {% endif %}
@@ -122,9 +132,11 @@ Deze URL zie je in de adresbalk van de browser als je het voorstel bekijkt.
 {% for m in hr %}
 <div class="row">
 <div class="cell" style="min-width: 300px;"> <p><a href="{{ m.get_absolute_url }}">HR '{{m.titel}}'</a></p></div>
-{% if tijden.mag_hr %}
+{% if m.mag_wijzigen %}
 <div class="cell" style="padding-left:20px;"> <p><a href="{% url 'zues:wijzighr' pk=m.pk %}">wijzigen</a></p></div>
+{% if m.mag_verwijderen %}
 <div class="cell" style="padding-left:20px;"> <p><a href="{% url 'zues:verwijderhr' pk=m.pk %}">intrekken</a></p></div>
+{% endif %}
 {% else %}
 <div class="cell" style="padding-left: 20px;"><p>definitief ingediend</p></div>
 {% endif %}

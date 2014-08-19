@@ -7,6 +7,7 @@ from django.core.exceptions import PermissionDenied
 from django.core.mail import EmailMessage
 from django.core.urlresolvers import reverse
 from django.core.urlresolvers import reverse_lazy
+from django.db.models import Q
 from django.http import HttpResponseRedirect, Http404, HttpResponseForbidden, HttpResponse
 from django.shortcuts import render_to_response
 from django.template.loader import render_to_string
@@ -101,27 +102,80 @@ def view_lidnummer(request):
 def lidnummer_verzonden(request):
     return render_to_response("zues/lidnummerverzonden.html")
 
+def get_categorieen(q=(Q(status=models.Stuk.GEACCEPTEERD) | Q(status=models.Stuk.PUBLIEK))):
+    categories = []
+    for c in models.Categorie.objects.order_by('index'):
+        cat = {}
+        cat['prefix'] = c.prefix
+        cat['titel'] = c.titel
+        items = []
+        items += c.actuelepolitiekemotie_set.order_by('boeknummer').filter(q)
+        items += c.politiekemotie_set.order_by('boeknummer').filter(q)
+        items += c.organimo_set.order_by('boeknummer').filter(q)
+        items += c.resolutie_set.order_by('boeknummer').filter(q)
+        items += c.hrwijziging_set.order_by('boeknummer').filter(q)
+        items += c.amendement_set.order_by('boeknummer').filter(q)
+        cat['items'] = items
+        categories.append(cat)
+    c = [c for c in categories if c['prefix']=="PM"]
+    if len(c) == 0:
+        c = {'prefix':'PM', 'titel':'Politieke Moties', 'items':[]}
+        categories.append(c)
+    else: c=c[0]
+    c['items'] += models.PolitiekeMotie.objects.filter(q).filter(categorie=None)
+    c = [c for c in categories if c['prefix']=="APM"]
+    if len(c) == 0:
+        c = {'prefix':'APM', 'titel':'Actuele Politieke Moties', 'items':[]}
+        categories.append(c)
+    else: c=c[0]
+    c['items'] += models.ActuelePolitiekeMotie.objects.filter(q).filter(categorie=None)
+    c = [c for c in categories if c['prefix']=="RES"]
+    if len(c) == 0:
+        c = {'prefix':'RES', 'titel':'Resoluties', 'items':[]}
+        categories.append(c)
+    else: c=c[0]
+    c['items'] += models.Resolutie.objects.filter(q).filter(categorie=None)
+    c = [c for c in categories if c['prefix']=="ORG"]
+    if len(c) == 0:
+        c = {'prefix':'ORG', 'titel':'Organimo\'s', 'items':[]}
+        categories.append(c)
+    else: c=c[0]
+    c['items'] += models.Organimo.objects.filter(q).filter(categorie=None)
+    c = [c for c in categories if c['prefix']=="HR"]
+    if len(c) == 0:
+        c = {'prefix':'HR', 'titel':'HR-Wijzigingen', 'items':[]}
+        categories.append(c)
+    else: c=c[0]
+    c['items'] += models.HRWijziging.objects.filter(q).filter(categorie=None)
+    c = [c for c in categories if c['prefix']=="AM"]
+    if len(c) == 0:
+        c = {'prefix':'AM', 'titel':'Amendementen', 'items':[]}
+        categories.append(c)
+    else: c=c[0]
+    c['items'] += models.Amendement.objects.filter(q).filter(categorie=None)
+    return [c for c in categories if len(c['items'])>0]
+
 def view_home(request):
     lid = check_login(request)
     if lid:
         context = {}
         context['lid'] = lid
-        context['pm'] = models.PolitiekeMotie.objects.filter(eigenaar=lid).filter(verwijderd=False)
-        context['apm'] = models.ActuelePolitiekeMotie.objects.filter(eigenaar=lid).filter(verwijderd=False)
-        context['org'] = models.Organimo.objects.filter(eigenaar=lid).filter(verwijderd=False)
-        context['res'] = models.Resolutie.objects.filter(eigenaar=lid).filter(verwijderd=False)
-        context['am'] = models.Amendement.objects.filter(eigenaar=lid).filter(verwijderd=False)
-        context['hr'] = models.HRWijziging.objects.filter(eigenaar=lid).filter(verwijderd=False)
+        context['pm'] = models.PolitiekeMotie.objects.filter(eigenaar=lid).exclude(status=models.Stuk.VERWIJDERD)
+        context['apm'] = models.ActuelePolitiekeMotie.objects.filter(eigenaar=lid).exclude(status=models.Stuk.VERWIJDERD)
+        context['org'] = models.Organimo.objects.filter(eigenaar=lid).exclude(status=models.Stuk.VERWIJDERD)
+        context['res'] = models.Resolutie.objects.filter(eigenaar=lid).exclude(status=models.Stuk.VERWIJDERD)
+        context['am'] = models.Amendement.objects.filter(eigenaar=lid).exclude(status=models.Stuk.VERWIJDERD)
+        context['hr'] = models.HRWijziging.objects.filter(eigenaar=lid).exclude(status=models.Stuk.VERWIJDERD)
         context['count'] = len(context['pm'])+len(context['apm'])+len(context['org'])+len(context['res'])+len(context['am'])+len(context['hr'])
         tijden = models.Tijden.get_solo()
         context['tijden'] = tijden
         context['staff'] = request.user.is_active and request.user.is_staff
-        context['allpm'] = models.PolitiekeMotie.objects.filter(verwijderd=False).filter(publiek=True)
-        context['allapm'] = models.ActuelePolitiekeMotie.objects.filter(verwijderd=False).filter(publiek=True)
-        context['allorg'] = models.Organimo.objects.filter(verwijderd=False).filter(publiek=True)
-        context['allres'] = models.Resolutie.objects.filter(verwijderd=False).filter(publiek=True)
-        context['allam'] = models.Amendement.objects.filter(verwijderd=False).filter(publiek=True)
-        context['allhr'] = models.HRWijziging.objects.filter(verwijderd=False).filter(publiek=True)
+        context['allpm'] = models.PolitiekeMotie.objects.filter(status=models.Stuk.PUBLIEK)
+        context['allapm'] = models.ActuelePolitiekeMotie.objects.filter(status=models.Stuk.PUBLIEK)
+        context['allorg'] = models.Organimo.objects.filter(status=models.Stuk.PUBLIEK)
+        context['allres'] = models.Resolutie.objects.filter(status=models.Stuk.PUBLIEK)
+        context['allam'] = models.Amendement.objects.filter(status=models.Stuk.PUBLIEK)
+        context['allhr'] = models.HRWijziging.objects.filter(status=models.Stuk.PUBLIEK)
         context['allcount'] = len(context['allpm'])+len(context['allapm'])+len(context['allorg'])+len(context['allres'])+len(context['allam'])+len(context['allhr'])
         return render_to_response("zues/yolo.html", context)
 
@@ -178,58 +232,6 @@ def view_home(request):
 
     return render_to_response("zues/home.html", context)
 
-def get_categorieen():
-    categories = []
-    for c in models.Categorie.objects.order_by('index'):
-        cat = {}
-        cat['prefix'] = c.prefix
-        cat['titel'] = c.titel
-        items = []
-        items += c.actuelepolitiekemotie_set.order_by('boeknummer')
-        items += c.politiekemotie_set.order_by('boeknummer')
-        items += c.organimo_set.order_by('boeknummer')
-        items += c.resolutie_set.order_by('boeknummer')
-        items += c.hrwijziging_set.order_by('boeknummer')
-        items += c.amendement_set.order_by('boeknummer')
-        cat['items'] = items
-        categories.append(cat)
-    c = [c for c in categories if c['prefix']=="PM"]
-    if len(c) == 0:
-        c = {'prefix':'PM', 'titel':'Politieke Moties', 'items':[]}
-        categories.append(c)
-    else: c=c[0]
-    c['items'] += models.PolitiekeMotie.objects.filter(verwijderd=False).filter(categorie=None)
-    c = [c for c in categories if c['prefix']=="APM"]
-    if len(c) == 0:
-        c = {'prefix':'APM', 'titel':'Actuele Politieke Moties', 'items':[]}
-        categories.append(c)
-    else: c=c[0]
-    c['items'] += models.ActuelePolitiekeMotie.objects.filter(verwijderd=False).filter(categorie=None)
-    c = [c for c in categories if c['prefix']=="RES"]
-    if len(c) == 0:
-        c = {'prefix':'RES', 'titel':'Resoluties', 'items':[]}
-        categories.append(c)
-    else: c=c[0]
-    c['items'] += models.Resolutie.objects.filter(verwijderd=False).filter(categorie=None)
-    c = [c for c in categories if c['prefix']=="ORG"]
-    if len(c) == 0:
-        c = {'prefix':'ORG', 'titel':'Organimo\'s', 'items':[]}
-        categories.append(c)
-    else: c=c[0]
-    c['items'] += models.Organimo.objects.filter(verwijderd=False).filter(categorie=None)
-    c = [c for c in categories if c['prefix']=="HR"]
-    if len(c) == 0:
-        c = {'prefix':'HR', 'titel':'HR-Wijzigingen', 'items':[]}
-        categories.append(c)
-    else: c=c[0]
-    c['items'] += models.HRWijziging.objects.filter(verwijderd=False).filter(categorie=None)
-    c = [c for c in categories if c['prefix']=="AM"]
-    if len(c) == 0:
-        c = {'prefix':'AM', 'titel':'Amendementen', 'items':[]}
-        categories.append(c)
-    else: c=c[0]
-    c['items'] += models.Amendement.objects.filter(verwijderd=False).filter(categorie=None)
-    return [c for c in categories if len(c['items'])>0]
 
 @staff_member_required
 def view_export(request):
@@ -327,41 +329,23 @@ class EigenaarMixin(object):
         except PermissionDenied:
             return HttpResponseForbidden()
 
-class MagPMMixin(object):
-    def dispatch(self, request, *args, **kwargs):
-        if not models.Tijden.get_solo().mag_pm(): return HttpResponseForbidden()
-        else: return super(MagPMMixin, self).dispatch(request, *args, **kwargs)
+class MagWijzigenMixin(object):
+    def get_object(self, **kwargs):
+        obj = super(MagWijzigenMixin, self).get_object(**kwargs)
+        if not obj.mag_wijzigen(): raise PermissionDenied()
+        return obj
 
-class MagAPMMixin(object):
-    def dispatch(self, request, *args, **kwargs):
-        if not models.Tijden.get_solo().mag_apm(): return HttpResponseForbidden()
-        else: return super(MagAPMMixin, self).dispatch(request, *args, **kwargs)
-
-class MagORGMixin(object):
-    def dispatch(self, request, *args, **kwargs):
-        if not models.Tijden.get_solo().mag_org(): return HttpResponseForbidden()
-        else: return super(MagORGMixin, self).dispatch(request, *args, **kwargs)
-
-class MagRESMixin(object):
-    def dispatch(self, request, *args, **kwargs):
-        if not models.Tijden.get_solo().mag_res(): return HttpResponseForbidden()
-        else: return super(MagRESMixin, self).dispatch(request, *args, **kwargs)
-
-class MagAMMixin(object):
-    def dispatch(self, request, *args, **kwargs):
-        if not models.Tijden.get_solo().mag_am(): return HttpResponseForbidden()
-        else: return super(MagAMMixin, self).dispatch(request, *args, **kwargs)
-
-class MagHRMixin(object):
-    def dispatch(self, request, *args, **kwargs):
-        if not models.Tijden.get_solo().mag_hr(): return HttpResponseForbidden()
-        else: return super(MagHRMixin, self).dispatch(request, *args, **kwargs)
+class MagVerwijderenMixin(object):
+    def get_object(self, **kwargs):
+        obj = super(MagVerwijderenMixin, self).get_object(**kwargs)
+        if not obj.mag_verwijderen(): raise PermissionDenied()
+        return obj
 
 class PMView(LidMixin, DetailView):
     template_name = 'zues/pm.html'
     context_object_name = "voorstel"
     model = models.PolitiekeMotie
-    queryset = models.PolitiekeMotie.objects.filter(verwijderd=False)
+    queryset = models.PolitiekeMotie.objects.exclude(status=models.Stuk.VERWIJDERD)
 
     def get_object(self, **kwargs):
         obj = super(PMView, self).get_object(**kwargs)
@@ -374,10 +358,14 @@ class PMView(LidMixin, DetailView):
         context['mag'] = models.Tijden.get_solo().mag_pm() and self.lid == context['voorstel'].eigenaar
         return context
 
-class NieuwePM(LoginMixin, MagPMMixin, CreateView):
+class NieuwePM(LoginMixin, CreateView):
     model = models.PolitiekeMotie
     form_class = forms.PMForm
     template_name = 'zues/pmnew.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        if not models.Tijden.get_solo().mag_pm(): return HttpResponseForbidden()
+        else: return super(NieuwePM, self).dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
         if 'preview' not in self.request.POST:
@@ -390,25 +378,23 @@ class NieuwePM(LoginMixin, MagPMMixin, CreateView):
             self.object.save()
             return HttpResponseRedirect(self.object.get_absolute_url())
 
-class WijzigPM(LoginMixin, EigenaarMixin, MagPMMixin, UpdateView):
+class WijzigPM(LoginMixin, EigenaarMixin, MagWijzigenMixin, UpdateView):
     model = models.PolitiekeMotie
     form_class = forms.PMForm
     template_name = 'zues/pmnew.html'
-    queryset = models.PolitiekeMotie.objects.filter(verwijderd=False)
 
     def get_context_data(self, **kwargs):
         context = super(WijzigPM, self).get_context_data(**kwargs)
         context['edit'] = 1
         return context
 
-class VerwijderPM(LoginMixin, EigenaarMixin, MagPMMixin, DeleteView):
+class VerwijderPM(LoginMixin, EigenaarMixin, MagVerwijderenMixin, DeleteView):
     model = models.PolitiekeMotie
     template_name = 'zues/pmdel.html'
-    queryset = models.PolitiekeMotie.objects.filter(verwijderd=False)
 
     def delete(self, request, *args, **kwargs):
         self.object = self.get_object()
-        self.object.verwijderd = True
+        self.object.status = models.Stuk.VERWIJDERD
         self.object.save()
         return HttpResponseRedirect(reverse_lazy("zues:home"))
 
@@ -416,7 +402,7 @@ class APMView(LidMixin, DetailView):
     template_name = 'zues/apm.html'
     context_object_name = "voorstel"
     model = models.ActuelePolitiekeMotie
-    queryset = models.ActuelePolitiekeMotie.objects.filter(verwijderd=False)
+    queryset = models.ActuelePolitiekeMotie.objects.exclude(status=models.Stuk.VERWIJDERD)
 
     def get_object(self, **kwargs):
         obj = super(APMView, self).get_object(**kwargs)
@@ -429,10 +415,14 @@ class APMView(LidMixin, DetailView):
         context['mag'] = models.Tijden.get_solo().mag_apm() and self.lid == context['voorstel'].eigenaar
         return context
 
-class NieuweAPM(LoginMixin, MagAPMMixin, CreateView):
+class NieuweAPM(LoginMixin, CreateView):
     model = models.ActuelePolitiekeMotie
     form_class = forms.APMForm
     template_name = 'zues/apmnew.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        if not models.Tijden.get_solo().mag_apm(): return HttpResponseForbidden()
+        else: return super(MagAPMMixin, self).dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
         if 'preview' not in self.request.POST:
@@ -445,25 +435,23 @@ class NieuweAPM(LoginMixin, MagAPMMixin, CreateView):
             self.object.save()
             return HttpResponseRedirect(self.object.get_absolute_url())
 
-class WijzigAPM(LoginMixin, EigenaarMixin, MagAPMMixin, UpdateView):
+class WijzigAPM(LoginMixin, EigenaarMixin, MagWijzigenMixin, UpdateView):
     model = models.ActuelePolitiekeMotie
     form_class = forms.APMForm
     template_name = 'zues/apmnew.html'
-    queryset = models.ActuelePolitiekeMotie.objects.filter(verwijderd=False)
 
     def get_context_data(self, **kwargs):
         context = super(WijzigAPM, self).get_context_data(**kwargs)
         context['edit'] = 1
         return context
 
-class VerwijderAPM(LoginMixin, EigenaarMixin, MagAPMMixin, DeleteView):
+class VerwijderAPM(LoginMixin, EigenaarMixin, MagVerwijderenMixin, DeleteView):
     model = models.ActuelePolitiekeMotie
     template_name = 'zues/apmdel.html'
-    queryset = models.ActuelePolitiekeMotie.objects.filter(verwijderd=False)
 
     def delete(self, request, *args, **kwargs):
         self.object = self.get_object()
-        self.object.verwijderd = True
+        self.object.status = models.Stuk.VERWIJDERD
         self.object.save()
         return HttpResponseRedirect(reverse_lazy("zues:home"))
 
@@ -471,7 +459,7 @@ class ORGView(LidMixin, DetailView):
     template_name = 'zues/org.html'
     context_object_name = "voorstel"
     model = models.Organimo
-    queryset = models.Organimo.objects.filter(verwijderd=False)
+    queryset = models.Organimo.objects.exclude(status=models.Stuk.VERWIJDERD)
 
     def get_object(self, **kwargs):
         obj = super(ORGView, self).get_object(**kwargs)
@@ -484,10 +472,14 @@ class ORGView(LidMixin, DetailView):
         context['mag'] = models.Tijden.get_solo().mag_org() and self.lid == context['voorstel'].eigenaar
         return context
 
-class NieuweORG(LoginMixin, MagORGMixin, CreateView):
+class NieuweORG(LoginMixin, CreateView):
     model = models.Organimo
     form_class = forms.ORGForm
     template_name = 'zues/orgnew.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        if not models.Tijden.get_solo().mag_org(): return HttpResponseForbidden()
+        else: return super(MagORGMixin, self).dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
         if 'preview' not in self.request.POST:
@@ -500,25 +492,23 @@ class NieuweORG(LoginMixin, MagORGMixin, CreateView):
             self.object.save()
             return HttpResponseRedirect(self.object.get_absolute_url())
 
-class WijzigORG(LoginMixin, EigenaarMixin, MagORGMixin, UpdateView):
+class WijzigORG(LoginMixin, EigenaarMixin, MagWijzigenMixin, UpdateView):
     model = models.Organimo
     form_class = forms.ORGForm
     template_name = 'zues/orgnew.html'
-    queryset = models.Organimo.objects.filter(verwijderd=False)
 
     def get_context_data(self, **kwargs):
         context = super(WijzigORG, self).get_context_data(**kwargs)
         context['edit'] = 1
         return context
 
-class VerwijderORG(LoginMixin, EigenaarMixin, MagORGMixin, DeleteView):
+class VerwijderORG(LoginMixin, EigenaarMixin, MagVerwijderenMixin, DeleteView):
     model = models.Organimo
     template_name = 'zues/orgdel.html'
-    queryset = models.Organimo.objects.filter(verwijderd=False)
 
     def delete(self, request, *args, **kwargs):
         self.object = self.get_object()
-        self.object.verwijderd = True
+        self.object.status = models.Stuk.VERWIJDERD
         self.object.save()
         return HttpResponseRedirect(reverse_lazy("zues:home"))
 
@@ -526,7 +516,7 @@ class RESView(LidMixin, DetailView):
     template_name = 'zues/res.html'
     context_object_name = "voorstel"
     model = models.Resolutie
-    queryset = models.Resolutie.objects.filter(verwijderd=False)
+    queryset = models.Resolutie.objects.exclude(status=models.Stuk.VERWIJDERD)
 
     def get_object(self, **kwargs):
         obj = super(RESView, self).get_object(**kwargs)
@@ -539,10 +529,14 @@ class RESView(LidMixin, DetailView):
         context['mag'] = models.Tijden.get_solo().mag_res() and self.lid == context['voorstel'].eigenaar
         return context
 
-class NieuweRES(LoginMixin, MagRESMixin, CreateView):
+class NieuweRES(LoginMixin, CreateView):
     model = models.Resolutie
     form_class = forms.RESForm
     template_name = 'zues/resnew.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        if not models.Tijden.get_solo().mag_res(): return HttpResponseForbidden()
+        else: return super(MagRESMixin, self).dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
         if 'preview' not in self.request.POST:
@@ -555,25 +549,23 @@ class NieuweRES(LoginMixin, MagRESMixin, CreateView):
             self.object.save()
             return HttpResponseRedirect(self.object.get_absolute_url())
 
-class WijzigRES(LoginMixin, EigenaarMixin, MagRESMixin, UpdateView):
+class WijzigRES(LoginMixin, EigenaarMixin, MagWijzigenMixin, UpdateView):
     model = models.Resolutie
     form_class = forms.RESForm
     template_name = 'zues/resnew.html'
-    queryset = models.Resolutie.objects.filter(verwijderd=False)
 
     def get_context_data(self, **kwargs):
         context = super(WijzigRES, self).get_context_data(**kwargs)
         context['edit'] = 1
         return context
 
-class VerwijderRES(LoginMixin, EigenaarMixin, MagRESMixin, DeleteView):
+class VerwijderRES(LoginMixin, EigenaarMixin, MagVerwijderenMixin, DeleteView):
     model = models.Resolutie
     template_name = 'zues/resdel.html'
-    queryset = models.Resolutie.objects.filter(verwijderd=False)
 
     def delete(self, request, *args, **kwargs):
         self.object = self.get_object()
-        self.object.verwijderd = True
+        self.object.status = models.Stuk.VERWIJDERD
         self.object.save()
         return HttpResponseRedirect(reverse_lazy("zues:home"))
 
@@ -581,7 +573,7 @@ class AMView(LidMixin, DetailView):
     template_name = 'zues/am.html'
     context_object_name = "voorstel"
     model = models.Amendement
-    queryset = models.Amendement.objects.filter(verwijderd=False)
+    queryset = models.Amendement.objects.exclude(status=models.Stuk.VERWIJDERD)
 
     def get_object(self, **kwargs):
         obj = super(AMView, self).get_object(**kwargs)
@@ -594,10 +586,14 @@ class AMView(LidMixin, DetailView):
         context['mag'] = models.Tijden.get_solo().mag_am() and self.lid == context['voorstel'].eigenaar
         return context
 
-class NieuweAM(LoginMixin, MagAMMixin, CreateView):
+class NieuweAM(LoginMixin, CreateView):
     model = models.Amendement
     form_class = forms.AMForm
     template_name = 'zues/amnew.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        if not models.Tijden.get_solo().mag_am(): return HttpResponseForbidden()
+        else: return super(MagAMMixin, self).dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
         if 'preview' not in self.request.POST:
@@ -610,25 +606,23 @@ class NieuweAM(LoginMixin, MagAMMixin, CreateView):
             self.object.save()
             return HttpResponseRedirect(self.object.get_absolute_url())
 
-class WijzigAM(LoginMixin, EigenaarMixin, MagAMMixin, UpdateView):
+class WijzigAM(LoginMixin, EigenaarMixin, MagWijzigenMixin, UpdateView):
     model = models.Amendement
     form_class = forms.AMForm
     template_name = 'zues/amnew.html'
-    queryset = models.Amendement.objects.filter(verwijderd=False)
 
     def get_context_data(self, **kwargs):
         context = super(WijzigAM, self).get_context_data(**kwargs)
         context['edit'] = 1
         return context
 
-class VerwijderAM(LoginMixin, EigenaarMixin, MagAMMixin, DeleteView):
+class VerwijderAM(LoginMixin, EigenaarMixin, MagVerwijderenMixin, DeleteView):
     model = models.Amendement
     template_name = 'zues/amdel.html'
-    queryset = models.Amendement.objects.filter(verwijderd=False)
 
     def delete(self, request, *args, **kwargs):
         self.object = self.get_object()
-        self.object.verwijderd = True
+        self.object.status = models.Stuk.VERWIJDERD
         self.object.save()
         return HttpResponseRedirect(reverse_lazy("zues:home"))
 
@@ -636,7 +630,7 @@ class HRView(LidMixin, DetailView):
     template_name = 'zues/hr.html'
     context_object_name = "voorstel"
     model = models.HRWijziging
-    queryset = models.HRWijziging.objects.filter(verwijderd=False)
+    queryset = models.HRWijziging.objects.exclude(status=models.Stuk.VERWIJDERD)
 
     def get_object(self, **kwargs):
         obj = super(HRView, self).get_object(**kwargs)
@@ -649,10 +643,14 @@ class HRView(LidMixin, DetailView):
         context['mag'] = models.Tijden.get_solo().mag_hr() and self.lid == context['voorstel'].eigenaar
         return context
 
-class NieuweHR(LoginMixin, MagHRMixin, CreateView):
+class NieuweHR(LoginMixin, CreateView):
     model = models.HRWijziging
     form_class = forms.HRForm
     template_name = 'zues/hrnew.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        if not models.Tijden.get_solo().mag_hr(): return HttpResponseForbidden()
+        else: return super(MagHRMixin, self).dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
         if 'preview' not in self.request.POST:
@@ -665,24 +663,22 @@ class NieuweHR(LoginMixin, MagHRMixin, CreateView):
             self.object.save()
             return HttpResponseRedirect(self.object.get_absolute_url())
 
-class WijzigHR(LoginMixin, EigenaarMixin, MagHRMixin, UpdateView):
+class WijzigHR(LoginMixin, EigenaarMixin, MagWijzigenMixin, UpdateView):
     model = models.HRWijziging
     form_class = forms.HRForm
     template_name = 'zues/hrnew.html'
-    queryset = models.HRWijziging.objects.filter(verwijderd=False)
 
     def get_context_data(self, **kwargs):
         context = super(WijzigHR, self).get_context_data(**kwargs)
         context['edit'] = 1
         return context
 
-class VerwijderHR(LoginMixin, EigenaarMixin, MagHRMixin, DeleteView):
+class VerwijderHR(LoginMixin, EigenaarMixin, MagVerwijderenMixin, DeleteView):
     model = models.HRWijziging
     template_name = 'zues/hrdel.html'
-    queryset = models.HRWijziging.objects.filter(verwijderd=False)
 
     def delete(self, request, *args, **kwargs):
         self.object = self.get_object()
-        self.object.verwijderd = True
+        self.object.status = models.Stuk.VERWIJDERD
         self.object.save()
         return HttpResponseRedirect(reverse_lazy("zues:home"))
