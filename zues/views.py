@@ -170,6 +170,7 @@ def view_home(request):
         tijden = models.Tijden.get_solo()
         context['tijden'] = tijden
         context['staff'] = request.user.is_active and request.user.is_staff
+        context['publiek'] = get_categorieen(Q(status=models.Stuk.PUBLIEK))
         context['allpm'] = models.PolitiekeMotie.objects.filter(status=models.Stuk.PUBLIEK)
         context['allapm'] = models.ActuelePolitiekeMotie.objects.filter(status=models.Stuk.PUBLIEK)
         context['allorg'] = models.Organimo.objects.filter(status=models.Stuk.PUBLIEK)
@@ -232,6 +233,12 @@ def view_home(request):
 
     return render_to_response("zues/home.html", context)
 
+def view_publiek(request):
+    lid = check_login(request)
+    if lid == None:
+        return HttpResponseRedirect('/')
+    context = {'categories': get_categorieen(Q(status=models.Stuk.PUBLIEK))}
+    return render_to_response("zues/publiek.html", context)
 
 @staff_member_required
 def view_export(request):

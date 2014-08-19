@@ -1,0 +1,65 @@
+{% extends 'zues/base.html' %}
+{% load staticfiles %}
+{% block terugnaarbegin %}{% endblock %}
+{% block head %}
+<script src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
+<script src="{% static 'zues/js/jquery-sortable-min.js' %}"></script>
+<style>
+    .minibutton {
+        background:url('{% static 'zues/images/plusminus.png' %}') no-repeat top left;
+        /*background-position-y: -10px;*/
+        background-size: 75%;
+        display: inline-block;
+        /*position: relative;
+        top: 0px;*/
+        height: 15px;
+        width: 20px;
+        cursor: pointer;
+    }
+</style>
+{% endblock %}
+{% block content %}
+
+{% for k in categories %}
+<h2>{{ k.titel }}</h2>
+{% for m in k.items %}
+{{ m.as_html_table }}
+{% endfor %}
+{% endfor %}
+
+<script>
+var publiekPage = {
+    
+    init: function() {
+        publiekPage.setup();
+    },
+
+    setup: function() {
+        $('#content table').each(publiekPage.setupVoorstel);
+    },
+
+    onToggleVoorstel: function(event) {
+        // toggle icon
+        var y = -15 - parseInt($(this).css('background-position-y'));
+        $(this).css({backgroundPositionY: ''+y+'px'});
+        // toggle rest of table
+        $(this).closest('table').find('tr:not(.exporttitle)').toggle();
+    },
+
+    setupVoorstel: function(i, v) {
+        // oude tekst
+        var boeknummer = $(v).find('tr:first-child td:first-child').text()
+        // toevoegen +- knopje bij elke item
+        $('tr:first-child td:first-child', v).html('<span class="minibutton">&nbsp;</span><span>'+boeknummer+'</span>');
+        // elk knopje interactief maken
+        $('.minibutton', v).click(publiekPage.onToggleVoorstel);
+        // standaard ingeklapt
+        $('tr:not(.exporttitle)', v).toggle();
+    },
+};
+
+$(document).ready(publiekPage.init);
+
+</script>
+
+{% endblock %} 
