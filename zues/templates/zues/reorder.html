@@ -21,6 +21,7 @@
         height: 20px;
         width: 20px;
         padding-right: 4px;
+        cursor: pointer;
     }
     .cat .minibutton {
         background:url('{% static 'zues/images/plusminus.png' %}') no-repeat top left;
@@ -40,7 +41,7 @@
     }
     .cat .title {
         font-size: 20px;
-        cursor: pointer;
+        cursor: move;
     }
     .sortable {
         margin: 0 0 9px 0;
@@ -67,6 +68,9 @@
         border-left-color: red;
         border-right: none;
     }
+    #cats > li {
+        margin: 16px 0;
+    }
 </style>
 {% endblock %}
 {% block terugnaarbegin %}{% endblock %}
@@ -80,21 +84,20 @@
 <button class='jdbutton' id="opslaan" style='width: 100px'>Opslaan</button>
 </span>
 
+<ul id="cats" class="sortable">
 {% for l in categories %}
-{% for k,v in voorstellen.items %}
-{% if l == k %}
-<span>&nbsp;</span>
+<li>
 <div class="cat">
-<div class="title"><span class="button">&nbsp;</span><span>{{ k }}</span></div>
+<div class="title"><span class="button">&nbsp;</span><span style="display:inline-block; width: 150px">{{ l.prefix }}</span><span>{{ l.titel }}</span></div>
 <ul class="sortable">
-{% for m in v %}
+{% for m in l.items %}
 <li>{{ m.as_html_table }}</li>
 {% endfor %}
 </ul>
 </div>
-{% endif %}
+</li>
 {% endfor %}
-{% endfor %}
+</ul>
 
 <script>
 $.ajaxSetup({ 
@@ -120,10 +123,46 @@ $.ajaxSetup({
          }
      } 
 });
-$(function() {
-    $.fn.gather_pks = function(callback) {
+
+var reorderPage = {
+    
+    init: function() {
+        reorderPage.setup();
+    },
+
+    setup: function() {
+        $('#opslaan').click(reorderPage.onOpslaan);
+        $('#toevoegen').click(reorderPage.onToevoegen);
+        reorderPage.setupCats();
+        $('.cat').each(reorderPage.setupCat);
+        $('.cat table').each(reorderPage.setupVoorstel);
+        reorderPage.reorderAll();
+    },
+
+    gather_data: function(callback) {
+        var cats = [];
+        $('.cat').each(function(i, v) {
+            var prefix = $(v).find('.title span:nth-child(2)').text();
+            var titel = $(v).find('.title span:nth-child(3)').text();
+            var items = [];
+            $(v).find('table').each(function(i, v) {
+                var splitClassName = v.className.split(/\s+/);
+                for (var j in splitClassName) {
+                    var className = splitClassName[j];
+                    if (className.indexOf('pk-')===0) {
+                        pk = className.substr(3);
+                        items.push(pk);
+                    }
+                }
+            });
+            cats.push({idx: i, prefix: prefix, titel: titel, items: items});
+        });
+        return cats;
+    },
+
+    gather_pks: function(callback) {
         var pks = [];
-        $.each(this, function(i, v) {
+        $('.cat table').each(function(i, v) {
             var splitClassName = v.className.split(/\s+/);
             for (var j in splitClassName) {
                 var className = splitClassName[j];
@@ -137,51 +176,47 @@ $(function() {
             for (var i in pks) callback(pks[i]);
         }
         return pks;
-    };
-    $('#opslaan').click(function() {
-        var res = {};
-        $('.cat table').gather_pks(function(pk) {
-            res[pk] = $('.cat table.pk-'+pk+' td:first').text();
-        });
-        $.post("{% url 'zues:reorder' %}", res);
-    });
-    function pad(str, max) {
+    },
+
+    onOpslaan: function(event) {
+        var data = JSON.stringify(reorderPage.gather_data());
+        $.post("{% url 'zues:reorder' %}", data);
+    },
+
+    pad: function(str, max) {
         str = str.toString();
-        return str.length < max ? pad("0"+str, max) : str;
-    }
-    $.fn.reorder = function() {
-        this.each(function() {
-            var txt = $('.title span:nth-child(2)', this).text();
-            var c = $('table tr:first-child td:first-child', this);
-            if (c.length == 1) c.html('<span class="minibutton">&nbsp;</span>'+txt);
-            else c.each(function (i) {$(this).html('<span class="minibutton">&nbsp;</span>'+txt+' '+pad(i+1,2));});
-        });
-        $('.minibutton').click(function() {
-            var y = -15 - parseInt($(this).css('background-position-y'));
-            $(this).css({backgroundPositionY: ''+y+'px'});
-            $('tr:not(.exporttitle)',$(this).parent().parent().parent()).toggle();
-        });
-        return this;
-    };
-    $.fn.add_cat = function(cat) {
-        var str = '<span>&nbsp;</span><div class="cat"><div class="title"><span class="button">&nbsp;</span><span>'+cat+'</span></div><ul class="sortable"></ul></div>'
-        var item = $($.parseHTML(str)).appendTo(this);
-        item.makeInteractive();
-    };
-    $('#toevoegen').click(function() {
-        var input = prompt('Geef een nieuwe (unieke) prefix:');
-        if (input === null) return;
-        $('#content').add_cat(input);
-    });
-    $.fn.makeInteractive = function() {
-        this.each(function() {
-        $('.title', this).click(function() {
-            var y = -20 - parseInt($(this).children(".button").css('background-position-y'));
-            $(this).children(".button").css({backgroundPositionY: ''+y+'px'});
-            $(this).parent().children("ul").slideToggle();
-        });
-        $('.sortable', this).sortable({
-            group: 'sortable',
+        return str.length < max ? reorderPage.pad("0"+str, max) : str;
+    },
+
+    reorderCat: function() {
+        var txt = $('.title span:nth-child(2)', this).text();
+        var c = $('table tr:first-child td:first-child span:nth-child(2)', this);
+        if (c.length == 1) c.text(txt);
+        else c.each(function (i) { $(this).text(txt+reorderPage.pad(i+1,2)); });
+    },
+
+    reorderAll: function() {
+        $('.cat').each(reorderPage.reorderCat);
+    },
+
+    addCat: function(cat, titel) {
+        var str = '<li><div class="cat"><div class="title"><span class="button">&nbsp;</span><span style="display:inline-block; width: 150px;">'+cat+'</span><span>'+titel+'</span></div><ul class="sortable"></ul></div></li>'
+        var item = $($.parseHTML(str)).appendTo($('#cats'));
+        reorderPage.setupCat(item);
+    },
+
+    onToevoegen: function(event) {
+        var prefix = prompt('Geef een nieuwe (unieke) prefix:');
+        if (prefix === null) return;
+        var titel = prompt('Geef een titel voor categorie "'+prefix+'":');
+        if (titel === null) return;
+        reorderPage.addCat(prefix, titel);
+    },
+
+    setupCats: function() {
+        // maak sortable
+        $('#cats').sortable({
+            group: 'cats',
             pullPlaceholder: false,
             // animation on drop
             onDrop: function  (item, targetContainer, _super) {
@@ -193,15 +228,11 @@ $(function() {
                     clonedItem.detach()
                     _super(item)
                 })
-
-                // reorder on drop
-                $('.cat').reorder();
             },
             // set item relative to cursor position
             onDragStart: function ($item, container, _super) {
                 var offset = $item.offset(),
                 pointer = container.rootGroup.pointer
-
                 adjustment = {
                     left: pointer.left - offset.left,
                     top: pointer.top - offset.top
@@ -211,22 +242,91 @@ $(function() {
             onDrag: function ($item, position) {
                 $item.css({left: position.left - adjustment.left,
                            top: position.top - adjustment.top})
+                // autoscroll
                 var top = $(window).scrollTop();
                 var bottom = top + $(window).innerHeight();
-                if (position.top > bottom - 150) {
+                if (position.top > bottom - 100) {
                     $(window).scrollTop(top+20);
-                } else if (position.top < top + 150) {
+                } else if (position.top < top + 100) {
                     $(window).scrollTop(top-20);
                 }
             },
         });
+    },
+
+    onToggleCat: function(event) {
+        var y = -20 - parseInt($(this).css('background-position-y'));
+        $(this).css({backgroundPositionY: ''+y+'px'});
+        $(this).closest('.cat').children("ul").toggle();
+    },
+
+    setupCat: function(i, v) {
+        // +/- knopje van categorie
+        $('.title .button', v).click(reorderPage.onToggleCat);
+
+        // maak sortable
+        $('.sortable', v).sortable({
+            group: 'sortable',
+            nested: false,
+            pullPlaceholder: false,
+            // animation on drop
+            onDrop: function  (item, targetContainer, _super) {
+                var clonedItem = $('<li/>').css({height: 0})
+                item.before(clonedItem)
+                clonedItem.animate({'height': item.height()})
+                item.animate(clonedItem.position(), function  () {
+                    clonedItem.detach()
+                    _super(item)
+                })
+                // reorder on drop
+                reorderPage.reorderAll();
+                $('#cats').sortable('enable')
+            },
+            // set item relative to cursor position
+            onDragStart: function ($item, container, _super) {
+                var offset = $item.offset(),
+                pointer = container.rootGroup.pointer
+                adjustment = {
+                    left: pointer.left - offset.left,
+                    top: pointer.top - offset.top
+                }
+                $('#cats').sortable('disable')
+                _super($item, container)
+            },
+            onDrag: function ($item, position) {
+                $item.css({left: position.left - adjustment.left,
+                           top: position.top - adjustment.top})
+                // autoscroll
+                var top = $(window).scrollTop();
+                var bottom = top + $(window).innerHeight();
+                if (position.top > bottom - 100) {
+                    $(window).scrollTop(top+20);
+                } else if (position.top < top + 100) {
+                    $(window).scrollTop(top-20);
+                }
+            },
         });
-        return this;
-    };
-    $('.cat').makeInteractive();
-    $('.cat').reorder();
-    $('.cat tr:not(.exporttitle)').toggle();
-});
+    },
+
+    onToggleVoorstel: function(event) {
+        // toggle icon
+        var y = -15 - parseInt($(this).css('background-position-y'));
+        $(this).css({backgroundPositionY: ''+y+'px'});
+        // toggle rest of table
+        $(this).closest('table').find('tr:not(.exporttitle)').toggle();
+    },
+
+    setupVoorstel: function(i, v) {
+        // toevoegen +- knopje bij elke item
+        $('tr:first-child td:first-child', v).html('<span class="minibutton">&nbsp;</span><span></span>');
+        // elk knopje interactief maken
+        $('.minibutton', v).click(reorderPage.onToggleVoorstel);
+        // standaard ingeklapt
+        $('tr:not(.exporttitle)', v).toggle();
+    },
+};
+
+$(document).ready(reorderPage.init);
 
 </script>
 

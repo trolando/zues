@@ -5,12 +5,9 @@
 {% block content %}
 
 {% for k in categories %}
-{% for l,v in voorstellen.items %}
-{% if l == k %}
-{% for m in v %}
+<h2>{{ k.titel }}</h2>
+{% for m in k.items %}
 {{ m.as_html_table }}
-{% endfor %}
-{% endif %}
 {% endfor %}
 {% endfor %}
 

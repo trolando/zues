@@ -91,6 +91,17 @@ class Tijden(SingletonModel):
     class Meta:
         verbose_name_plural = 'tijden'
 
+class Categorie(models.Model):
+    prefix = models.CharField(max_length=50,unique=True)
+    titel = models.CharField(max_length=250,)
+    index = models.IntegerField()
+
+    def __unicode__(self):
+        return unicode("Categorie {0}".format(self.prefix))
+
+    class Meta:
+        verbose_name_plural = u'categorieen'
+
 class Stuk(models.Model):
     titel = models.CharField(max_length=250,)
     indieners = models.TextField()
@@ -103,7 +114,12 @@ class Stuk(models.Model):
     eigenaar = models.ForeignKey(Login, blank=True, null=True, on_delete=models.SET_NULL) # bij verwijderen eigenaar, verliest eigenaar
     verwijderd = models.BooleanField(default=False)
     publiek = models.BooleanField(default=False)
-    boeknummer = models.CharField(max_length=250, blank=True,)
+    boeknummer = models.IntegerField(blank=True)
+    categorie = models.ForeignKey(Categorie, blank=True, null=True, on_delete=models.SET_NULL) # bij verwijderen categorie, doei categorie
+
+    def format_boeknummer(self):
+        if self.categorie == None: return ""
+        return escape("%s%.02d" % (self.categorie.prefix, self.boeknummer))
 
     class Meta:
         abstract = True

@@ -178,86 +178,98 @@ def view_home(request):
 
     return render_to_response("zues/home.html", context)
 
-def verzamel_op_boeknummer(voorstellen, stukken, default):
-    for x in stukken:
-        if len(x.boeknummer) > 0:
-            i = x.boeknummer.rfind(' ')
-            if i != -1:
-                try:
-                    grp = x.boeknummer[:i]
-                    idx = int(x.boeknummer[i+1:])
-                except ValueError:
-                    grp = x.boeknummer
-                    idx = ''
-            else:
-                grp = x.boeknummer
-                idx = ''
-        else:
-            grp = default
-            idx = "rest"
-        if grp not in voorstellen: voorstellen[grp] = {}
-        if idx not in voorstellen[grp]: voorstellen[grp][idx] = []
-        voorstellen[grp][idx].append(x);
-
-def geplet(s):
-    keys = s.keys()
-    keys.sort()
-    res = []
-    for k in keys: res = res + s[k]
-    return res
+def get_categorieen():
+    categories = []
+    for c in models.Categorie.objects.order_by('index'):
+        cat = {}
+        cat['prefix'] = c.prefix
+        cat['titel'] = c.titel
+        items = []
+        items += c.actuelepolitiekemotie_set.all()
+        items += c.politiekemotie_set.all()
+        items += c.organimo_set.all()
+        items += c.resolutie_set.all()
+        items += c.hrwijziging_set.all()
+        items += c.amendement_set.all()
+        cat['items'] = items
+        categories.append(cat)
+    c = [c for c in categories if c['prefix']=="PM"]
+    if len(c) == 0:
+        c = {'prefix':'PM', 'titel':'Politieke Moties', 'items':[]}
+        categories.append(c)
+    else: c=c[0]
+    c['items'] += models.PolitiekeMotie.objects.filter(verwijderd=False).filter(categorie=None)
+    c = [c for c in categories if c['prefix']=="APM"]
+    if len(c) == 0:
+        c = {'prefix':'APM', 'titel':'Actuele Politieke Moties', 'items':[]}
+        categories.append(c)
+    else: c=c[0]
+    c['items'] += models.ActuelePolitiekeMotie.objects.filter(verwijderd=False).filter(categorie=None)
+    c = [c for c in categories if c['prefix']=="RES"]
+    if len(c) == 0:
+        c = {'prefix':'RES', 'titel':'Resoluties', 'items':[]}
+        categories.append(c)
+    else: c=c[0]
+    c['items'] += models.Resolutie.objects.filter(verwijderd=False).filter(categorie=None)
+    c = [c for c in categories if c['prefix']=="ORG"]
+    if len(c) == 0:
+        c = {'prefix':'ORG', 'titel':'Organimo\'s', 'items':[]}
+        categories.append(c)
+    else: c=c[0]
+    c['items'] += models.Organimo.objects.filter(verwijderd=False).filter(categorie=None)
+    c = [c for c in categories if c['prefix']=="HR"]
+    if len(c) == 0:
+        c = {'prefix':'HR', 'titel':'HR-Wijzigingen', 'items':[]}
+        categories.append(c)
+    else: c=c[0]
+    c['items'] += models.HRWijziging.objects.filter(verwijderd=False).filter(categorie=None)
+    c = [c for c in categories if c['prefix']=="AM"]
+    if len(c) == 0:
+        c = {'prefix':'AM', 'titel':'Amendementen', 'items':[]}
+        categories.append(c)
+    else: c=c[0]
+    c['items'] += models.Amendement.objects.filter(verwijderd=False).filter(categorie=None)
+    return categories
 
 @staff_member_required
 def view_export(request):
-    voorstellen = {}
-    verzamel_op_boeknummer(voorstellen, models.PolitiekeMotie.objects.filter(verwijderd=False), "PM")
-    verzamel_op_boeknummer(voorstellen, models.ActuelePolitiekeMotie.objects.filter(verwijderd=False), "APM")
-    verzamel_op_boeknummer(voorstellen, models.Organimo.objects.filter(verwijderd=False), "ORG")
-    verzamel_op_boeknummer(voorstellen, models.Resolutie.objects.filter(verwijderd=False), "RES")
-    verzamel_op_boeknummer(voorstellen, models.Amendement.objects.filter(verwijderd=False), "AM")
-    verzamel_op_boeknummer(voorstellen, models.HRWijziging.objects.filter(verwijderd=False), "HR")
-    # oke, pletten en sorteren
-    for k in voorstellen:
-        voorstellen[k] = geplet(voorstellen[k])
-    keys = voorstellen.keys()
-    keys.sort()
-    context = {'categories': keys, 'voorstellen': voorstellen}
+    context = {'categories': get_categorieen()}
     return render_to_response("zues/export.html", context)
 
 @staff_member_required
 def view_reorder(request):
     if request.method == 'POST':
-        for k in request.POST:
-            try:
-                if k.startswith("PM-"):
-                    o = models.PolitiekeMotie.objects.get(pk=int(k[3:]))
-                elif k.startswith("APM-"):
-                    o = models.ActuelePolitiekeMotie.objects.get(pk=int(k[4:]))
-                elif k.startswith("ORG-"):
-                    o = models.Organimo.objects.get(pk=int(k[4:]))
-                elif k.startswith("RES-"):
-                    o = models.Resolutie.objects.get(pk=int(k[4:]))
-                elif k.startswith("AM-"):
-                    o = models.Amendement.objects.get(pk=int(k[3:]))
-                elif k.startswith("HR-"):
-                    o = models.HRWijziging.objects.get(pk=int(k[3:]))
-                o.boeknummer = request.POST[k]
-                o.save()
-            except ObjectDoesNotExist:
-                pass # huh? whatever.
-            
-    voorstellen = {}
-    verzamel_op_boeknummer(voorstellen, models.PolitiekeMotie.objects.filter(verwijderd=False), "PM")
-    verzamel_op_boeknummer(voorstellen, models.ActuelePolitiekeMotie.objects.filter(verwijderd=False), "APM")
-    verzamel_op_boeknummer(voorstellen, models.Organimo.objects.filter(verwijderd=False), "ORG")
-    verzamel_op_boeknummer(voorstellen, models.Resolutie.objects.filter(verwijderd=False), "RES")
-    verzamel_op_boeknummer(voorstellen, models.Amendement.objects.filter(verwijderd=False), "AM")
-    verzamel_op_boeknummer(voorstellen, models.HRWijziging.objects.filter(verwijderd=False), "HR")
-    # oke, pletten en sorteren
-    for k in voorstellen:
-        voorstellen[k] = geplet(voorstellen[k])
-    keys = voorstellen.keys()
-    keys.sort()
-    context = {'categories': keys, 'voorstellen': voorstellen}
+        import sys
+        import json
+        data = json.loads(request.body)
+        models.Categorie.objects.all().delete()
+        for cat in data:
+            if len(cat['items']) == 0: continue
+            c = models.Categorie(prefix=cat['prefix'], titel=cat['titel'], index=int(cat['idx']))
+            c.save()
+            i = 1
+            for k in cat['items']:
+                try:
+                    if k.startswith("PM-"):
+                        o = models.PolitiekeMotie.objects.get(pk=int(k[3:]))
+                    elif k.startswith("APM-"):
+                        o = models.ActuelePolitiekeMotie.objects.get(pk=int(k[4:]))
+                    elif k.startswith("ORG-"):
+                        o = models.Organimo.objects.get(pk=int(k[4:]))
+                    elif k.startswith("RES-"):
+                        o = models.Resolutie.objects.get(pk=int(k[4:]))
+                    elif k.startswith("AM-"):
+                        o = models.Amendement.objects.get(pk=int(k[3:]))
+                    elif k.startswith("HR-"):
+                        o = models.HRWijziging.objects.get(pk=int(k[3:]))
+                    o.categorie = c
+                    o.boeknummer = i
+                    o.save()
+                except ObjectDoesNotExist:
+                    pass # huh? whatever.
+                i = i + 1
+
+    context = {'categories': get_categorieen()}
     return render_to_response("zues/reorder.html", context)
 
 def login_verzonden(request):
