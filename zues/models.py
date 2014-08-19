@@ -177,9 +177,12 @@ class Motie(Stuk):
     def as_dict(self, typje):
         # Dict-output, kan hergebruikt worden om JSON te genereren
         res = {}
-        res['id'] = self.boeknummer 
+        res['id'] = self.format_boeknummer()
         res['titel'] = self.titel
-        res['groep'] = typje
+        if self.categorie:
+            res['groep'] = self.categorie.titel
+        else:
+            res['groep'] = typje
         res['woordvoerder'] = self.woordvoerder
         res['indieners'] = self.to_commas(self.indieners)
         inhoud = []
@@ -351,9 +354,12 @@ class Modificatie(Stuk):
     def as_dict(self, typje):
         # Dict-output, kan hergebruikt worden om JSON te genereren
         res = {}
-        res['id'] = self.boeknummer 
+        res['id'] = self.format_boeknummer()
         res['titel'] = self.titel
-        res['groep'] = typje
+        if self.categorie:
+            res['groep'] = self.categorie.titel
+        else:
+            res['groep'] = typje
         res['woordvoerder'] = self.woordvoerder
         res['indieners'] = self.to_commas(self.indieners)
         inhoud = [['Betreft', self.betreft]]
