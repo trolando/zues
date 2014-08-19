@@ -185,12 +185,12 @@ def get_categorieen():
         cat['prefix'] = c.prefix
         cat['titel'] = c.titel
         items = []
-        items += c.actuelepolitiekemotie_set.all()
-        items += c.politiekemotie_set.all()
-        items += c.organimo_set.all()
-        items += c.resolutie_set.all()
-        items += c.hrwijziging_set.all()
-        items += c.amendement_set.all()
+        items += c.actuelepolitiekemotie_set.order_by('boeknummer')
+        items += c.politiekemotie_set.order_by('boeknummer')
+        items += c.organimo_set.order_by('boeknummer')
+        items += c.resolutie_set.order_by('boeknummer')
+        items += c.hrwijziging_set.order_by('boeknummer')
+        items += c.amendement_set.order_by('boeknummer')
         cat['items'] = items
         categories.append(cat)
     c = [c for c in categories if c['prefix']=="PM"]
