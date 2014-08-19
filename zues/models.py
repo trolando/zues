@@ -158,50 +158,6 @@ class Motie(Stuk):
 
         return "<p>De ALV der Jonge Democraten,</p>" + con + over + uit + orde + toe
 
-    def as_csv(self, typje):
-        # Raar bestandsformaatje voor de congresapp
-        res = []
-        res.append('"' + typje + '"') # id
-        res.append('\t')
-        res.append('"' + escape(self.titel) + '"')
-        res.append('\t')
-        res.append('""') # lege betreft
-        res.append('\t')
-        res.append('"' + typje + '"') # groep
-        res.append('\t')
-        res.append('"' + escape(self.woordvoerder) + '"')
-        res.append('\t')
-        res.append('"' + escape(self.to_commas(self.indieners)) + '"')
-        res.append('\t')
-        res.append('"Constaterende dat"')
-        res.append('\t')
-        con = self.to_list(escape(self.constateringen))
-        if con:
-            if len(con)>1: res.append('"' + "\r\n".join(['* '+c for c in con]) + '"')
-            else: res.append('"' + con[0] + '"')
-        else: res.append('""')
-        res.append('\t')
-        res.append('"Overwegende dat"')
-        res.append('\t')
-        over = self.to_list(escape(self.overwegingen))
-        if over:
-            if len(over)>1: res.append('"'+ "\r\n".join(['* '+o for o in over]) + '"')
-            else: res.append('"' + over[0] + '"')
-        else: res.append('""')
-        res.append('\t')
-        res.append('"Spreekt uit dat"')
-        res.append('\t')
-        uit = self.to_list(escape(self.uitspraken))
-        if uit:
-            if len(uit)>1: res.append('"'+ "\r\n".join(['* '+u for u in uit]) + '"')
-            else: res.append('"' + uit[0] + '"')
-        else: res.append('""')
-        res.append('\t')
-        res.append('"' + escape(self.toelichting) + '"')
-        res.append('\t')
-        res.append('"Excel"')
-        return mark_safe("".join(res))
-
     def as_dict(self, typje):
         # Dict-output, kan hergebruikt worden om JSON te genereren
         res = {}
@@ -233,35 +189,11 @@ class Motie(Stuk):
         res['toelichting'] = self.toelichting
         return res
 
-    def as_html(self):
-        html = []
-        html.append("<div class='pm'>")
-        html.append("<fieldset>")
-        html.append("<div class='row'>")
-        html.append("<div class='cell'><p>Titel:</p></div>")
-        html.append("<div class='cell'><p>%s</p></div>" % escape(self.titel))
-        html.append("</div>")
-        html.append("<div class='row'>")
-        html.append("<div class='cell'><p>Indieners:</p></div>")
-        html.append("<div class='cell'><p>%s</p></div>" % escape(self.to_commas(self.indieners)))
-        html.append("</div>")
-        html.append("<div class='row'>")
-        html.append("<div class='cell'><p>Woordvoerder:</p></div>")
-        html.append("<div class='cell'><p>%s</p></div>" % escape(self.woordvoerder))
-        html.append("</div>")
-        html.append("<div class='row'>")
-        html.append("<div class='cell'><p>Inhoud:</p></div>")
-        html.append("<div class='cell'>%s</div>" % self.get_content())
-        html.append("</div>")
-        html.append("</fieldset>")
-        html.append("</div>")
-        return mark_safe('\n'.join(html))
-
     def as_html_table(self, ik):
         html = []
         html.append("<table border='1' class='export pk-{0}-{1}'>".format(ik, self.pk))
         html.append("<tr class='exporttitle'>")
-        html.append("<td><p>%s</p></td>" % escape(self.boeknummer))
+        html.append("<td><p>%s</p></td>" % self.format_boeknummer())
         html.append("<td><p>%s</p></td>" % escape(self.titel))
         html.append("</tr>")
         html.append("<tr class='exporthead'>")
@@ -321,9 +253,6 @@ class Organimo(Motie):
     def get_absolute_url(self):
         return reverse('zues:org', kwargs={'key': self.secret, 'pk': self.pk})
 
-    def as_csv(self):
-        return super(Organimo, self).as_csv('ORG')
-
     def as_dict(self):
         return super(Organimo, self).as_dict('ORG')
 
@@ -341,9 +270,6 @@ class PolitiekeMotie(Motie):
     def get_absolute_url(self):
         return reverse('zues:pm', kwargs={'key': self.secret, 'pk': self.pk})
 
-    def as_csv(self):
-        return super(PolitiekeMotie, self).as_csv('PM')
-
     def as_dict(self):
         return super(PolitiekeMotie, self).as_dict('PM')
 
@@ -360,9 +286,6 @@ class ActuelePolitiekeMotie(Motie):
 
     def get_absolute_url(self):
         return reverse('zues:apm', kwargs={'key': self.secret, 'pk': self.pk})
-
-    def as_csv(self):
-        return super(ActuelePolitiekeMotie, self).as_csv('APM')
 
     def as_dict(self):
         return super(ActuelePolitiekeMotie, self).as_dict('APM')
@@ -409,39 +332,6 @@ class Modificatie(Stuk):
 
         return "Geen inhoud?!"
 
-    def as_csv(self, typje):
-        # Raar bestandsformaatje voor de congresapp
-        res = []
-        res.append('"'+typje+'"')
-        res.append('\t')
-        res.append('"' + escape(self.titel) + '"')
-        res.append('\t')
-        res.append('"' + escape(self.betreft) + '"')
-        res.append('\t')
-        res.append('"'+typje+'"') # groep
-        res.append('\t')
-        res.append('"' + escape(self.woordvoerder) + '"')
-        res.append('\t')
-        res.append('"' + escape(self.to_commas(self.indieners)) + '"')
-        res.append('\t')
-        if self.type == self.SCHRAPPEN or self.type == self.WIJZIGEN: res.append('"Schrap"')
-        elif self.type == self.TOEVOEGEN: res.append('"Voeg toe"')
-        else: res.append('""')
-        res.append('\t')
-        res.append('"' + escape(self.tekst1) + '"')
-        res.append('\t')
-        if self.type == self.WIJZIGEN: res.append('"Vervang door"')
-        else: res.append('""')
-        res.append('\t')
-        res.append('"' + escape(self.tekst2) + '"')
-        res.append('\t')
-        res.append('\t')
-        res.append('\t')
-        res.append('"' + escape(self.toelichting) + '"')
-        res.append('\t')
-        res.append('"Excel"')
-        return mark_safe("".join(res))
-
     def as_dict(self, typje):
         # Dict-output, kan hergebruikt worden om JSON te genereren
         res = {}
@@ -461,39 +351,11 @@ class Modificatie(Stuk):
         res['toelichting'] = self.toelichting
         return res
 
-    def as_html(self):
-        html = []
-        html.append("<div class='pm'>")
-        html.append("<fieldset>")
-        html.append("<div class='row'>")
-        html.append("<div class='cell'><label>Titel:</label></div>")
-        html.append("<div class='cell'><p>%s</p></div>" % escape(self.titel))
-        html.append("</div>")
-        html.append("<div class='row'>")
-        html.append("<div class='cell'><label>Indieners:</label></div>")
-        html.append("<div class='cell'><p>%s</p></div>" % escape(self.to_commas(self.indieners)))
-        html.append("</div>")
-        html.append("<div class='row'>")
-        html.append("<div class='cell'><label>Woordvoerder:</label></div>")
-        html.append("<div class='cell'><p>%s</p></div>" % escape(self.woordvoerder))
-        html.append("</div>")
-        html.append("<div class='row'>")
-        html.append("<div class='cell'><label>Betreft:</label></div>")
-        html.append("<div class='cell'><p>%s</p></div>" % escape(self.betreft))
-        html.append("</div>")
-        html.append("<div class='row'>")
-        html.append("<div class='cell'><label>Inhoud:</label></div>")
-        html.append("<div class='cell'>%s</div>" % self.get_content())
-        html.append("</div>")
-        html.append("</fieldset>")
-        html.append("</div>")
-        return mark_safe('\n'.join(html))
-
     def as_html_table(self, ik):
         html = []
         html.append("<table border='1' class='export pk-{0}-{1}'>".format(ik, self.pk))
         html.append("<tr class='exporttitle'>")
-        html.append("<td><p>%s</p></td>" % escape(self.boeknummer))
+        html.append("<td><p>%s</p></td>" % self.format_boeknummer())
         html.append("<td><p>%s</p></td>" % escape(self.titel))
         html.append("</tr>")
         html.append("<tr class='exporthead'>")
@@ -550,9 +412,6 @@ class Resolutie(Modificatie):
     def get_absolute_url(self):
         return reverse('zues:res', kwargs={'key': self.secret, 'pk': self.pk})
 
-    def as_csv(self):
-        return super(Resolutie, self).as_csv('RES')
-
     def as_dict(self):
         return super(Resolutie, self).as_dict('RES')
 
@@ -569,9 +428,6 @@ class Amendement(Modificatie):
     def get_absolute_url(self):
         return reverse('zues:am', kwargs={'key': self.secret, 'pk': self.pk})
 
-    def as_csv(self):
-        return super(Amendement, self).as_csv('AM')
-
     def as_dict(self):
         return super(Amendement, self).as_dict('AM')
 
@@ -587,9 +443,6 @@ class HRWijziging(Modificatie):
 
     def get_absolute_url(self):
         return reverse('zues:hr', kwargs={'key': self.secret, 'pk': self.pk})
-
-    def as_csv(self):
-        return super(HRWijziging, self).as_csv('HR')
 
     def as_dict(self):
         return super(HRWijziging, self).as_dict('HR')
