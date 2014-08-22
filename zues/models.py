@@ -16,7 +16,7 @@ class Login(models.Model):
     secret = models.CharField(max_length=250,)
 
     def __unicode__(self):
-        return unicode("Login {0} ({1})".format(self.lidnummer, self.naam))
+        return unicode(u"Login {0} ({1})".format(self.lidnummer, self.naam))
 
 class Tijden(SingletonModel):
     pm_start = models.DateTimeField(null=True, blank=True)
@@ -97,7 +97,7 @@ class Categorie(models.Model):
     index = models.IntegerField()
 
     def __unicode__(self):
-        return unicode("Categorie {0}".format(self.prefix))
+        return unicode(u"Categorie {0}".format(self.prefix))
 
     class Meta:
         verbose_name_plural = u'categorieen'
@@ -291,7 +291,7 @@ class Organimo(Motie):
         verbose_name_plural = 'organimos'
 
     def __unicode__(self):
-        return 'ORG %s' % self.titel
+        return u'ORG %s' % self.titel
 
     def get_absolute_url(self):
         return reverse('zues:org', kwargs={'key': self.secret, 'pk': self.pk})
@@ -314,7 +314,7 @@ class PolitiekeMotie(Motie):
         verbose_name_plural = 'politieke moties'
 
     def __unicode__(self):
-        return 'PM %s' % self.titel
+        return u'PM %s' % self.titel
 
     def get_absolute_url(self):
         return reverse('zues:pm', kwargs={'key': self.secret, 'pk': self.pk})
@@ -337,7 +337,7 @@ class ActuelePolitiekeMotie(Motie):
         verbose_name_plural = 'actuele politieke moties'
 
     def __unicode__(self):
-        return 'APM %s' % self.titel
+        return u'APM %s' % self.titel
 
     def get_absolute_url(self):
         return reverse('zues:apm', kwargs={'key': self.secret, 'pk': self.pk})
@@ -471,7 +471,7 @@ class Resolutie(Modificatie):
         verbose_name_plural = 'resoluties'
 
     def __unicode__(self):
-        return 'RES %s' % self.titel
+        return u'RES %s' % self.titel
 
     def get_absolute_url(self):
         return reverse('zues:res', kwargs={'key': self.secret, 'pk': self.pk})
@@ -493,7 +493,7 @@ class Amendement(Modificatie):
         verbose_name_plural = 'amendementen'
 
     def __unicode__(self):
-        return 'AM %s' % self.titel
+        return u'AM %s' % self.titel
 
     def get_absolute_url(self):
         return reverse('zues:am', kwargs={'key': self.secret, 'pk': self.pk})
@@ -515,7 +515,7 @@ class HRWijziging(Modificatie):
         verbose_name_plural = "HR-wijzigingen"
 
     def __unicode__(self):
-        return 'HR %s' % self.titel
+        return u'HR %s' % self.titel
 
     def get_absolute_url(self):
         return reverse('zues:hr', kwargs={'key': self.secret, 'pk': self.pk})
