@@ -34,9 +34,8 @@ class Tijden(SingletonModel):
 
     def _check(self, start, stop):
         _now = now()
-        if start != None and _now < start: return False
-        if stop != None and _now > stop: return False
-        return True
+        if start == None or stop == None: return False
+        return start < _now and _now < stop
 
     def mag_pm(self):
         return self._check(self.pm_start, self.pm_stop)
@@ -58,17 +57,10 @@ class Tijden(SingletonModel):
 
     def _deadline(self, start, stop):
         _now = now()
-        if stop == None:
-            if start == None or start < _now:
-                return "geen deadline"
-            else:
-                return "vanaf "+formats.date_format(localtime(start), "DATETIME_FORMAT")
-        elif stop > _now:
-            if start == None or start < _now:
-                return "tot "+formats.date_format(localtime(stop), "DATETIME_FORMAT")
-            else:
-                return "vanaf "+formats.date_format(localtime(start), "DATETIME_FORMAT")
-        else: return "deadline verlopen"
+        if stop == None or start == None: return "deadline niet ingesteld"
+        if stop < _now: return "deadline verlopen"
+        if start < _now: return "tot "+formats.date_format(localtime(stop), "DATETIME_FORMAT")
+        else: return "vanaf "+formats.date_format(localtime(start), "DATETIME_FORMAT")
 
     def deadline_pm(self):
         return self._deadline(self.pm_start, self.pm_stop)
