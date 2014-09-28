@@ -19,16 +19,15 @@ def attributes(lidnummer):
 
     Voorbeeld:
     res = attributes(lidnummer)
-    if res != None:
-        email, naam = res
+    if res != None: email, naam = res
     """
     try:
         with _connection() as l:
             baseDN = "cn="+str(int(lidnummer))+",ou=users,dc=jd,dc=nl"
             result_data = l.search_st(baseDN, ldap.SCOPE_BASE, timeout=1)
-            if len(result_data) == 1:
-                dn, attrs = result_data[0]
-                return attrs['mail'][0], attrs['sn'][0]
+            if len(result_data) != 1: return None
+            dn, attrs = result_data[0]
+            return attrs['mail'][0], attrs['sn'][0]
     except ldap.NO_SUCH_OBJECT:
         pass
     except ldap.INVALID_CREDENTIALS:
@@ -40,8 +39,7 @@ def attributes(lidnummer):
 def lidnummers(email):
     """Genereert alle lidnummers die bij een emailadres horen.
 
-    Voorbeeld:
-    for lidnummer in lidnummers('email@adr.es'):
+    Voorbeeld: for lidnummer, naam in lidnummers('email@adr.es'):
         ...
     """
     try:
@@ -85,11 +83,10 @@ def _test_login(dn, password):
 
 def chpwd(uid, old, new):
     try:
-        with _connection() as l:
-            dn, attrs = _dn_from_uid(l, uid)
-        testconn = ldap.initialize(settings.LDAP_NAME)
-        testconn.simple_bind_s(dn, old)
-        return testconn.passwd_s(dn, old, new)
+        with _connection() as l: dn, attrs = _dn_from_uid(l, uid)
+        conn = ldap.initialize(settings.LDAP_NAME)
+        conn.simple_bind_s(dn, old)
+        return conn.passwd_s(dn, old, new)
     except ldap.INVALID_CREDENTIALS:
         pass
     except ldap.LDAPError:
@@ -118,6 +115,7 @@ class MijnJDBackend(object):
             
         if not settings.LDAP_AUTH(username, groups): return None
 
+        # get or create nieuwe User
         model = get_user_model()
         username_field = getattr(model, 'USERNAME_FIELD', 'username')
 
@@ -128,9 +126,7 @@ class MijnJDBackend(object):
 
         user, created = model.objects.get_or_create(**kwargs)
 
-        if created:
-            logger.debug("Created Django user %s", username)
-            user.set_unusable_password()
+        if created: user.set_unusable_password()
 
         setattr(user, 'last_name', attrs['sn'][0]);
         setattr(user, 'email', attrs['mail'][0]);
@@ -144,12 +140,8 @@ class MijnJDBackend(object):
         return user
            
     def get_user(self, user_id):
-        user = None
-
         try:
-            user = get_user_model().objects.get(pk=user_id)
+            return get_user_model().objects.get(pk=user_id)
         except ObjectDoesNotExist:
-            pass
-
-        return user
+            return None
 
