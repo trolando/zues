@@ -86,6 +86,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
+# STATIC_ROOT = ''
 STATIC_URL = '/static/'
 
 EMAIL_HOST = 'localhost'
@@ -100,6 +101,11 @@ EMAIL_PORT = 587
 # LDAP_NAME = "ldap://127.0.0.1:389/"
 # LDAP_DN = "cn=readuser,ou=sysUsers,dc=jd,dc=nl"
 # LDAP_PASS = "..."
+# LDAP_AUTH = lambda user,groups: "role-team-ict" in groups or "role-as-landelijk" in groups
+# from django.db.models import Q
+# LDAP_AUTH_PERMISSIONS = lambda user,groups: Q(content_type__app_label='zues') | Q(content_type__app_label='appolo')
+
+# AUTHENTICATION_BACKENDS = ('zues.jdldap.MijnJDBackend', 'django.contrib.auth.backends.ModelBackend',)
 
 MEDEDELING = "Komende congres: <b>niet ingevuld!</b>"
 NAAMKORT = "Congres ..."
