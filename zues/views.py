@@ -48,7 +48,7 @@ def generate_lid(lidnummer):
 def check_login(request):
     if 'lid' not in request.session: return None
     if 'key' not in request.session: return None
-    leden = models.Login.objects.filter(lidnummer=int(request.session['lid'])).filter(secret=hashlib.sha256(request.session['key']).hexdigest())
+    leden = models.Login.objects.filter(lidnummer=int(request.session['lid'])).filter(secret=request.session['key'])
     if len(leden) == 0:
         try:
             del request.session['lid']
@@ -289,7 +289,7 @@ def login(request, lid, key):
     hetlid = models.Login.objects.filter(lidnummer=lid).filter(secret=hashlib.sha256(key).hexdigest())
     if len(hetlid):
         request.session['lid'] = lid
-        request.session['key'] = key
+        request.session['key'] = hetlid[0].secret
         return HttpResponseRedirect('/')
     return render_to_response("zues/loginfout.html")
 
