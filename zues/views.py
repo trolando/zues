@@ -30,7 +30,9 @@ def generate_lid(lidnummer):
         res = jdldap.attributes(lidnummer)
     if res == None: return None
     email, naam = res
-        
+    return _generate_lid(lidnummer, email, naam)
+
+def _generate_lid(lidnummer, email, naam):
     code = hashlib.sha256(base64.urlsafe_b64encode(os.urandom(64))).hexdigest()
 
     lid = models.Login.objects.filter(lidnummer=lidnummer)
