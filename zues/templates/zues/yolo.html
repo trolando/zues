@@ -218,20 +218,4 @@ Deze URL zie je in de adresbalk van de browser als je het voorstel bekijkt.
 {% endif %}
 </fieldset>
 
-{% if staff %}
-
-<h3>Exporteren</h3>
-
-<fieldset>
-<div class="row">
-<div class="cell" style="min-width: 300px;"><p><a href="{% url 'zues:export' %}">Exporteren</a></p></div>
-</div>
-<div class="row">
-<div class="cell" style="min-width: 300px;"><p><a href="{% url 'zues:reorder' %}">Reorder</a></p></div>
-</div>
-</fieldset>
-
-
-{% endif %}
-
 {% endblock %} 
