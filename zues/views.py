@@ -14,7 +14,7 @@ from django.template.loader import render_to_string
 from django.views.generic import View, FormView, DetailView, UpdateView, DeleteView, CreateView
 from zues import models
 from zues import forms
-from zues import jdldap
+from janeus import Janeus
 import base64
 import hashlib
 import ldap
@@ -27,7 +27,7 @@ def generate_lid(lidnummer):
     if getattr(settings, 'SKIP_LDAP', False):
         res = ('', 'Onbekend lid')
     else:
-        res = jdldap.attributes(lidnummer)
+        res = Janeus().attributes(lidnummer)
     if res == None: return None
     email, naam = res
     return _generate_lid(lidnummer, email, naam)
@@ -73,7 +73,7 @@ def view_lidnummer(request):
             if getattr(settings, 'SKIP_LDAP', False):
                 return HttpResponseRedirect('/lidnummerverzonden/')
 
-            for lidnummer, naam in jdldap.lidnummers(email):
+            for lidnummer, naam in Janeus().lidnummers(email):
                 subject = '[JD] Lidnummer'
                 from_email = 'noreply@jongedemocraten.nl'
 

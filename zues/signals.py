@@ -5,14 +5,13 @@ from django.core.mail import EmailMessage
 import re
 
 def on_user_login(sender, user, request, **kwargs):
-    from zues import jdldap
+    from janeus import Janeus
     from zues import models
     from zues import views
     username = user.get_username()
-    with jdldap._connection() as l:
-        res = jdldap._dn_from_uid(l, username)
-        if res == None: return
-        dn, attrs = res
+    res = Janeus().by_uid(username)
+    if res == None: return
+    dn, attrs = res
 
     lidnummer = int(attrs['cn'][0])
     email = attrs['mail'][0]
