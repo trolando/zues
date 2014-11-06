@@ -43,6 +43,7 @@ INSTALLED_APPS = (
     'ldap',
     'captcha',
     'solo',
+    'overextends',
 )
 
 MIDDLEWARE_CLASSES = (
