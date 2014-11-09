@@ -32,18 +32,15 @@
             {% endif %}
             </tr>
         {% endfor %}
+        {% if app.app_label == "zues" %}
+            <tr><th scope="row"><a href="{% url 'zues:home' %}">Frontend interface</a></th><td>&nbsp;</td></tr>
+            <tr><th scope="row"><a href="{% url 'zues:reorder' %}">Volgorde bepalen</a></th><td>&nbsp;</td></tr>
+            <tr><th scope="row"><a href="{% url 'zues:export' %}">Interne export</a></th><td>&nbsp;</td></tr>
+            <tr><th scope="row"><a href="{% url 'zues:publiek' %}">Handig voor Arend</a></th><td>&nbsp;</td></tr>
+        {% endif %}
         </table>
         </div>
     {% endfor %}
-        <div class="module">
-        <table>
-        <caption>Overige</caption>
-	<tr><th scope="row"><a href="{% url 'zues:home' %}">Frontend interface</a></th><td>&nbsp;</td></tr>
-	<tr><th scope="row"><a href="{% url 'zues:reorder' %}">Volgorde bepalen</a></th><td>&nbsp;</td></tr>
-	<tr><th scope="row"><a href="{% url 'zues:export' %}">Interne export</a></th><td>&nbsp;</td></tr>
-	<tr><th scope="row"><a href="{% url 'zues:publiek' %}">Handig voor Arend</a></th><td>&nbsp;</td></tr>
-        </table>
-        </div>
 	
 {% else %}
     <p>{% trans "You don't have permission to edit anything." %}</p>
