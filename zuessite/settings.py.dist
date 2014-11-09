@@ -100,14 +100,13 @@ EMAIL_PORT = 587
 # RECAPTCHA_PRIVATE_KEY = 
 # RECAPTCHA_USE_SSL = True
 
-# LDAP_NAME = "ldap://127.0.0.1:389/"
-# LDAP_DN = "cn=readuser,ou=sysUsers,dc=jd,dc=nl"
-# LDAP_PASS = "..."
-# LDAP_AUTH = lambda user,groups: "role-team-ict" in groups or "role-as-landelijk" in groups
+# JANEUS_SERVER = "ldap://127.0.0.1:389/"
+# JANEUS_DN = "cn=readuser,ou=sysUsers,dc=jd,dc=nl"
+# JANEUS_PASS = "..."
+# JANEUS_AUTH = lambda user,groups: "role-team-ict" in groups or "role-as-landelijk" in groups
 # from django.db.models import Q
-# LDAP_AUTH_PERMISSIONS = lambda user,groups: Q(content_type__app_label='zues') | Q(content_type__app_label='appolo')
-
-# AUTHENTICATION_BACKENDS = ('zues.jdldap.MijnJDBackend', 'django.contrib.auth.backends.ModelBackend',)
+# JANEUS_AUTH_PERMISSIONS = lambda user,groups: Q(content_type__app_label='zues') | Q(content_type__app_label='appolo')
+# AUTHENTICATION_BACKENDS = ('janeus.backend.JaneusBackend', 'django.contrib.auth.backends.ModelBackend',)
 
 MEDEDELING = "Komende congres: <b>niet ingevuld!</b>"
 NAAMKORT = "Congres ..."
