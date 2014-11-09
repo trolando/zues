@@ -44,6 +44,7 @@ INSTALLED_APPS = (
     'captcha',
     'solo',
     'overextends',
+    'janeus',
 )
 
 MIDDLEWARE_CLASSES = (
