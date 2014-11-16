@@ -1,6 +1,6 @@
-from django.conf.urls import patterns, url, include
-from django.views.generic import DetailView, ListView
+from django.conf.urls import url
 from zues import views
+
 
 urlpatterns = [
     url(r'^$', views.view_home, name='home'),
@@ -46,4 +46,3 @@ urlpatterns = [
     url(r'^lidnummer/$', views.view_lidnummer, name='lidnummer'),
     url(r'^lidnummerverzonden/$', views.lidnummer_verzonden),
 ]
-

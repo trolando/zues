@@ -1,14 +1,15 @@
 from django.contrib import admin
 from django import forms
-from django.contrib.contenttypes.generic import GenericTabularInline
 from zues.models import PolitiekeMotie, ActuelePolitiekeMotie, Organimo, Resolutie, Amendement, HRWijziging, Login, Tijden, Categorie
 from solo.admin import SingletonModelAdmin
+
 
 class MotieForm(forms.ModelForm):
     class Meta:
         widgets = {
-            'admin_opmerkingen' : forms.Textarea(attrs={'rows': '4',})
+            'admin_opmerkingen': forms.Textarea(attrs={'rows': '4', })
         }
+
 
 class MotieAdmin(admin.ModelAdmin):
     list_display = ('titel', 'status', 'admin_opmerkingen', 'categorie', 'boeknummer', 'eigenaar', 'woordvoerder', 'laatsteupdate')

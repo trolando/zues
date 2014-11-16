@@ -1,14 +1,12 @@
-from datetime import datetime
 from django.utils import formats
-from django.utils.timezone import utc, is_aware, now, localtime
+from django.utils.timezone import now, localtime
 from django.db import models
-from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes import generic
 from django.utils.safestring import mark_safe
 from django.utils.html import escape
 from django.core.urlresolvers import reverse
 from re import sub
 from solo.models import SingletonModel
+
 
 class Login(models.Model):
     naam = models.CharField(max_length=250,)
@@ -17,6 +15,7 @@ class Login(models.Model):
 
     def __unicode__(self):
         return unicode(u"Login {0} ({1})".format(self.lidnummer, self.naam))
+
 
 class Tijden(SingletonModel):
     pm_start = models.DateTimeField(null=True, blank=True)
@@ -34,7 +33,8 @@ class Tijden(SingletonModel):
 
     def _check(self, start, stop):
         _now = now()
-        if start == None or stop == None: return False
+        if start is None or stop is None:
+            return False
         return start < _now and _now < stop
 
     def mag_pm(self):
@@ -57,10 +57,14 @@ class Tijden(SingletonModel):
 
     def _deadline(self, start, stop):
         _now = now()
-        if stop == None or start == None: return "deadline niet ingesteld"
-        if stop < _now: return "deadline verlopen"
-        if start < _now: return "tot "+formats.date_format(localtime(stop), "DATETIME_FORMAT")
-        else: return "vanaf "+formats.date_format(localtime(start), "DATETIME_FORMAT")
+        if stop is None or start is None:
+            return "deadline niet ingesteld"
+        if stop < _now:
+            return "deadline verlopen"
+        if start < _now:
+            return "tot " + formats.date_format(localtime(stop), "DATETIME_FORMAT")
+        else:
+            return "vanaf " + formats.date_format(localtime(start), "DATETIME_FORMAT")
 
     def deadline_pm(self):
         return self._deadline(self.pm_start, self.pm_stop)
@@ -83,8 +87,9 @@ class Tijden(SingletonModel):
     class Meta:
         verbose_name_plural = 'tijden'
 
+
 class Categorie(models.Model):
-    prefix = models.CharField(max_length=50,unique=True)
+    prefix = models.CharField(max_length=50, unique=True)
     titel = models.CharField(max_length=250,)
     index = models.IntegerField()
 
@@ -93,6 +98,7 @@ class Categorie(models.Model):
 
     class Meta:
         verbose_name_plural = u'categorieen'
+
 
 class Stuk(models.Model):
     INGEDIEND = 1
@@ -109,10 +115,10 @@ class Stuk(models.Model):
     )
 
     titel = models.CharField(max_length=250,)
-    eigenaar = models.ForeignKey(Login, blank=True, null=True, on_delete=models.SET_NULL) # bij verwijderen eigenaar, verliest eigenaar
+    eigenaar = models.ForeignKey(Login, blank=True, null=True, on_delete=models.SET_NULL)  # bij verwijderen eigenaar, verliest eigenaar
     status = models.IntegerField(choices=STATUS_CHOICES, default=INGEDIEND)
     admin_opmerkingen = models.TextField(blank=True, help_text='Opmerkingen van de beheerder')
-    categorie = models.ForeignKey(Categorie, blank=True, null=True, on_delete=models.SET_NULL) # bij verwijderen categorie, doei categorie
+    categorie = models.ForeignKey(Categorie, blank=True, null=True, on_delete=models.SET_NULL)  # bij verwijderen categorie, doei categorie
     boeknummer = models.IntegerField(blank=True)
     indienmoment = models.DateField(auto_now_add=True)
     laatsteupdate = models.DateField(auto_now=True)
@@ -122,8 +128,10 @@ class Stuk(models.Model):
     toelichting = models.TextField(blank=True, help_text='Gebruik een dubbele enter voor de volgende paragraaf')
 
     def format_boeknummer(self):
-        if self.categorie == None: return self.stuk_type()
-        return escape("%s%.02d" % (self.categorie.prefix, self.boeknummer))
+        if self.categorie is None:
+            return self.stuk_type()
+        else:
+            return escape("%s%.02d" % (self.categorie.prefix, self.boeknummer))
 
     def is_verwijderd(self):
         return self.status == Stuk.VERWIJDERD
@@ -140,6 +148,7 @@ class Stuk(models.Model):
     class Meta:
         abstract = True
 
+
 class Motie(Stuk):
     constateringen = models.TextField(blank=True, help_text='Gebruik een dubbele enter voor de volgende bullet')
     overwegingen = models.TextField(blank=True, help_text='Gebruik een dubbele enter voor de volgende bullet')
@@ -149,39 +158,52 @@ class Motie(Stuk):
         abstract = True
 
     def to_list(self, str):
-        if str == None: return []
+        if str is None:
+            return []
         str = "\n".join([s.strip() for s in str.strip().split("\n")])
         str = [s for s in str.split("\n") if len(s)]
         return str
 
     def to_p(self, str):
-        if str == None: return ""
+        if str is None:
+            return ""
         str = "\n".join([s.strip() for s in str.strip().split("\n")])
         str = sub("(?<!\n)(\n)(?!\n)", "<br />", str)
         str = [s for s in str.split("\n") if len(s)]
-        if len(str) == 0: return ""
+        if len(str) == 0:
+            return ""
         return "<p>" + "</p><p>".join(str) + "</p>"
 
     def to_commas(self, str):
-        if str == None: return None
+        if str is None:
+            return None
         str = ", ".join([s.strip() for s in str.strip().split("\n")])
         return str
 
     def get_content(self):
         con = self.to_list(escape(self.constateringen))
-        if len(con)>1: con = "<p><strong>constaterende dat</strong></p><ul><li>" + "</li><li>".join(con) + "</li></ul>"
-        elif len(con): con = "<p><strong>constaterende dat</strong></p><p>" + con[0] + "</p>"
-        else: con = ""
+        if len(con) > 1:
+            con = "<p><strong>constaterende dat</strong></p><ul><li>" + "</li><li>".join(con) + "</li></ul>"
+        elif len(con):
+            con = "<p><strong>constaterende dat</strong></p><p>" + con[0] + "</p>"
+        else:
+            con = ""
 
         over = self.to_list(escape(self.overwegingen))
-        if len(over)>1: over = "<p><strong>overwegende dat</strong></p><ul><li>" + "</li><li>".join(over) + "</li></ul>"
-        elif len(over): over = "<p><strong>overwegende dat</strong></p><p>" + over[0] + "</p>"
-        else: over = ""
+        if len(over) > 1:
+            over = "<p><strong>overwegende dat</strong></p><ul><li>" + "</li><li>".join(over) + "</li></ul>"
+        elif len(over):
+            over = "<p><strong>overwegende dat</strong></p><p>" + over[0] + "</p>"
+        else:
+            over = ""
 
         uit = self.to_list(escape(self.uitspraken))
-        if len(uit)>1: uit = "<p><strong>spreekt uit dat</strong></p><ul><li>" + "</li><li>".join(uit) + "</li></ul>"
-        elif len(uit): uit = "<p><strong>spreekt uit dat</strong></p><p>" + uit[0] + "</p>"
-        else: uit = ""
+        if len(uit) > 1:
+            uit = "<p><strong>spreekt uit dat</strong></p><ul><li>" + "</li><li>".join(uit) + "</li></ul>"
+        elif len(uit):
+            uit = "<p><strong>spreekt uit dat</strong></p><p>" + uit[0] + "</p>"
+        else:
+            uit = ""
 
         toe = self.to_p(escape(self.toelichting))
         toe = len(toe) and ("<p><strong>Toelichting:</strong></p><p>" + toe + "</p>") or ""
@@ -204,21 +226,21 @@ class Motie(Stuk):
         inhoud = []
         con = self.to_list(escape(self.constateringen))
         if con:
-            if len(con)>1: 
+            if len(con) > 1:
                 inhoud.append(["Constaterende dat", con])
-            else: 
+            else:
                 inhoud.append(["Constaterende dat", con[0]])
         over = self.to_list(escape(self.overwegingen))
         if over:
-            if len(over)>1: 
+            if len(over) > 1:
                 inhoud.append(["Overwegende dat", over])
-            else: 
+            else:
                 inhoud.append(["Overwegende dat", over[0]])
         uit = self.to_list(escape(self.uitspraken))
         if uit:
-            if len(uit)>1: 
+            if len(uit) > 1:
                 inhoud.append(["Spreekt uit dat", uit])
-            else: 
+            else:
                 inhoud.append(["Spreekt uit dat", uit[0]])
         res['inhoud'] = inhoud
         res['toelichting'] = self.toelichting
@@ -242,8 +264,10 @@ class Motie(Stuk):
 
         con = self.to_list(escape(self.constateringen))
         if len(con):
-            if len(con)>1: con = "<ul><li>" + "</li><li>".join(con) + "</li></ul>"
-            else: con = "<p>" + con[0] + "</p>"
+            if len(con) > 1:
+                con = "<ul><li>" + "</li><li>".join(con) + "</li></ul>"
+            else:
+                con = "<p>" + con[0] + "</p>"
             html.append("<tr>")
             html.append("<td><p><strong>Constaterende dat</strong></p></td>")
             html.append("<td>%s</td>" % con)
@@ -251,17 +275,22 @@ class Motie(Stuk):
 
         over = self.to_list(escape(self.overwegingen))
         if len(over):
-            if len(over)>1: over = "<ul><li>" + "</li><li>".join(over) + "</li></ul>"
-            else: over = "<p>" + over[0] + "</p>"
+            if len(over) > 1:
+                over = "<ul><li>" + "</li><li>".join(over) + "</li></ul>"
+            else:
+                over = "<p>" + over[0] + "</p>"
             html.append("<tr>")
             html.append("<td><p><strong>Overwegende dat</strong></p></td>")
             html.append("<td>%s</td>" % over)
             html.append("</tr>")
 
         uit = self.to_list(escape(self.uitspraken))
-        if len(uit)>1: uit = "<ul><li>" + "</li><li>".join(uit) + "</li></ul>"
-        elif len(uit): uit = "<p>" + uit[0] + "</p>"
-        else: uit = ""
+        if len(uit) > 1:
+            uit = "<ul><li>" + "</li><li>".join(uit) + "</li></ul>"
+        elif len(uit):
+            uit = "<p>" + uit[0] + "</p>"
+        else:
+            uit = ""
         html.append("<tr>")
         html.append("<td><p><strong>Spreekt uit dat</strong></p></td>")
         html.append("<td>%s</td>" % uit)
@@ -276,6 +305,7 @@ class Motie(Stuk):
 
         html.append("</table>")
         return mark_safe('\n'.join(html))
+
 
 class Organimo(Motie):
     class Meta:
@@ -300,6 +330,7 @@ class Organimo(Motie):
     def mag(self):
         return Tijden.get_solo().mag_org()
 
+
 class PolitiekeMotie(Motie):
     class Meta:
         ordering = ('-laatsteupdate',)
@@ -322,6 +353,7 @@ class PolitiekeMotie(Motie):
 
     def mag(self):
         return Tijden.get_solo().mag_pm()
+
 
 class ActuelePolitiekeMotie(Motie):
     class Meta:
@@ -346,11 +378,12 @@ class ActuelePolitiekeMotie(Motie):
     def mag(self):
         return Tijden.get_solo().mag_apm()
 
+
 class Modificatie(Stuk):
     WIJZIGEN = 'W'
     SCHRAPPEN = 'S'
     TOEVOEGEN = 'T'
-    type_CHOICES = ((WIJZIGEN, 'Wijzigen'),(SCHRAPPEN, 'Schrappen'),(TOEVOEGEN, 'Toevoegen'))
+    type_CHOICES = ((WIJZIGEN, 'Wijzigen'), (SCHRAPPEN, 'Schrappen'), (TOEVOEGEN, 'Toevoegen'))
 
     betreft = models.CharField(max_length=250,)
     type = models.CharField(max_length=2, choices=type_CHOICES, blank=False)
@@ -361,16 +394,19 @@ class Modificatie(Stuk):
         abstract = True
 
     def to_commas(self, str):
-        if str == None: return None
+        if str is None:
+            return None
         str = ", ".join([s.strip() for s in str.strip().split("\n")])
         return str
 
     def to_p(self, str):
-        if str == None: return ""
+        if str is None:
+            return ""
         str = "\n".join([s.strip() for s in str.strip().split("\n")])
         str = sub("(?<!\n)(\n)(?!\n)", "<br />", str)
         str = [s for s in str.split("\n") if len(s)]
-        if len(str) == 0: return ""
+        if len(str) == 0:
+            return ""
         return "<p>" + "</p><p>".join(str) + "</p>"
 
     def get_content(self):
@@ -458,6 +494,7 @@ class Modificatie(Stuk):
         html.append("</table>")
         return mark_safe('\n'.join(html))
 
+
 class Resolutie(Modificatie):
     class Meta:
         verbose_name_plural = 'resoluties'
@@ -480,6 +517,7 @@ class Resolutie(Modificatie):
     def mag(self):
         return Tijden.get_solo().mag_res()
 
+
 class Amendement(Modificatie):
     class Meta:
         verbose_name_plural = 'amendementen'
@@ -501,6 +539,7 @@ class Amendement(Modificatie):
 
     def mag(self):
         return Tijden.get_solo().mag_am()
+
 
 class HRWijziging(Modificatie):
     class Meta:

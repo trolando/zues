@@ -1,1 +1,1 @@
-import zues.signals
+from zues import signals  # noqa

@@ -4,13 +4,17 @@ from django.conf import settings
 from django.core.mail import EmailMessage
 import re
 
+
 def on_user_login(sender, user, request, **kwargs):
     from janeus import Janeus
     from zues import models
     from zues import views
+
     username = user.get_username()
     res = Janeus().by_uid(username)
-    if res == None: return
+    if res is None:
+        return
+
     dn, attrs = res
 
     lidnummer = int(attrs['cn'][0])
@@ -29,7 +33,7 @@ def on_user_login(sender, user, request, **kwargs):
             inhoud = []
             inhoud.append('Beste %s,' % naam)
             inhoud.append('')
-            inhoud.append('Als beheerder van het voorstelsysteem \'' + str(settings.NAAMKORT) +'\' van de Jonge Democraten heb je ook automatisch een account voor de normale interface. Als je de site wilt gebruiken als gewone gebruiker (dus niet als beheerder), dan kun je de volgende persoonlijke geheime URL gebruiken:')
+            inhoud.append('Als beheerder van het voorstelsysteem \'' + str(settings.NAAMKORT) + '\' van de Jonge Democraten heb je ook automatisch een account voor de normale interface. Als je de site wilt gebruiken als gewone gebruiker (dus niet als beheerder), dan kun je de volgende persoonlijke geheime URL gebruiken:')
             inhoud.append(secret_url)
             inhoud.append('')
             inhoud.append('Deze URL kun je ook gebruiken om jouw ingediende voorstellen in te zien, te wijzigen en terug te trekken. Deel deze URL dus niet met anderen!')
@@ -41,7 +45,8 @@ def on_user_login(sender, user, request, **kwargs):
             inhoud = '\n'.join(inhoud)
             msg = EmailMessage(subject, inhoud, from_email=from_email, to=[to])
             msg.send()
-    else: lid = lid[0]
+    else:
+        lid = lid[0]
 
     request.session['lid'] = lidnummer
     request.session['key'] = lid.secret
