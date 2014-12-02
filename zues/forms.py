@@ -23,7 +23,7 @@ class ResolutieForm(ModelForm):
         self.fields['indieners'].widget.attrs.update({'placeholder': '"[JD Afdeling] Voorzitter, Secretaris" of "Naam 1, Naam 2, etc... (minimaal 5)"'})
         self.fields['betreft'].widget.attrs.update({'placeholder': 'Resolutie/Voorstel/Hoofdstuk N, pagina M, regels X-Y'})
         self.fields['tekst1'].widget.attrs.update({'placeholder': 'Volledige tekst die geschrapt of toegevoegd wordt...'})
-        self.fields['tekst2'].widget.attrs.update({'placeholder': 'Volledige tekst die de geschrapte tekst vervangt... (alleen gebruiken bij type Wijzigen)'})
+        self.fields['tekst2'].widget.attrs.update({'placeholder': 'Volledige tekst die de geschrapte tekst vervangt... (alleen gebruiken bij type Vervangen)'})
         self.fields['toelichting'].widget.attrs.update({'placeholder': 'Optionele toelichting van maximaal 250 woorden...'})
 
 

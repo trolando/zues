@@ -119,7 +119,7 @@ class Stuk(models.Model):
     status = models.IntegerField(choices=STATUS_CHOICES, default=INGEDIEND)
     admin_opmerkingen = models.TextField(blank=True, help_text='Opmerkingen van de beheerder')
     categorie = models.ForeignKey(Categorie, blank=True, null=True, on_delete=models.SET_NULL)  # bij verwijderen categorie, doei categorie
-    boeknummer = models.IntegerField(blank=True)
+    boeknummer = models.IntegerField(blank=True, default=0)
     indienmoment = models.DateField(auto_now_add=True)
     laatsteupdate = models.DateField(auto_now=True)
     secret = models.CharField(max_length=250,)
@@ -383,7 +383,7 @@ class Modificatie(Stuk):
     WIJZIGEN = 'W'
     SCHRAPPEN = 'S'
     TOEVOEGEN = 'T'
-    type_CHOICES = ((WIJZIGEN, 'Wijzigen'), (SCHRAPPEN, 'Schrappen'), (TOEVOEGEN, 'Toevoegen'))
+    type_CHOICES = ((WIJZIGEN, 'Vervangen'), (SCHRAPPEN, 'Schrappen'), (TOEVOEGEN, 'Toevoegen'))
 
     betreft = models.CharField(max_length=250,)
     type = models.CharField(max_length=2, choices=type_CHOICES, blank=False)
