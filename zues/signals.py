@@ -20,9 +20,9 @@ def on_user_login(sender, user, request, **kwargs):
 
     dn, attrs = res
 
-    lidnummer = int(attrs['cn'][0])
-    email = attrs['mail'][0]
-    naam = attrs['sn'][0]
+    lidnummer = int(attrs['cn'][0].decode('utf-8'))
+    email = attrs['mail'][0].decode('utf-8')
+    naam = attrs['sn'][0].decode('utf-8')
 
     lid = models.Login.objects.filter(lidnummer=lidnummer)
     if len(lid) == 0:
