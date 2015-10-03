@@ -1,5 +1,4 @@
 Django==1.7.8
-django-overextends==0.4.0
 django-recaptcha==1.0.2
 -e git+https://github.com/jonge-democraten/janeus@1.2#egg=janeus-master
 -e git+https://github.com/jonge-democraten/python-ldap@py3#egg=python-ldap
