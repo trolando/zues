@@ -1,4 +1,5 @@
 {% extends 'zues/base.html' %}
+{% load l10n %}
 {% block terugnaarbegin %}<p>Ingelogd als {{ lid.naam }} (<a href="{% url 'zues:loguit' %}">uitloggen</a>)</p>{% endblock %}
 {% block content %}
 {% if settings.public %}
