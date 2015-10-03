@@ -28,7 +28,7 @@ def generate_lid(lidnummer):
     if res is None:
         return None
     email, naam = res
-    return _generate_lid(lidnummer, email, naam)
+    return _generate_lid(lidnummer, email.decode('utf-8'), naam.decode('utf-8'))
 
 
 def _generate_lid(lidnummer, email, naam):
@@ -77,6 +77,7 @@ def view_lidnummer(request):
                 return HttpResponseRedirect('/lidnummerverzonden/')
 
             for lidnummer, naam in Janeus().lidnummers(email):
+                naam = naam.decode('utf-8')
                 subject = '[JD] Lidnummer'
                 from_email = 'noreply@jongedemocraten.nl'
 
