@@ -1,23 +1,42 @@
-from django.utils import formats
-from django.utils.timezone import now, localtime
-from django.db import models
-from django.utils.safestring import mark_safe
-from django.utils.html import escape
 from django.core.urlresolvers import reverse
+from django.db import models
+from django.utils import formats
+from django.utils.html import escape
+from django.utils.safestring import mark_safe
+from django.utils.timezone import now, localtime
 from re import sub
-from solo.models import SingletonModel
+
+from . import utils
 
 
-class Login(models.Model):
-    naam = models.CharField(max_length=250,)
-    lidnummer = models.IntegerField(primary_key=True,)
-    secret = models.CharField(max_length=250,)
+class SiteRelated(models.Model):
+    objects = utils.CurrentSiteManager()
 
-    def __unicode__(self):
-        return unicode(u"Login {0} ({1})".format(self.lidnummer, self.naam))
+    class Meta:
+        abstract = True
+
+    site = models.ForeignKey("sites.Site", editable=False)
+
+    def save(self, update_site=False, *args, **kwargs):
+        if update_site or not self.site_id:
+            self.site_id = utils.current_site_id()
+        super(SiteRelated, self).save(*args, **kwargs)
 
 
-class Tijden(SingletonModel):
+class Login(SiteRelated):
+    naam = models.CharField(max_length=250)
+    lidnummer = models.IntegerField()
+    secret = models.CharField(max_length=250)
+
+    def __str__(self):
+        return "Login {0} ({1})".format(self.lidnummer, self.naam)
+
+
+class Settings(SiteRelated):
+    naam = models.CharField(max_length=250)
+    mededeling = models.CharField(max_length=250)
+    public = models.BooleanField(default=False)
+
     pm_start = models.DateTimeField(null=True, blank=True)
     pm_stop = models.DateTimeField(null=True, blank=True)
     apm_start = models.DateTimeField(null=True, blank=True)
@@ -85,22 +104,31 @@ class Tijden(SingletonModel):
         return self._deadline(self.hr_start, self.hr_stop)
 
     class Meta:
-        verbose_name_plural = 'tijden'
+        verbose_name_plural = 'settings'
 
 
-class Categorie(models.Model):
-    prefix = models.CharField(max_length=50, unique=True)
+def get_settings():
+    try:
+        return Settings.objects.get()
+    except Settings.DoesNotExist:
+        s = Settings()
+        s.save()
+        return s
+
+
+class Categorie(SiteRelated):
+    prefix = models.CharField(max_length=50)
     titel = models.CharField(max_length=250,)
     index = models.IntegerField()
 
-    def __unicode__(self):
-        return unicode(u"Categorie {0}".format(self.prefix))
+    def __str__(self):
+        return "Categorie {0}".format(self.prefix)
 
     class Meta:
         verbose_name_plural = u'categorieen'
 
 
-class Stuk(models.Model):
+class Stuk(SiteRelated):
     INGEDIEND = 1
     VERWIJDERD = 2
     REPAREREN = 3
@@ -312,8 +340,8 @@ class Organimo(Motie):
         ordering = ('-laatsteupdate',)
         verbose_name_plural = 'organimos'
 
-    def __unicode__(self):
-        return u'ORG %s' % self.titel
+    def __str__(self):
+        return 'ORG %s' % self.titel
 
     def get_absolute_url(self):
         return reverse('zues:org', kwargs={'key': self.secret, 'pk': self.pk})
@@ -328,7 +356,7 @@ class Organimo(Motie):
         return 'ORG'
 
     def mag(self):
-        return Tijden.get_solo().mag_org()
+        return get_settings().mag_org()
 
 
 class PolitiekeMotie(Motie):
@@ -336,8 +364,8 @@ class PolitiekeMotie(Motie):
         ordering = ('-laatsteupdate',)
         verbose_name_plural = 'politieke moties'
 
-    def __unicode__(self):
-        return u'PM %s' % self.titel
+    def __str__(self):
+        return 'PM %s' % self.titel
 
     def get_absolute_url(self):
         return reverse('zues:pm', kwargs={'key': self.secret, 'pk': self.pk})
@@ -352,7 +380,7 @@ class PolitiekeMotie(Motie):
         return 'PM'
 
     def mag(self):
-        return Tijden.get_solo().mag_pm()
+        return get_settings().mag_pm()
 
 
 class ActuelePolitiekeMotie(Motie):
@@ -360,8 +388,8 @@ class ActuelePolitiekeMotie(Motie):
         ordering = ('-laatsteupdate',)
         verbose_name_plural = 'actuele politieke moties'
 
-    def __unicode__(self):
-        return u'APM %s' % self.titel
+    def __str__(self):
+        return 'APM %s' % self.titel
 
     def get_absolute_url(self):
         return reverse('zues:apm', kwargs={'key': self.secret, 'pk': self.pk})
@@ -376,7 +404,7 @@ class ActuelePolitiekeMotie(Motie):
         return 'APM'
 
     def mag(self):
-        return Tijden.get_solo().mag_apm()
+        return get_settings().mag_apm()
 
 
 class Modificatie(Stuk):
@@ -499,8 +527,8 @@ class Resolutie(Modificatie):
     class Meta:
         verbose_name_plural = 'resoluties'
 
-    def __unicode__(self):
-        return u'RES %s' % self.titel
+    def __str__(self):
+        return 'RES %s' % self.titel
 
     def get_absolute_url(self):
         return reverse('zues:res', kwargs={'key': self.secret, 'pk': self.pk})
@@ -515,15 +543,15 @@ class Resolutie(Modificatie):
         return 'RES'
 
     def mag(self):
-        return Tijden.get_solo().mag_res()
+        return get_settings().mag_res()
 
 
 class Amendement(Modificatie):
     class Meta:
         verbose_name_plural = 'amendementen'
 
-    def __unicode__(self):
-        return u'AM %s' % self.titel
+    def __str__(self):
+        return 'AM %s' % self.titel
 
     def get_absolute_url(self):
         return reverse('zues:am', kwargs={'key': self.secret, 'pk': self.pk})
@@ -538,15 +566,15 @@ class Amendement(Modificatie):
         return 'AM'
 
     def mag(self):
-        return Tijden.get_solo().mag_am()
+        return get_settings().mag_am()
 
 
 class HRWijziging(Modificatie):
     class Meta:
         verbose_name_plural = "HR-wijzigingen"
 
-    def __unicode__(self):
-        return u'HR %s' % self.titel
+    def __str__(self):
+        return 'HR %s' % self.titel
 
     def get_absolute_url(self):
         return reverse('zues:hr', kwargs={'key': self.secret, 'pk': self.pk})
@@ -561,4 +589,4 @@ class HRWijziging(Modificatie):
         return 'HR'
 
     def mag(self):
-        return Tijden.get_solo().mag_hr()
+        return get_settings().mag_hr()

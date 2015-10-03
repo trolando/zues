@@ -10,6 +10,9 @@ def on_user_login(sender, user, request, **kwargs):
     from zues import models
     from zues import views
 
+    if not hasattr(settings, 'JANEUS_SERVER'):
+        return
+
     username = user.get_username()
     res = Janeus().by_uid(username)
     if res is None:
@@ -28,12 +31,12 @@ def on_user_login(sender, user, request, **kwargs):
             secret_url = reverse('zues:login', kwargs={'key': key, 'lid': lid.lidnummer})
             secret_url = request.build_absolute_uri(secret_url)
             secret_url = re.sub(r'^http://', r'https://', secret_url)
-            subject = '[JD] Toegang \'' + str(settings.NAAMKORT) + '\' voorstelsysteem'
+            subject = '[JD] Toegang voorstelsysteem {}'.format(request.get_host().lower())
             from_email = 'noreply@jongedemocraten.nl'
             inhoud = []
             inhoud.append('Beste %s,' % naam)
             inhoud.append('')
-            inhoud.append('Als beheerder van het voorstelsysteem \'' + str(settings.NAAMKORT) + '\' van de Jonge Democraten heb je ook automatisch een account voor de normale interface. Als je de site wilt gebruiken als gewone gebruiker (dus niet als beheerder), dan kun je de volgende persoonlijke geheime URL gebruiken:')
+            inhoud.append('Als beheerder van het voorstelsysteem van de Jonge Democraten heb je ook automatisch een account voor de normale interface. Als je de site wilt gebruiken als gewone gebruiker (dus niet als beheerder), dan kun je de volgende persoonlijke geheime URL gebruiken:')
             inhoud.append(secret_url)
             inhoud.append('')
             inhoud.append('Deze URL kun je ook gebruiken om jouw ingediende voorstellen in te zien, te wijzigen en terug te trekken. Deel deze URL dus niet met anderen!')

@@ -32,16 +32,16 @@ def generate_lid(lidnummer):
 
 
 def _generate_lid(lidnummer, email, naam):
-    code = hashlib.sha256(base64.urlsafe_b64encode(os.urandom(64))).hexdigest()
+    code = hashlib.sha256(os.urandom(64)).hexdigest()
 
     lid = models.Login.objects.filter(lidnummer=lidnummer)
     if len(lid):
         # lid bestaat al
         lid = lid[0]
-        lid.secret = hashlib.sha256(code).hexdigest()
+        lid.secret = hashlib.sha256(code.encode('utf-8')).hexdigest()
     else:
         # lid bestaat nog njet
-        lid = models.Login(naam=naam, lidnummer=lidnummer, secret=hashlib.sha256(code).hexdigest())
+        lid = models.Login(naam=naam, lidnummer=lidnummer, secret=hashlib.sha256(code.encode('utf-8')).hexdigest())
 
     lid.save()
     return (lid, email, naam, code)
@@ -191,8 +191,7 @@ def view_home(request):
         context['am'] = models.Amendement.objects.filter(eigenaar=lid).exclude(status=models.Stuk.VERWIJDERD)
         context['hr'] = models.HRWijziging.objects.filter(eigenaar=lid).exclude(status=models.Stuk.VERWIJDERD)
         context['count'] = len(context['pm']) + len(context['apm']) + len(context['org']) + len(context['res']) + len(context['am']) + len(context['hr'])
-        tijden = models.Tijden.get_solo()
-        context['tijden'] = tijden
+        context['settings'] = models.get_settings()
         context['staff'] = request.user.is_active and request.user.is_staff
         context['publiek'] = get_categorieen(Q(status=models.Stuk.PUBLIEK))
         context['allpm'] = models.PolitiekeMotie.objects.filter(status=models.Stuk.PUBLIEK)
@@ -224,13 +223,13 @@ def view_home(request):
                 if getattr(settings, 'EMAIL_HOST', '') == '':
                     return HttpResponseRedirect(secret_url)
 
-                subject = '[JD] Toegang \'' + str(settings.NAAMKORT) + '\' voorstelsysteem'
+                subject = '[JD] Toegang voorstelsysteem {}'.format(request.get_host().lower())
                 from_email = 'noreply@jongedemocraten.nl'
 
                 inhoud = []
                 inhoud.append('Beste %s,' % naam)
                 inhoud.append('')
-                inhoud.append('Je hebt toegang gevraagd tot het voorstelsysteem \'' + str(settings.NAAMKORT) + '\' van de Jonge Democraten. ')
+                inhoud.append('Je hebt toegang gevraagd tot het voorstelsysteem van de Jonge Democraten. ')
                 inhoud.append('Dit systeem kun je gebruiken met de volgende persoonlijke geheime URL:')
                 inhoud.append(secret_url)
                 inhoud.append('')
@@ -312,7 +311,7 @@ def login_verzonden(request):
 
 def login(request, lid, key):
     # controleer login
-    hetlid = models.Login.objects.filter(lidnummer=lid).filter(secret=hashlib.sha256(key).hexdigest())
+    hetlid = models.Login.objects.filter(lidnummer=lid).filter(secret=hashlib.sha256(key.encode('utf-8')).hexdigest())
     if len(hetlid):
         request.session['lid'] = lid
         request.session['key'] = hetlid[0].secret
@@ -329,6 +328,19 @@ def loguit(request):
     # ook uitloggen bij admin
     logout(request)
     return HttpResponseRedirect('/')
+
+
+class SettingsMixin(object):
+    def get_context_data(self, **kwargs):
+        context = super(SettingsMixin, self).get_context_data(**kwargs)
+        context['settings'] = models.get_settings()
+        return context
+
+    def dispatch(self, request, *args, **kwargs):
+        if models.get_settings().public:
+            return super(SettingsMixin, self).dispatch(request, *args, **kwargs)
+        else:
+            return HttpResponseForbidden()
 
 
 class LidMixin(object):
@@ -387,7 +399,7 @@ class MagVerwijderenMixin(object):
         return obj
 
 
-class PMView(LidMixin, DetailView):
+class PMView(LidMixin, SettingsMixin, DetailView):
     template_name = 'zues/pm.html'
     context_object_name = "voorstel"
     model = models.PolitiekeMotie
@@ -401,17 +413,17 @@ class PMView(LidMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(PMView, self).get_context_data(**kwargs)
-        context['mag'] = models.Tijden.get_solo().mag_pm() and self.lid == context['voorstel'].eigenaar
+        context['mag'] = models.get_settings().mag_pm() and self.lid == context['voorstel'].eigenaar
         return context
 
 
-class NieuwePM(LoginMixin, CreateView):
+class NieuwePM(LoginMixin, SettingsMixin, CreateView):
     model = models.PolitiekeMotie
     form_class = forms.PMForm
     template_name = 'zues/pmnew.html'
 
     def dispatch(self, request, *args, **kwargs):
-        if not models.Tijden.get_solo().mag_pm():
+        if not models.get_settings().mag_pm():
             return HttpResponseForbidden()
         else:
             return super(NieuwePM, self).dispatch(request, *args, **kwargs)
@@ -428,7 +440,7 @@ class NieuwePM(LoginMixin, CreateView):
             return HttpResponseRedirect(self.object.get_absolute_url())
 
 
-class WijzigPM(LoginMixin, EigenaarMixin, MagWijzigenMixin, UpdateView):
+class WijzigPM(LoginMixin, EigenaarMixin, MagWijzigenMixin, SettingsMixin, UpdateView):
     model = models.PolitiekeMotie
     form_class = forms.PMForm
     template_name = 'zues/pmnew.html'
@@ -439,7 +451,7 @@ class WijzigPM(LoginMixin, EigenaarMixin, MagWijzigenMixin, UpdateView):
         return context
 
 
-class VerwijderPM(LoginMixin, EigenaarMixin, MagVerwijderenMixin, DeleteView):
+class VerwijderPM(LoginMixin, EigenaarMixin, MagVerwijderenMixin, SettingsMixin, DeleteView):
     model = models.PolitiekeMotie
     template_name = 'zues/pmdel.html'
 
@@ -450,7 +462,7 @@ class VerwijderPM(LoginMixin, EigenaarMixin, MagVerwijderenMixin, DeleteView):
         return HttpResponseRedirect(reverse_lazy("zues:home"))
 
 
-class APMView(LidMixin, DetailView):
+class APMView(LidMixin, SettingsMixin, DetailView):
     template_name = 'zues/apm.html'
     context_object_name = "voorstel"
     model = models.ActuelePolitiekeMotie
@@ -464,17 +476,17 @@ class APMView(LidMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(APMView, self).get_context_data(**kwargs)
-        context['mag'] = models.Tijden.get_solo().mag_apm() and self.lid == context['voorstel'].eigenaar
+        context['mag'] = models.get_settings().mag_apm() and self.lid == context['voorstel'].eigenaar
         return context
 
 
-class NieuweAPM(LoginMixin, CreateView):
+class NieuweAPM(LoginMixin, SettingsMixin, CreateView):
     model = models.ActuelePolitiekeMotie
     form_class = forms.APMForm
     template_name = 'zues/apmnew.html'
 
     def dispatch(self, request, *args, **kwargs):
-        if not models.Tijden.get_solo().mag_apm():
+        if not models.get_settings().mag_apm():
             return HttpResponseForbidden()
         else:
             return super(NieuweAPM, self).dispatch(request, *args, **kwargs)
@@ -491,7 +503,7 @@ class NieuweAPM(LoginMixin, CreateView):
             return HttpResponseRedirect(self.object.get_absolute_url())
 
 
-class WijzigAPM(LoginMixin, EigenaarMixin, MagWijzigenMixin, UpdateView):
+class WijzigAPM(LoginMixin, EigenaarMixin, MagWijzigenMixin, SettingsMixin, UpdateView):
     model = models.ActuelePolitiekeMotie
     form_class = forms.APMForm
     template_name = 'zues/apmnew.html'
@@ -502,7 +514,7 @@ class WijzigAPM(LoginMixin, EigenaarMixin, MagWijzigenMixin, UpdateView):
         return context
 
 
-class VerwijderAPM(LoginMixin, EigenaarMixin, MagVerwijderenMixin, DeleteView):
+class VerwijderAPM(LoginMixin, EigenaarMixin, MagVerwijderenMixin, SettingsMixin, DeleteView):
     model = models.ActuelePolitiekeMotie
     template_name = 'zues/apmdel.html'
 
@@ -513,7 +525,7 @@ class VerwijderAPM(LoginMixin, EigenaarMixin, MagVerwijderenMixin, DeleteView):
         return HttpResponseRedirect(reverse_lazy("zues:home"))
 
 
-class ORGView(LidMixin, DetailView):
+class ORGView(LidMixin, SettingsMixin, DetailView):
     template_name = 'zues/org.html'
     context_object_name = "voorstel"
     model = models.Organimo
@@ -527,17 +539,17 @@ class ORGView(LidMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(ORGView, self).get_context_data(**kwargs)
-        context['mag'] = models.Tijden.get_solo().mag_org() and self.lid == context['voorstel'].eigenaar
+        context['mag'] = models.get_settings().mag_org() and self.lid == context['voorstel'].eigenaar
         return context
 
 
-class NieuweORG(LoginMixin, CreateView):
+class NieuweORG(LoginMixin, SettingsMixin, CreateView):
     model = models.Organimo
     form_class = forms.ORGForm
     template_name = 'zues/orgnew.html'
 
     def dispatch(self, request, *args, **kwargs):
-        if not models.Tijden.get_solo().mag_org():
+        if not models.get_settings().mag_org():
             return HttpResponseForbidden()
         else:
             return super(NieuweORG, self).dispatch(request, *args, **kwargs)
@@ -554,7 +566,7 @@ class NieuweORG(LoginMixin, CreateView):
             return HttpResponseRedirect(self.object.get_absolute_url())
 
 
-class WijzigORG(LoginMixin, EigenaarMixin, MagWijzigenMixin, UpdateView):
+class WijzigORG(LoginMixin, EigenaarMixin, MagWijzigenMixin, SettingsMixin, UpdateView):
     model = models.Organimo
     form_class = forms.ORGForm
     template_name = 'zues/orgnew.html'
@@ -565,7 +577,7 @@ class WijzigORG(LoginMixin, EigenaarMixin, MagWijzigenMixin, UpdateView):
         return context
 
 
-class VerwijderORG(LoginMixin, EigenaarMixin, MagVerwijderenMixin, DeleteView):
+class VerwijderORG(LoginMixin, EigenaarMixin, MagVerwijderenMixin, SettingsMixin, DeleteView):
     model = models.Organimo
     template_name = 'zues/orgdel.html'
 
@@ -576,7 +588,7 @@ class VerwijderORG(LoginMixin, EigenaarMixin, MagVerwijderenMixin, DeleteView):
         return HttpResponseRedirect(reverse_lazy("zues:home"))
 
 
-class RESView(LidMixin, DetailView):
+class RESView(LidMixin, SettingsMixin, DetailView):
     template_name = 'zues/res.html'
     context_object_name = "voorstel"
     model = models.Resolutie
@@ -590,17 +602,17 @@ class RESView(LidMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(RESView, self).get_context_data(**kwargs)
-        context['mag'] = models.Tijden.get_solo().mag_res() and self.lid == context['voorstel'].eigenaar
+        context['mag'] = models.get_settings().mag_res() and self.lid == context['voorstel'].eigenaar
         return context
 
 
-class NieuweRES(LoginMixin, CreateView):
+class NieuweRES(LoginMixin, SettingsMixin, CreateView):
     model = models.Resolutie
     form_class = forms.RESForm
     template_name = 'zues/resnew.html'
 
     def dispatch(self, request, *args, **kwargs):
-        if not models.Tijden.get_solo().mag_res():
+        if not models.get_settings().mag_res():
             return HttpResponseForbidden()
         else:
             return super(NieuweRES, self).dispatch(request, *args, **kwargs)
@@ -617,7 +629,7 @@ class NieuweRES(LoginMixin, CreateView):
             return HttpResponseRedirect(self.object.get_absolute_url())
 
 
-class WijzigRES(LoginMixin, EigenaarMixin, MagWijzigenMixin, UpdateView):
+class WijzigRES(LoginMixin, EigenaarMixin, MagWijzigenMixin, SettingsMixin, UpdateView):
     model = models.Resolutie
     form_class = forms.RESForm
     template_name = 'zues/resnew.html'
@@ -628,7 +640,7 @@ class WijzigRES(LoginMixin, EigenaarMixin, MagWijzigenMixin, UpdateView):
         return context
 
 
-class VerwijderRES(LoginMixin, EigenaarMixin, MagVerwijderenMixin, DeleteView):
+class VerwijderRES(LoginMixin, EigenaarMixin, MagVerwijderenMixin, SettingsMixin, DeleteView):
     model = models.Resolutie
     template_name = 'zues/resdel.html'
 
@@ -639,7 +651,7 @@ class VerwijderRES(LoginMixin, EigenaarMixin, MagVerwijderenMixin, DeleteView):
         return HttpResponseRedirect(reverse_lazy("zues:home"))
 
 
-class AMView(LidMixin, DetailView):
+class AMView(LidMixin, SettingsMixin, DetailView):
     template_name = 'zues/am.html'
     context_object_name = "voorstel"
     model = models.Amendement
@@ -653,17 +665,17 @@ class AMView(LidMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(AMView, self).get_context_data(**kwargs)
-        context['mag'] = models.Tijden.get_solo().mag_am() and self.lid == context['voorstel'].eigenaar
+        context['mag'] = models.get_settings().mag_am() and self.lid == context['voorstel'].eigenaar
         return context
 
 
-class NieuweAM(LoginMixin, CreateView):
+class NieuweAM(LoginMixin, SettingsMixin, CreateView):
     model = models.Amendement
     form_class = forms.AMForm
     template_name = 'zues/amnew.html'
 
     def dispatch(self, request, *args, **kwargs):
-        if not models.Tijden.get_solo().mag_am():
+        if not models.get_settings().mag_am():
             return HttpResponseForbidden()
         else:
             return super(NieuweAM, self).dispatch(request, *args, **kwargs)
@@ -680,7 +692,7 @@ class NieuweAM(LoginMixin, CreateView):
             return HttpResponseRedirect(self.object.get_absolute_url())
 
 
-class WijzigAM(LoginMixin, EigenaarMixin, MagWijzigenMixin, UpdateView):
+class WijzigAM(LoginMixin, EigenaarMixin, MagWijzigenMixin, SettingsMixin, UpdateView):
     model = models.Amendement
     form_class = forms.AMForm
     template_name = 'zues/amnew.html'
@@ -691,7 +703,7 @@ class WijzigAM(LoginMixin, EigenaarMixin, MagWijzigenMixin, UpdateView):
         return context
 
 
-class VerwijderAM(LoginMixin, EigenaarMixin, MagVerwijderenMixin, DeleteView):
+class VerwijderAM(LoginMixin, EigenaarMixin, MagVerwijderenMixin, SettingsMixin, DeleteView):
     model = models.Amendement
     template_name = 'zues/amdel.html'
 
@@ -702,7 +714,7 @@ class VerwijderAM(LoginMixin, EigenaarMixin, MagVerwijderenMixin, DeleteView):
         return HttpResponseRedirect(reverse_lazy("zues:home"))
 
 
-class HRView(LidMixin, DetailView):
+class HRView(LidMixin, SettingsMixin, DetailView):
     template_name = 'zues/hr.html'
     context_object_name = "voorstel"
     model = models.HRWijziging
@@ -716,17 +728,17 @@ class HRView(LidMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(HRView, self).get_context_data(**kwargs)
-        context['mag'] = models.Tijden.get_solo().mag_hr() and self.lid == context['voorstel'].eigenaar
+        context['mag'] = models.get_settings().mag_hr() and self.lid == context['voorstel'].eigenaar
         return context
 
 
-class NieuweHR(LoginMixin, CreateView):
+class NieuweHR(LoginMixin, SettingsMixin, CreateView):
     model = models.HRWijziging
     form_class = forms.HRForm
     template_name = 'zues/hrnew.html'
 
     def dispatch(self, request, *args, **kwargs):
-        if not models.Tijden.get_solo().mag_hr():
+        if not models.get_settings().mag_hr():
             return HttpResponseForbidden()
         else:
             return super(NieuweHR, self).dispatch(request, *args, **kwargs)
@@ -743,7 +755,7 @@ class NieuweHR(LoginMixin, CreateView):
             return HttpResponseRedirect(self.object.get_absolute_url())
 
 
-class WijzigHR(LoginMixin, EigenaarMixin, MagWijzigenMixin, UpdateView):
+class WijzigHR(LoginMixin, EigenaarMixin, MagWijzigenMixin, SettingsMixin, UpdateView):
     model = models.HRWijziging
     form_class = forms.HRForm
     template_name = 'zues/hrnew.html'
@@ -754,7 +766,7 @@ class WijzigHR(LoginMixin, EigenaarMixin, MagWijzigenMixin, UpdateView):
         return context
 
 
-class VerwijderHR(LoginMixin, EigenaarMixin, MagVerwijderenMixin, DeleteView):
+class VerwijderHR(LoginMixin, EigenaarMixin, MagVerwijderenMixin, SettingsMixin, DeleteView):
     model = models.HRWijziging
     template_name = 'zues/hrdel.html'
 
