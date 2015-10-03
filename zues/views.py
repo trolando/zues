@@ -21,7 +21,7 @@ import re
 
 def generate_lid(lidnummer):
     lidnummer = int(lidnummer)
-    if getattr(settings, 'SKIP_LDAP', False):
+    if not hasattr(settings, 'JANEUS_SERVER'):
         res = ('', 'Onbekend lid')
     else:
         res = Janeus().attributes(lidnummer)
@@ -65,15 +65,15 @@ def check_login(request):
 
 def view_lidnummer(request):
     if request.method == 'POST':
-        if getattr(settings, 'SKIP_RECAPTCHA', False):
+        if getattr(settings, 'RECAPTCHA_PUBLIC_KEY', '') == '':
             form = forms.HelpLidnummerForm(request.POST)
         else:
             form = forms.HelpLidnummerRecaptchaForm(request.POST)
         if form.is_valid():
             email = form.cleaned_data['email']
-            if getattr(settings, 'SKIP_EMAIL', False):
+            if getattr(settings, 'EMAIL_HOST', '') == '':
                 return HttpResponseRedirect('/lidnummerverzonden/')
-            if getattr(settings, 'SKIP_LDAP', False):
+            if not hasattr(settings, 'JANEUS_SERVER'):
                 return HttpResponseRedirect('/lidnummerverzonden/')
 
             for lidnummer, naam in Janeus().lidnummers(email):
@@ -94,7 +94,7 @@ def view_lidnummer(request):
 
             return HttpResponseRedirect('/lidnummerverzonden/')
     else:
-        if getattr(settings, 'SKIP_RECAPTCHA', False):
+        if getattr(settings, 'RECAPTCHA_PUBLIC_KEY', '') == '':
             form = forms.HelpLidnummerForm()
         else:
             form = forms.HelpLidnummerRecaptchaForm()
@@ -205,7 +205,7 @@ def view_home(request):
         return render_to_response("zues/yolo.html", context)
 
     if request.method == 'POST':
-        if getattr(settings, 'SKIP_RECAPTCHA', False):
+        if getattr(settings, 'RECAPTCHA_PUBLIC_KEY', '') == '':
             form = forms.LidnummerForm(request.POST)
         else:
             form = forms.LidnummerRecaptchaForm(request.POST)
@@ -221,7 +221,7 @@ def view_home(request):
                 secret_url = request.build_absolute_uri(secret_url)
                 secret_url = re.sub(r'^http://', r'https://', secret_url)
 
-                if getattr(settings, 'SKIP_EMAIL', False):
+                if getattr(settings, 'EMAIL_HOST', '') == '':
                     return HttpResponseRedirect(secret_url)
 
                 subject = '[JD] Toegang \'' + str(settings.NAAMKORT) + '\' voorstelsysteem'
@@ -247,7 +247,7 @@ def view_home(request):
 
             return HttpResponseRedirect('/loginverzonden/')
     else:
-        if getattr(settings, 'SKIP_RECAPTCHA', False):
+        if getattr(settings, 'RECAPTCHA_PUBLIC_KEY', '') == '':
             form = forms.LidnummerForm()
         else:
             form = forms.LidnummerRecaptchaForm()

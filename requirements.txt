@@ -4,6 +4,6 @@ django-overextends==0.3.2
 django-recaptcha==1.0.2
 django-solo==1.1.0
 gunicorn==19.1.1
--e git+https://github.com/jonge-democraten/janeus@1.0#egg=janeus-master
+-e git+https://github.com/jonge-democraten/janeus@1.2#egg=janeus-master
 python-ldap==2.4.18
 wsgiref==0.1.2

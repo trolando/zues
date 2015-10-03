@@ -24,7 +24,7 @@ def on_user_login(sender, user, request, **kwargs):
     lid = models.Login.objects.filter(lidnummer=lidnummer)
     if len(lid) == 0:
         lid, to, naam, key = views._generate_lid(lidnummer, email, naam)
-        if not getattr(settings, 'SKIP_EMAIL', False):
+        if getattr(settings, 'EMAIL_HOST', '') != '':
             secret_url = reverse('zues:login', kwargs={'key': key, 'lid': lid.lidnummer})
             secret_url = request.build_absolute_uri(secret_url)
             secret_url = re.sub(r'^http://', r'https://', secret_url)
