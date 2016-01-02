@@ -15,6 +15,7 @@ from zues import forms
 from janeus import Janeus
 import base64
 import hashlib
+import json
 import os
 import re
 
@@ -275,8 +276,12 @@ def view_export(request):
 @staff_member_required
 def view_reorder(request):
     if request.method == 'POST':
-        import json
-        data = json.loads(request.body)
+        try:
+            # assuming UTF-8 here...
+            data = json.loads(request.body.decode('utf-8'))
+        except TypeError as e:
+            logger.exception(e)
+            raise e
         models.Categorie.objects.all().delete()
         for cat in data:
             if len(cat['items']) == 0:
