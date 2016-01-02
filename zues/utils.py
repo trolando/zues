@@ -35,6 +35,8 @@ class CurrentRequestMiddleware(object):
 
 def current_site_id():
     request = current_request()
+    if request is None:
+        return None
     site_id = getattr(request, "site_id", None)
     return request.site_id
     if request and not site_id:
