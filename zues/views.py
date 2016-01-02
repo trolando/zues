@@ -23,7 +23,7 @@ import re
 def generate_lid(lidnummer):
     lidnummer = int(lidnummer)
     if not hasattr(settings, 'JANEUS_SERVER'):
-        res = ('', 'Onbekend lid')
+        res = (b'', 'Onbekend lid'.encode('utf-8'))
     else:
         res = Janeus().attributes(lidnummer)
     if res is None:
