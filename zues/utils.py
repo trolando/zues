@@ -3,10 +3,12 @@
 from django.contrib.sites.models import Site
 from django.contrib.sites.managers import CurrentSiteManager as DjangoCSM
 from django.conf import settings
+import logging
 import threading
 
 
 _thread_local = threading.local()
+logger = logging.getLogger(__name__)
 
 
 def current_request():
@@ -36,24 +38,10 @@ class CurrentRequestMiddleware(object):
 def current_site_id():
     request = current_request()
     if request is None:
-        return None
+        logger.warning('current_site_id: current_request returned None!')
+        return getattr(settings, 'SITE_ID', None)
     site_id = getattr(request, "site_id", None)
     return request.site_id
-    if request and not site_id:
-        site_id = request.session.get("site_id", None)
-        if not site_id:
-            domain = request.get_host().lower()
-            try:
-                site = Site.objects.get(domain__iexact=domain)
-            except Site.DoesNotExist:
-                pass
-            else:
-                site_id = site.id
-        if request and site_id:
-            request.site_id = site_id
-    if not site_id:
-        site_id = getattr(settings, 'SITE_ID', None)
-    return site_id
 
 
 class CurrentSiteManager(DjangoCSM):
