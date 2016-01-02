@@ -2,7 +2,7 @@
 {% load staticfiles %}
 {% block head %}
 <script src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
-<script src="{% static 'zues/js/jquery-sortable-min.js' %}"></script>
+<script src="{% static 'zues/js/Sortable.min.js' %}"></script>
 <style>
     body.dragging, body.dragging * {
         cursor: move !important;
@@ -43,30 +43,14 @@
         font-size: 20px;
         cursor: move;
     }
-    .sortable {
+    .sortabie, .sortable {
         margin: 0 0 9px 0;
         min-height: 20px;
         padding: 0;
     }
-    .sortable li {
+    .sortabie, .sortable li {
         list-style: none;
         cursor: move;
-    }
-    .sortable li.placeholder {
-        display: block;
-        position: relative;
-    }
-    .sortable li.placeholder:before {
-        position: absolute;
-        content: "";
-        width: 0;
-        height: 0;
-        margin-top: -5px;
-        left: -5px;
-        top: -4px;
-        border: 5px solid transparent;
-        border-left-color: red;
-        border-right: none;
     }
     #cats > li {
         margin: 16px 0;
@@ -84,7 +68,7 @@
 <button class='jdbutton' id="opslaan" style='width: 100px'>Opslaan</button>
 </span>
 
-<ul id="cats" class="sortable">
+<ul id="cats" class='sortabie'>
 {% for l in categories %}
 <li>
 <div class="cat">
@@ -215,42 +199,8 @@ var reorderPage = {
 
     setupCats: function() {
         // maak sortable
-        $('#cats').sortable({
-            group: 'cats',
-            pullPlaceholder: false,
-            // animation on drop
-            onDrop: function  (item, targetContainer, _super) {
-                var clonedItem = $('<li/>').css({height: 0})
-                item.before(clonedItem)
-                clonedItem.animate({'height': item.height()})
-
-                item.animate(clonedItem.position(), function  () {
-                    clonedItem.detach()
-                    _super(item)
-                })
-            },
-            // set item relative to cursor position
-            onDragStart: function ($item, container, _super) {
-                var offset = $item.offset(),
-                pointer = container.rootGroup.pointer
-                adjustment = {
-                    left: pointer.left - offset.left,
-                    top: pointer.top - offset.top
-                }
-                _super($item, container)
-            },
-            onDrag: function ($item, position) {
-                $item.css({left: position.left - adjustment.left,
-                           top: position.top - adjustment.top})
-                // autoscroll
-                var top = $(window).scrollTop();
-                var bottom = top + $(window).innerHeight();
-                if (position.top > bottom - 100) {
-                    $(window).scrollTop(top+20);
-                } else if (position.top < top + 100) {
-                    $(window).scrollTop(top-20);
-                }
-            },
+        $('.sortabie').each(function(i, v) {
+            Sortable.create(v, {group: 'alpha', animation: 300});
         });
     },
 
@@ -265,46 +215,11 @@ var reorderPage = {
         $('.title .button', v).click(reorderPage.onToggleCat);
 
         // maak sortable
-        $('.sortable', v).sortable({
-            group: 'sortable',
-            nested: false,
-            pullPlaceholder: false,
-            // animation on drop
-            onDrop: function  (item, targetContainer, _super) {
-                var clonedItem = $('<li/>').css({height: 0})
-                item.before(clonedItem)
-                clonedItem.animate({'height': item.height()})
-                item.animate(clonedItem.position(), function  () {
-                    clonedItem.detach()
-                    _super(item)
-                })
-                // reorder on drop
-                reorderPage.reorderAll();
-                $('#cats').sortable('enable')
-            },
-            // set item relative to cursor position
-            onDragStart: function ($item, container, _super) {
-                var offset = $item.offset(),
-                pointer = container.rootGroup.pointer
-                adjustment = {
-                    left: pointer.left - offset.left,
-                    top: pointer.top - offset.top
-                }
-                $('#cats').sortable('disable')
-                _super($item, container)
-            },
-            onDrag: function ($item, position) {
-                $item.css({left: position.left - adjustment.left,
-                           top: position.top - adjustment.top})
-                // autoscroll
-                var top = $(window).scrollTop();
-                var bottom = top + $(window).innerHeight();
-                if (position.top > bottom - 100) {
-                    $(window).scrollTop(top+20);
-                } else if (position.top < top + 100) {
-                    $(window).scrollTop(top-20);
-                }
-            },
+        $('.sortable', v).each(function(i, v) {
+            Sortable.create(v, {group: 'omega', animation: 300,
+                onEnd: function(evt) {
+                    reorderPage.reorderAll();
+                }});
         });
     },
 
