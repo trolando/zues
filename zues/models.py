@@ -4,7 +4,7 @@ from django.utils import formats
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
 from django.utils.timezone import now, localtime
-from re import sub
+from re import match, sub, split
 
 from . import utils
 
@@ -437,6 +437,30 @@ class Modificatie(Stuk):
             return ""
         return "<p>" + "</p><p>".join(str) + "</p>"
 
+    def to_p_numbered(self, str):
+        if str is None:
+            return ""
+        # First remove excessive whitespace
+        str = "\n".join([s.strip() for s in str.strip().split("\n")])
+        # Handle each part, splitting on multi-newline
+        i = 1
+        parts = []
+        for part in split("\n\n+", str):
+            # Check if this part is a chapter start
+            m = match("(?P<header>\d+(\.\d+)*\.?[^\.\n]*\.?)\n*(?P<rest>.*)", part)
+            if m is not None:
+                parts += ["<p>{}</p>".format(m.group("header")), ]
+                part = m.group("rest")
+            # Convert "dot space" to "dot newline"
+            part = sub("\. ", ".\n", part)
+            newpart = ""
+            for s in split("\n", part):
+                if s.strip() != "":
+                    newpart += "<span class=\"v\">{:d} </span>{:s} ".format(i, s)
+                    i += 1
+            parts += ["<p>{}</p>".format(newpart), ]
+        return "".join(parts)
+
     def get_content(self):
         if self.type == self.SCHRAPPEN:
             return "<p><strong>Schrap:</strong></p>" + self.to_p(escape(self.tekst1))
@@ -499,7 +523,7 @@ class Modificatie(Stuk):
             html.append("</tr>")
             html.append("<tr>")
             html.append("<td><p><strong>Vervang door:</strong></p></td>")
-            html.append("<td>%s</td>" % self.to_p(escape(self.tekst2)))
+            html.append("<td>%s</td>" % self.to_p_numbered(escape(self.tekst2)))
             html.append("</tr>")
         elif self.type == self.SCHRAPPEN:
             html.append("<tr>")
@@ -509,7 +533,7 @@ class Modificatie(Stuk):
         elif self.type == self.TOEVOEGEN:
             html.append("<tr>")
             html.append("<td><p><strong>Voeg toe:</strong></p></td>")
-            html.append("<td>%s</td>" % self.to_p(escape(self.tekst1)))
+            html.append("<td>%s</td>" % self.to_p_numbered(escape(self.tekst1)))
             html.append("</tr>")
 
         toe = self.to_p(escape(self.toelichting))
@@ -590,3 +614,6 @@ class HRWijziging(Modificatie):
 
     def mag(self):
         return get_settings().mag_hr()
+
+    def to_p_numbered(self, str):
+        return self.to_p(str)
