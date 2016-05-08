@@ -33,6 +33,10 @@ class CurrentRequestMiddleware(object):
                 site_id = site.id
 
         request.site_id = site_id
+        request.site = site
+
+        import django.contrib.sites.shortcuts
+        django.contrib.sites.shortcuts.get_current_site = lambda request: request.site
 
 
 def current_site_id():
