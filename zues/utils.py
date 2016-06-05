@@ -44,8 +44,7 @@ def current_site_id():
     if request is None:
         logger.warning('current_site_id: current_request returned None!')
         return getattr(settings, 'SITE_ID', None)
-    site_id = getattr(request, "site_id", None)
-    return request.site_id
+    return getattr(request, 'site_id', None)
 
 
 class CurrentSiteManager(DjangoCSM):

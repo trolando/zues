@@ -42,8 +42,6 @@ INSTALLED_APPS = (
     'appolo',
     'ldap',
     'captcha',
-    'solo',
-    'overextends',
     'janeus',
 )
 

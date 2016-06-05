@@ -92,7 +92,6 @@ class AMForm(ResolutieForm):
         self.fields['toelichting'].widget.attrs.update({'placeholder': 'Optionele toelichting van maximaal 100 woorden...'})
 
 
-
 class HRForm(ResolutieForm):
     tekst1 = CharField(widget=Textarea, label='Schrap/Voeg toe:')
     tekst2 = CharField(widget=Textarea, label='Vervang door:', required=False)

@@ -280,6 +280,8 @@ def view_reorder(request):
             # assuming UTF-8 here...
             data = json.loads(request.body.decode('utf-8'))
         except TypeError as e:
+            import logging
+            logger = logging.getLogger(__name__)
             logger.exception(e)
             raise e
         models.Categorie.objects.all().delete()
