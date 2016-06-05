@@ -4,6 +4,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from zues.models import PolitiekeMotie, ActuelePolitiekeMotie, Organimo, Resolutie, Amendement, HRWijziging, Login, Settings, Categorie, Stuk
+import re
 
 
 class MotieForm(forms.ModelForm):
@@ -38,14 +39,36 @@ def publiek(modeladmin, request, queryset):
 publiek.short_description = "Mark selected as Publiek"
 
 
-class MotieAdmin(admin.ModelAdmin):
+class StukAdmin(admin.ModelAdmin):
     list_display = ('titel', 'status', 'admin_opmerkingen', 'categorie', 'boeknummer', 'eigenaar', 'woordvoerder', 'laatsteupdate')
     list_editable = ('categorie', 'admin_opmerkingen', 'boeknummer', 'status')
     actions = [ingediend, verwijderen, accepteren, repareren, publiek]
 
     def get_changelist_form(self, request, **kwargs):
         kwargs.setdefault('form', MotieForm)
-        return super(MotieAdmin, self).get_changelist_form(request, **kwargs)
+        return super(StukAdmin, self).get_changelist_form(request, **kwargs)
+
+
+class MotieAdmin(StukAdmin):
+    list_display = ('titel', 'status', 'admin_opmerkingen', 'word_count', 'categorie', 'boeknummer', 'eigenaar', 'woordvoerder', 'laatsteupdate')
+
+    def word_count(self, obj):
+        def count(x):
+            return len(re.findall("[\w\\-'_]+", x))
+
+        return "{}, {}".format(count(obj.constateringen) + count(obj.overwegingen) + count(obj.uitspraken), count(obj.toelichting))
+    word_count.short_description = "Woorden"
+
+
+class ModificatieAdmin(StukAdmin):
+    list_display = ('titel', 'status', 'admin_opmerkingen', 'word_count', 'categorie', 'boeknummer', 'eigenaar', 'woordvoerder', 'laatsteupdate')
+
+    def word_count(self, obj):
+        def count(x):
+            return len(re.findall("[\w\\-'_]+", x))
+
+        return "{}, {}".format(count(obj.tekst1), count(obj.tekst2))
+    word_count.short_description = "Woorden"
 
 
 def admin_url(model, url, object_id=None):
@@ -122,7 +145,7 @@ admin.site.register(Settings, SingletonAdmin)
 admin.site.register(PolitiekeMotie, MotieAdmin)
 admin.site.register(ActuelePolitiekeMotie, MotieAdmin)
 admin.site.register(Organimo, MotieAdmin)
-admin.site.register(Resolutie, MotieAdmin)
-admin.site.register(Amendement, MotieAdmin)
-admin.site.register(HRWijziging, MotieAdmin)
+admin.site.register(Resolutie, ModificatieAdmin)
+admin.site.register(Amendement, ModificatieAdmin)
+admin.site.register(HRWijziging, ModificatieAdmin)
 admin.site.register(Categorie)
