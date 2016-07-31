@@ -523,7 +523,8 @@ class Modificatie(Stuk):
             html.append("</tr>")
             html.append("<tr>")
             html.append("<td><p><strong>Vervang door:</strong></p></td>")
-            html.append("<td>%s</td>" % self.to_p_numbered(escape(self.tekst2)))
+            html.append("<td>%s</td>" % self.to_p(escape(self.tekst2)))
+            # html.append("<td>%s</td>" % self.to_p_numbered(escape(self.tekst2)))
             html.append("</tr>")
         elif self.type == self.SCHRAPPEN:
             html.append("<tr>")
@@ -533,7 +534,8 @@ class Modificatie(Stuk):
         elif self.type == self.TOEVOEGEN:
             html.append("<tr>")
             html.append("<td><p><strong>Voeg toe:</strong></p></td>")
-            html.append("<td>%s</td>" % self.to_p_numbered(escape(self.tekst1)))
+            # html.append("<td>%s</td>" % self.to_p_numbered(escape(self.tekst1)))
+            html.append("<td>%s</td>" % self.to_p(escape(self.tekst1)))
             html.append("</tr>")
 
         toe = self.to_p(escape(self.toelichting))
