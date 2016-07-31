@@ -12,12 +12,17 @@ from django.shortcuts import render_to_response
 from django.views.generic import DetailView, UpdateView, DeleteView, CreateView
 from zues import models
 from zues import forms
+from zues.utils import current_site_id
 from janeus import Janeus
 import base64
 import hashlib
 import json
 import os
 import re
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 def generate_lid(lidnummer):
@@ -407,17 +412,28 @@ class MagVerwijderenMixin(object):
         return obj
 
 
-class PMView(LidMixin, SettingsMixin, DetailView):
+class SecretKeyMixin(object):
+    def get_object(self, **kwargs):
+        pk = self.kwargs['pk']
+        try:
+            # obj = super(SecretKeyMixin, self).get_object(**kwargs)
+            obj = self.queryset.filter(pk=pk).get()
+        except self.queryset.model.DoesNotExist:
+            site_id = current_site_id()
+            logger.warning("Http404 raised in SecretKeyMixin: NotFound for pk {} and site {}".format(pk, site_id))
+            raise Http404
+
+        if self.kwargs['key'] != obj.secret:
+            logger.warning("Http404 raised in SecretKeyMixin: Incorrect secret key for pk {}".format(pk))
+            raise Http404
+        return obj
+
+
+class PMView(LidMixin, SettingsMixin, SecretKeyMixin, DetailView):
     template_name = 'zues/pm.html'
     context_object_name = "voorstel"
     model = models.PolitiekeMotie
     queryset = models.PolitiekeMotie.objects.exclude(status=models.Stuk.VERWIJDERD)
-
-    def get_object(self, **kwargs):
-        obj = super(PMView, self).get_object(**kwargs)
-        if self.kwargs['key'] != obj.secret:
-            raise Http404
-        return obj
 
     def get_context_data(self, **kwargs):
         context = super(PMView, self).get_context_data(**kwargs)
@@ -470,17 +486,11 @@ class VerwijderPM(LoginMixin, EigenaarMixin, MagVerwijderenMixin, SettingsMixin,
         return HttpResponseRedirect(reverse_lazy("zues:home"))
 
 
-class APMView(LidMixin, SettingsMixin, DetailView):
+class APMView(LidMixin, SettingsMixin, SecretKeyMixin, DetailView):
     template_name = 'zues/apm.html'
     context_object_name = "voorstel"
     model = models.ActuelePolitiekeMotie
     queryset = models.ActuelePolitiekeMotie.objects.exclude(status=models.Stuk.VERWIJDERD)
-
-    def get_object(self, **kwargs):
-        obj = super(APMView, self).get_object(**kwargs)
-        if self.kwargs['key'] != obj.secret:
-            raise Http404
-        return obj
 
     def get_context_data(self, **kwargs):
         context = super(APMView, self).get_context_data(**kwargs)
@@ -533,17 +543,11 @@ class VerwijderAPM(LoginMixin, EigenaarMixin, MagVerwijderenMixin, SettingsMixin
         return HttpResponseRedirect(reverse_lazy("zues:home"))
 
 
-class ORGView(LidMixin, SettingsMixin, DetailView):
+class ORGView(LidMixin, SettingsMixin, SecretKeyMixin, DetailView):
     template_name = 'zues/org.html'
     context_object_name = "voorstel"
     model = models.Organimo
     queryset = models.Organimo.objects.exclude(status=models.Stuk.VERWIJDERD)
-
-    def get_object(self, **kwargs):
-        obj = super(ORGView, self).get_object(**kwargs)
-        if self.kwargs['key'] != obj.secret:
-            raise Http404
-        return obj
 
     def get_context_data(self, **kwargs):
         context = super(ORGView, self).get_context_data(**kwargs)
@@ -596,17 +600,11 @@ class VerwijderORG(LoginMixin, EigenaarMixin, MagVerwijderenMixin, SettingsMixin
         return HttpResponseRedirect(reverse_lazy("zues:home"))
 
 
-class RESView(LidMixin, SettingsMixin, DetailView):
+class RESView(LidMixin, SettingsMixin, SecretKeyMixin, DetailView):
     template_name = 'zues/res.html'
     context_object_name = "voorstel"
     model = models.Resolutie
     queryset = models.Resolutie.objects.exclude(status=models.Stuk.VERWIJDERD)
-
-    def get_object(self, **kwargs):
-        obj = super(RESView, self).get_object(**kwargs)
-        if self.kwargs['key'] != obj.secret:
-            raise Http404
-        return obj
 
     def get_context_data(self, **kwargs):
         context = super(RESView, self).get_context_data(**kwargs)
@@ -659,17 +657,11 @@ class VerwijderRES(LoginMixin, EigenaarMixin, MagVerwijderenMixin, SettingsMixin
         return HttpResponseRedirect(reverse_lazy("zues:home"))
 
 
-class AMView(LidMixin, SettingsMixin, DetailView):
+class AMView(LidMixin, SettingsMixin, SecretKeyMixin, DetailView):
     template_name = 'zues/am.html'
     context_object_name = "voorstel"
     model = models.Amendement
     queryset = models.Amendement.objects.exclude(status=models.Stuk.VERWIJDERD)
-
-    def get_object(self, **kwargs):
-        obj = super(AMView, self).get_object(**kwargs)
-        if self.kwargs['key'] != obj.secret:
-            raise Http404
-        return obj
 
     def get_context_data(self, **kwargs):
         context = super(AMView, self).get_context_data(**kwargs)
@@ -722,17 +714,11 @@ class VerwijderAM(LoginMixin, EigenaarMixin, MagVerwijderenMixin, SettingsMixin,
         return HttpResponseRedirect(reverse_lazy("zues:home"))
 
 
-class HRView(LidMixin, SettingsMixin, DetailView):
+class HRView(LidMixin, SettingsMixin, SecretKeyMixin, DetailView):
     template_name = 'zues/hr.html'
     context_object_name = "voorstel"
     model = models.HRWijziging
     queryset = models.HRWijziging.objects.exclude(status=models.Stuk.VERWIJDERD)
-
-    def get_object(self, **kwargs):
-        obj = super(HRView, self).get_object(**kwargs)
-        if self.kwargs['key'] != obj.secret:
-            raise Http404
-        return obj
 
     def get_context_data(self, **kwargs):
         context = super(HRView, self).get_context_data(**kwargs)
