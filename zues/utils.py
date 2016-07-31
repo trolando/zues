@@ -20,41 +20,59 @@ class CurrentRequestMiddleware(object):
         _thread_local.request = request
 
         site_id = request.session.get("site_id", None)
+        site = None
+
+        if site_id is not None:
+            try:
+                site = Site.objects.get(id=site_id)
+            except Site.DoesNotExist:
+                site = None
+                site_id = None
+
         if not site_id:
             domain = request.get_host().lower()
 
             try:
                 site = Site.objects.get(domain__iexact=domain)
+                site_id = site.id
             except Site.DoesNotExist:
                 site = Site(domain=domain, name=domain)
                 site.save()
-                site_id = site.id
-            else:
-                site_id = site.id
 
-        request.site_id = site_id
-        request.site = site
+            site_id = site.id
+
+        # logger.warning('CurrentRequestMiddleware: current site id is {}'.format(site_id))
+
+        _thread_local.site_id = site_id
+        _thread_local.site = site
 
         import django.contrib.sites.shortcuts
-        django.contrib.sites.shortcuts.get_current_site = lambda request: request.site
+        django.contrib.sites.shortcuts.get_current_site = lambda request: site
+
+
+def set_current_site_id(site_id):
+    _thread_local.site_id = site_id
+    _thread_local.site = Site.objects.get(id=site_id)
 
 
 def current_site_id():
-    request = current_request()
-    if request is None:
-        logger.warning('current_site_id: current_request returned None!')
+    site_id = getattr(_thread_local, 'site_id', None)
+    if site_id is None:
+        logger.error('current_site_id: no site_id set in thread local')
         return getattr(settings, 'SITE_ID', None)
-    return getattr(request, 'site_id', None)
+    return site_id
+
+
+def current_site():
+    site = getattr(_thread_local, 'site', None)
+    if site is None:
+        logger.error('current_site: no site set in thread local')
+        return None
+    return site
 
 
 class CurrentSiteManager(DjangoCSM):
-    def __init__(self, field_name=None, *args, **kwargs):
-        super(DjangoCSM, self).__init__(*args, **kwargs)
-        self.__field_name = field_name
-        self.__is_validated = False
-
     def get_queryset(self):
-        if not self.__is_validated:
-            self._get_field_name()
-        lookup = {self.__field_name + "__id__exact": current_site_id()}
-        return super(DjangoCSM, self).get_queryset().filter(**lookup)
+        logger.warning("current site id = {}".format(current_site_id()))
+        return super(DjangoCSM, self).get_queryset().filter(site__id=current_site_id())
+        # return super(DjangoCSM, self).get_queryset()
