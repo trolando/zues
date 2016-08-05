@@ -420,7 +420,9 @@ class SecretKeyMixin(object):
             obj = self.queryset.filter(pk=pk).get()
         except self.queryset.model.DoesNotExist:
             site_id = current_site_id()
-            logger.warning("Http404 raised in SecretKeyMixin: NotFound for pk {} and site {}".format(pk, site_id))
+            # if not found, let's also log all possible pk's...
+            candidates = str(list(self.queryset.all().values_list('id', flat=True)))
+            logger.warning("Http404 raised in SecretKeyMixin: NotFound for pk {} and site {}; candidates are {}".format(pk, site_id, candidates))
             raise Http404
 
         if self.kwargs['key'] != obj.secret:
