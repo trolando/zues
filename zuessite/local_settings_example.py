@@ -35,8 +35,6 @@ DATABASES = {
 JANEUS_SERVER = "ldap://127.0.0.1:389/"
 JANEUS_DN = "cn=readall,ou=sysUsers,dc=jd,dc=nl"
 JANEUS_PASS = ""
-from zues.utils import current_site_id
-JANEUS_CURRENT_SITE = current_site_id
 
 # Step 6: set Recaptcha-credentials.
 RECAPTCHA_PUBLIC_KEY = ''

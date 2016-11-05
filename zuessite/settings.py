@@ -63,8 +63,6 @@ STATIC_URL = '/static/'
 
 AUTHENTICATION_BACKENDS = ('janeus.backend.JaneusBackend', 'django.contrib.auth.backends.ModelBackend',)
 
-SITE_ID = 1
-
 ##################
 # LOCAL SETTINGS #
 ##################
@@ -80,3 +78,7 @@ except ImportError as e:
     if "local_settings" not in str(e):
         raise e
 
+from zues.utils import current_site_id
+JANEUS_CURRENT_SITE = current_site_id
+
+SITE_ID = 1
