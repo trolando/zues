@@ -15,8 +15,8 @@ ALLOWED_HOSTS = []
 
 # Step 3: when deploying in production, set STATIC_ROOT to the actual location
 # of the site's static files.
-# Do not set this value when runnig for development (i.e. manage.py runserver).
-# STATIC_ROOT = '/usr/share/jonge-democraten/visie/static/'
+# Do not set this value when running for development (i.e. manage.py runserver).
+# STATIC_ROOT = '/usr/share/jonge-democraten/zues/static/'
 
 # Step 4: set a database to store the application's information
 # For development, SQLite is fine. For production, use MySQL.
