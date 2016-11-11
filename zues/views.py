@@ -417,11 +417,11 @@ class SecretKeyMixin(object):
         pk = self.kwargs['pk']
         try:
             # obj = super(SecretKeyMixin, self).get_object(**kwargs)
-            obj = self.queryset.filter(pk=pk).get()
-        except self.queryset.model.DoesNotExist:
+            obj = self.get_queryset().filter(pk=pk).get()
+        except self.model.DoesNotExist:
             site_id = current_site_id()
             # if not found, let's also log all possible pk's...
-            candidates = str(list(self.queryset.all().values_list('id', flat=True)))
+            candidates = str(list(self.get_queryset().all().values_list('id', flat=True)))
             logger.warning("Http404 raised in SecretKeyMixin: NotFound for pk {} and site {}; candidates are {}".format(pk, site_id, candidates))
             raise Http404
 
@@ -431,11 +431,15 @@ class SecretKeyMixin(object):
         return obj
 
 
-class PMView(LidMixin, SettingsMixin, SecretKeyMixin, DetailView):
+class NoDeletedMixin(object):
+    def get_queryset(self, **kwargs):
+        return super(NoDeletedMixin, self).get_queryset(**kwargs).exclude(status=models.Stuk.VERWIJDERD)
+
+
+class PMView(LidMixin, SettingsMixin, SecretKeyMixin, NoDeletedMixin, DetailView):
     template_name = 'zues/pm.html'
     context_object_name = "voorstel"
     model = models.PolitiekeMotie
-    queryset = models.PolitiekeMotie.objects.exclude(status=models.Stuk.VERWIJDERD)
 
     def get_context_data(self, **kwargs):
         context = super(PMView, self).get_context_data(**kwargs)
@@ -488,11 +492,10 @@ class VerwijderPM(LoginMixin, EigenaarMixin, MagVerwijderenMixin, SettingsMixin,
         return HttpResponseRedirect(reverse_lazy("zues:home"))
 
 
-class APMView(LidMixin, SettingsMixin, SecretKeyMixin, DetailView):
+class APMView(LidMixin, SettingsMixin, SecretKeyMixin, NoDeletedMixin, DetailView):
     template_name = 'zues/apm.html'
     context_object_name = "voorstel"
     model = models.ActuelePolitiekeMotie
-    queryset = models.ActuelePolitiekeMotie.objects.exclude(status=models.Stuk.VERWIJDERD)
 
     def get_context_data(self, **kwargs):
         context = super(APMView, self).get_context_data(**kwargs)
@@ -545,11 +548,10 @@ class VerwijderAPM(LoginMixin, EigenaarMixin, MagVerwijderenMixin, SettingsMixin
         return HttpResponseRedirect(reverse_lazy("zues:home"))
 
 
-class ORGView(LidMixin, SettingsMixin, SecretKeyMixin, DetailView):
+class ORGView(LidMixin, SettingsMixin, SecretKeyMixin, NoDeletedMixin, DetailView):
     template_name = 'zues/org.html'
     context_object_name = "voorstel"
     model = models.Organimo
-    queryset = models.Organimo.objects.exclude(status=models.Stuk.VERWIJDERD)
 
     def get_context_data(self, **kwargs):
         context = super(ORGView, self).get_context_data(**kwargs)
@@ -602,11 +604,10 @@ class VerwijderORG(LoginMixin, EigenaarMixin, MagVerwijderenMixin, SettingsMixin
         return HttpResponseRedirect(reverse_lazy("zues:home"))
 
 
-class RESView(LidMixin, SettingsMixin, SecretKeyMixin, DetailView):
+class RESView(LidMixin, SettingsMixin, SecretKeyMixin, NoDeletedMixin, DetailView):
     template_name = 'zues/res.html'
     context_object_name = "voorstel"
     model = models.Resolutie
-    queryset = models.Resolutie.objects.exclude(status=models.Stuk.VERWIJDERD)
 
     def get_context_data(self, **kwargs):
         context = super(RESView, self).get_context_data(**kwargs)
@@ -659,11 +660,10 @@ class VerwijderRES(LoginMixin, EigenaarMixin, MagVerwijderenMixin, SettingsMixin
         return HttpResponseRedirect(reverse_lazy("zues:home"))
 
 
-class AMView(LidMixin, SettingsMixin, SecretKeyMixin, DetailView):
+class AMView(LidMixin, SettingsMixin, SecretKeyMixin, NoDeletedMixin, DetailView):
     template_name = 'zues/am.html'
     context_object_name = "voorstel"
     model = models.Amendement
-    queryset = models.Amendement.objects.exclude(status=models.Stuk.VERWIJDERD)
 
     def get_context_data(self, **kwargs):
         context = super(AMView, self).get_context_data(**kwargs)
@@ -716,11 +716,10 @@ class VerwijderAM(LoginMixin, EigenaarMixin, MagVerwijderenMixin, SettingsMixin,
         return HttpResponseRedirect(reverse_lazy("zues:home"))
 
 
-class HRView(LidMixin, SettingsMixin, SecretKeyMixin, DetailView):
+class HRView(LidMixin, SettingsMixin, SecretKeyMixin, NoDeletedMixin, DetailView):
     template_name = 'zues/hr.html'
     context_object_name = "voorstel"
     model = models.HRWijziging
-    queryset = models.HRWijziging.objects.exclude(status=models.Stuk.VERWIJDERD)
 
     def get_context_data(self, **kwargs):
         context = super(HRView, self).get_context_data(**kwargs)
