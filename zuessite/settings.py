@@ -61,8 +61,6 @@ DATETIME_FORMAT = 'd F Y H:i:s'
 
 STATIC_URL = '/static/'
 
-AUTHENTICATION_BACKENDS = ('janeus.backend.JaneusBackend', 'django.contrib.auth.backends.ModelBackend',)
-
 ##################
 # LOCAL SETTINGS #
 ##################

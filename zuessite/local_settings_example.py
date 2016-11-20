@@ -32,9 +32,10 @@ DATABASES = {
 }
 
 # Step 5: set an LDAP server that stores the identity and access management data 
-JANEUS_SERVER = "ldap://127.0.0.1:389/"
-JANEUS_DN = "cn=readall,ou=sysUsers,dc=jd,dc=nl"
-JANEUS_PASS = ""
+# JANEUS_SERVER = "ldap://127.0.0.1:389/"
+# JANEUS_DN = "cn=readall,ou=sysUsers,dc=jd,dc=nl"
+# JANEUS_PASS = ""
+# AUTHENTICATION_BACKENDS = ('janeus.backend.JaneusBackend', 'django.contrib.auth.backends.ModelBackend',)
 
 # Step 6: set Recaptcha-credentials.
 RECAPTCHA_PUBLIC_KEY = ''
