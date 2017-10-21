@@ -41,8 +41,6 @@ class CurrentRequestMiddleware(object):
 
             site_id = site.id
 
-        # logger.warning('CurrentRequestMiddleware: current site id is {}'.format(site_id))
-
         _thread_local.site_id = site_id
         _thread_local.site = site
 
@@ -75,4 +73,3 @@ class CurrentSiteManager(DjangoCSM):
     def get_queryset(self):
         logger.warning("current site id = {}".format(current_site_id()))
         return super(DjangoCSM, self).get_queryset().filter(site__id=current_site_id())
-        # return super(DjangoCSM, self).get_queryset()
