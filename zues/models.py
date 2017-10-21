@@ -334,6 +334,56 @@ class Motie(Stuk):
         html.append("</table>")
         return mark_safe('\n'.join(html))
 
+    def as_html_table_snc(self, ik):
+        html = []
+        html.append("<table border='1' class='exportsnc pk-{0}-{1}'>".format(ik, self.pk))
+        html.append("<tr class='exporttitle'>")
+        html.append("<td><p>%s</p></td>" % self.format_boeknummer())
+        html.append("<td colspan='2'><p>%s</p></td>" % escape(self.titel))
+        html.append("</tr>")
+
+        uit = self.to_list(escape(self.uitspraken))
+        if len(uit) > 1:
+            uit = "<ul><li>" + "</li><li>".join(uit) + "</li></ul>"
+        elif len(uit):
+            uit = "<p>" + uit[0] + "</p>"
+        else:
+            uit = ""
+        html.append("<tr class='exporthead'>")
+        html.append("<td valign='top'><p><strong>Dictum</strong></p></td>")
+        html.append("<td valign='top' colspan='2'>%s</td>" % uit)
+        html.append("</tr>")
+
+        html.append("<tr>")
+        html.append("<td valign='top'><p>Woordvoerder:<br/>%s</p></td>" % escape(self.woordvoerder))
+        html.append("<td valign='top' height='50px' colspan='2'><p></p></td>")
+        html.append("</tr>")
+
+        html.append("<tr class='exporthead'>");
+        html.append("<td width='260px' valign='top'><p><strong>Voor</strong></p></td>");
+        html.append("<td width='260px' valign='top'><p><strong>Neutraal</strong></p></td>");
+        html.append("<td width='260px' valign='top'><p><strong>Tegen</strong></p></td>");
+        html.append("</tr>");
+
+        html.append("<tr class='sncvotecount'>");
+        html.append("<td height='200px' valign='top'><p></p></td>");
+        html.append("<td height='200px' valign='top'><p></p></td>");
+        html.append("<td height='200px' valign='top'><p></p></td>");
+        html.append("</tr>");
+
+        html.append("<tr>")
+        html.append("<td valign='top'><p>Woordvoerder:</p></td>")
+        html.append("<td valign='top' height='50px' colspan='2'><p></p></td>")
+        html.append("</tr>")
+
+        html.append("<tr>");
+        html.append("<td valign='top'><p>Stemming:</p></td>");
+        html.append("<td valign='top' colspan='2'><p></p></td>");
+        html.append("</tr>");
+
+        html.append("</table>")
+        return mark_safe('\n'.join(html))
+
 
 class Organimo(Motie):
     class Meta:
@@ -351,6 +401,9 @@ class Organimo(Motie):
 
     def as_html_table(self):
         return super(Organimo, self).as_html_table('ORG')
+
+    def as_html_table_snc(self):
+        return super(Organimo, self).as_html_table_snc('ORG')
 
     def stuk_type(self):
         return 'ORG'
@@ -376,6 +429,9 @@ class PolitiekeMotie(Motie):
     def as_html_table(self):
         return super(PolitiekeMotie, self).as_html_table('PM')
 
+    def as_html_table_snc(self):
+        return super(PolitiekeMotie, self).as_html_table_snc('PM')
+
     def stuk_type(self):
         return 'PM'
 
@@ -399,6 +455,9 @@ class ActuelePolitiekeMotie(Motie):
 
     def as_html_table(self):
         return super(ActuelePolitiekeMotie, self).as_html_table('APM')
+
+    def as_html_table_snc(self):
+        return super(ActuelePolitiekeMotie, self).as_html_table_snc('APM')
 
     def stuk_type(self):
         return 'APM'
@@ -548,6 +607,44 @@ class Modificatie(Stuk):
         html.append("</table>")
         return mark_safe('\n'.join(html))
 
+    def as_html_table_snc(self, ik):
+        html = []
+        html.append("<table border='1' class='exportsnc pk-{0}-{1}'>".format(ik, self.pk))
+        html.append("<tr class='exporttitle'>")
+        html.append("<td><p>%s</p></td>" % self.format_boeknummer())
+        html.append("<td colspan='2'><p>%s</p></td>" % escape(self.titel))
+        html.append("</tr>")
+
+        html.append("<tr>")
+        html.append("<td valign='top'><p>Woordvoerder:<br/>%s</p></td>" % escape(self.woordvoerder))
+        html.append("<td valign='top' height='50px' colspan='2'><p></p></td>")
+        html.append("</tr>")
+
+        html.append("<tr class='exporthead'>");
+        html.append("<td width='260px' valign='top'><p><strong>Voor</strong></p></td>");
+        html.append("<td width='260px' valign='top'><p><strong>Neutraal</strong></p></td>");
+        html.append("<td width='260px' valign='top'><p><strong>Tegen</strong></p></td>");
+        html.append("</tr>");
+
+        html.append("<tr class='sncvotecount'>");
+        html.append("<td height='200px' valign='top'><p></p></td>");
+        html.append("<td height='200px' valign='top'><p></p></td>");
+        html.append("<td height='200px' valign='top'><p></p></td>");
+        html.append("</tr>");
+
+        html.append("<tr>")
+        html.append("<td valign='top'><p>Woordvoerder:</p></td>")
+        html.append("<td valign='top' height='50px' colspan='2'><p></p></td>")
+        html.append("</tr>")
+
+        html.append("<tr>");
+        html.append("<td valign='top'><p>Stemming:</p></td>");
+        html.append("<td valign='top' colspan='2'><p></p></td>");
+        html.append("</tr>");
+
+        html.append("</table>")
+        return mark_safe('\n'.join(html))
+
 
 class Resolutie(Modificatie):
     class Meta:
@@ -564,6 +661,9 @@ class Resolutie(Modificatie):
 
     def as_html_table(self):
         return super(Resolutie, self).as_html_table('RES')
+
+    def as_html_table_snc(self):
+        return super(Resolutie, self).as_html_table_snc('RES')
 
     def stuk_type(self):
         return 'RES'
@@ -588,6 +688,9 @@ class Amendement(Modificatie):
     def as_html_table(self):
         return super(Amendement, self).as_html_table('AM')
 
+    def as_html_table_snc(self):
+        return super(Amendement, self).as_html_table_snc('AM')
+
     def stuk_type(self):
         return 'AM'
 
@@ -610,6 +713,9 @@ class HRWijziging(Modificatie):
 
     def as_html_table(self):
         return super(HRWijziging, self).as_html_table('HR')
+
+    def as_html_table_snc(self):
+        return super(HRWijziging, self).as_html_table_snc('HR')
 
     def stuk_type(self):
         return 'HR'

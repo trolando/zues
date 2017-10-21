@@ -1,0 +1,15 @@
+{% extends 'zues/base.html' %}
+{% block terugnaarbegin %}{% endblock %}
+{% block mededeling %}{% endblock %}
+{% block logo %}{% endblock %}
+{% block content %}
+
+{% for k in categories %}
+<h2>{{ k.titel }}</h2>
+{% for m in k.items %}
+{{ m.as_html_table_snc }}
+<br />
+{% endfor %}
+{% endfor %}
+
+{% endblock %} 
