@@ -43,6 +43,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'zues.utils.CurrentRequestMiddleware',
+    'janeus.utils.CurrentRequestMiddleware'
 )
 
 ROOT_URLCONF = 'zuessite.urls'
