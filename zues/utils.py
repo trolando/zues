@@ -50,15 +50,18 @@ class CurrentRequestMiddleware(object):
 
 def set_current_site_id(site_id):
     _thread_local.site_id = site_id
-    _thread_local.site = Site.objects.get(id=site_id)
+    try:
+        _thread_local.site = Site.objects.get(id=site_id)
+    except Site.DoesNotExist:
+        _thread_local.site = None
 
 
 def current_site_id():
-    site_id = getattr(_thread_local, 'site_id', None)
-    if site_id is None:
-        logger.error('current_site_id: no site_id set in thread local')
-        return getattr(settings, 'SITE_ID', None)
-    return site_id
+    if not hasattr(_thread_local, 'site_id'):
+        site_id = getattr(settings, 'SITE_ID', None)
+        logger.warning('current_site: no site set in thread local, using SITE_ID={}'.format(site_id))
+        set_current_site_id(site_id)
+    return _thread_local.site_id
 
 
 def current_site():
@@ -71,5 +74,10 @@ def current_site():
 
 class CurrentSiteManager(DjangoCSM):
     def get_queryset(self):
-        logger.warning("current site id = {}".format(current_site_id()))
-        return super(DjangoCSM, self).get_queryset().filter(site__id=current_site_id())
+        site_id = current_site_id()
+        # if the site is None or invalid, don't use filter
+        queryset = super(DjangoCSM, self).get_queryset()
+        if Site.objects.filter(id=current_site_id()).exists():
+            return queryset.filter(site__id=current_site_id())
+        else:
+            return queryset
