@@ -279,6 +279,12 @@ def view_export(request):
 
 
 @staff_member_required
+def view_export_snc(request):
+    context = {'categories': get_categorieen()}
+    return render_to_response("zues/exportsnc.html", context)
+
+
+@staff_member_required
 def view_reorder(request):
     if request.method == 'POST':
         try:

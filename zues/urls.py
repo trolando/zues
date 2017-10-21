@@ -41,6 +41,7 @@ urlpatterns = [
     url(r'^alles/$', views.view_publiek),
     url(r'^handig/voor/arend/$', views.view_publiek, name='publiek'),
     url(r'^export/$', views.view_export, name='export'),
+    url(r'^exportsnc/$', views.view_export_snc, name='exportsnc'),
     url(r'^reorder/$', views.view_reorder, name='reorder'),
 
     url(r'^lidnummer/$', views.view_lidnummer, name='lidnummer'),
