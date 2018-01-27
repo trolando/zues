@@ -7,6 +7,7 @@ class MotieForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super(MotieForm, self).__init__(*args, **kwargs)
         self.fields['titel'].widget.attrs.update({'placeholder': 'Titel van het voorstel'})
+        self.fields['onderwerp'].widget.attrs.update({'placeholder': 'Onderwerp (voor bestuur/congresteam)'})
         self.fields['woordvoerder'].widget.attrs.update({'placeholder': 'Naam van de woordvoerder'})
         self.fields['indieners'].widget.attrs.update({'placeholder': '"[JD Afdeling] Voorzitter, Secretaris" of "Naam 1, Naam 2, etc... (minimaal 5)"'})
         self.fields['constateringen'].widget.attrs.update({'placeholder': 'Elke (optionele) constatering gescheiden door een of meerdere witregels..."'})
@@ -19,6 +20,7 @@ class ResolutieForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super(ResolutieForm, self).__init__(*args, **kwargs)
         self.fields['titel'].widget.attrs.update({'placeholder': 'Titel van het voorstel'})
+        self.fields['onderwerp'].widget.attrs.update({'placeholder': 'Onderwerp (voor bestuur/congresteam)'})
         self.fields['woordvoerder'].widget.attrs.update({'placeholder': 'Naam van de woordvoerder'})
         self.fields['indieners'].widget.attrs.update({'placeholder': '"[JD Afdeling] Voorzitter, Secretaris" of "Naam 1, Naam 2, etc... (minimaal 5)"'})
         self.fields['betreft'].widget.attrs.update({'placeholder': 'Resolutie/Voorstel/Hoofdstuk N, pagina M, regels X-Y'})
@@ -38,7 +40,7 @@ class PMForm(MotieForm):
 
     class Meta:
         model = models.PolitiekeMotie
-        fields = ('titel', 'woordvoerder', 'indieners', 'constateringen', 'overwegingen', 'uitspraken', 'toelichting',)
+        fields = ('titel', 'onderwerp', 'woordvoerder', 'indieners', 'constateringen', 'overwegingen', 'uitspraken', 'toelichting',)
 
 
 class APMForm(MotieForm):
@@ -52,7 +54,7 @@ class APMForm(MotieForm):
 
     class Meta:
         model = models.ActuelePolitiekeMotie
-        fields = ('titel', 'woordvoerder', 'indieners', 'constateringen', 'overwegingen', 'uitspraken', 'toelichting',)
+        fields = ('titel', 'onderwerp', 'woordvoerder', 'indieners', 'constateringen', 'overwegingen', 'uitspraken', 'toelichting',)
 
 
 class ORGForm(MotieForm):
@@ -62,7 +64,7 @@ class ORGForm(MotieForm):
 
     class Meta:
         model = models.Organimo
-        fields = ('titel', 'woordvoerder', 'indieners', 'constateringen', 'overwegingen', 'uitspraken', 'toelichting',)
+        fields = ('titel', 'onderwerp', 'woordvoerder', 'indieners', 'constateringen', 'overwegingen', 'uitspraken', 'toelichting',)
 
 
 class RESForm(ResolutieForm):
@@ -71,7 +73,7 @@ class RESForm(ResolutieForm):
 
     class Meta:
         model = models.Resolutie
-        fields = ('titel', 'woordvoerder', 'indieners', 'betreft', 'type', 'tekst1', 'tekst2', 'toelichting',)
+        fields = ('titel', 'onderwerp', 'woordvoerder', 'indieners', 'betreft', 'type', 'tekst1', 'tekst2', 'toelichting',)
 
     def __init__(self, *args, **kwargs):
         super(RESForm, self).__init__(*args, **kwargs)
@@ -84,7 +86,7 @@ class AMForm(ResolutieForm):
 
     class Meta:
         model = models.Amendement
-        fields = ('titel', 'woordvoerder', 'indieners', 'betreft', 'type', 'tekst1', 'tekst2', 'toelichting',)
+        fields = ('titel', 'onderwerp', 'woordvoerder', 'indieners', 'betreft', 'type', 'tekst1', 'tekst2', 'toelichting',)
 
     def __init__(self, *args, **kwargs):
         super(AMForm, self).__init__(*args, **kwargs)
@@ -98,7 +100,7 @@ class HRForm(ResolutieForm):
 
     class Meta:
         model = models.HRWijziging
-        fields = ('titel', 'woordvoerder', 'indieners', 'betreft', 'type', 'tekst1', 'tekst2', 'toelichting',)
+        fields = ('titel', 'onderwerp', 'woordvoerder', 'indieners', 'betreft', 'type', 'tekst1', 'tekst2', 'toelichting',)
 
     def __init__(self, *args, **kwargs):
         super(HRForm, self).__init__(*args, **kwargs)

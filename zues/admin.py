@@ -40,7 +40,7 @@ publiek.short_description = "Mark selected as Publiek"
 
 
 class StukAdmin(admin.ModelAdmin):
-    list_display = ('titel', 'status', 'admin_opmerkingen', 'categorie', 'boeknummer', 'eigenaar', 'woordvoerder', 'laatsteupdate')
+    list_display = ('titel', 'onderwerp', 'status', 'admin_opmerkingen', 'categorie', 'boeknummer', 'eigenaar', 'woordvoerder', 'laatsteupdate')
     list_editable = ('categorie', 'admin_opmerkingen', 'boeknummer', 'status')
     actions = [ingediend, verwijderen, accepteren, repareren, publiek]
 
@@ -50,7 +50,7 @@ class StukAdmin(admin.ModelAdmin):
 
 
 class MotieAdmin(StukAdmin):
-    list_display = ('titel', 'status', 'admin_opmerkingen', 'word_count', 'categorie', 'boeknummer', 'eigenaar', 'woordvoerder', 'laatsteupdate')
+    list_display = ('titel', 'onderwerp', 'status', 'admin_opmerkingen', 'word_count', 'categorie', 'boeknummer', 'eigenaar', 'woordvoerder', 'laatsteupdate')
 
     def word_count(self, obj):
         def count(x):
@@ -61,7 +61,7 @@ class MotieAdmin(StukAdmin):
 
 
 class ModificatieAdmin(StukAdmin):
-    list_display = ('titel', 'status', 'admin_opmerkingen', 'word_count', 'categorie', 'boeknummer', 'eigenaar', 'woordvoerder', 'laatsteupdate')
+    list_display = ('titel', 'onderwerp', 'status', 'admin_opmerkingen', 'word_count', 'categorie', 'boeknummer', 'eigenaar', 'woordvoerder', 'laatsteupdate')
 
     def word_count(self, obj):
         def count(x):

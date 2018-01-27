@@ -143,6 +143,7 @@ class Stuk(SiteRelated):
     )
 
     titel = models.CharField(max_length=250,)
+    onderwerp = models.CharField(max_length=250, blank=True, null=True)
     eigenaar = models.ForeignKey(Login, blank=True, null=True, on_delete=models.SET_NULL)  # bij verwijderen eigenaar, verliest eigenaar
     status = models.IntegerField(choices=STATUS_CHOICES, default=INGEDIEND)
     admin_opmerkingen = models.TextField(blank=True, help_text='Opmerkingen van de beheerder')
@@ -282,6 +283,10 @@ class Motie(Stuk):
         html.append("<td><p>%s</p></td>" % escape(self.titel))
         html.append("</tr>")
         html.append("<tr class='exporthead'>")
+        html.append("<td><p><strong>Onderwerp:</strong></p></td>")
+        html.append("<td><p>%s</p></td>" % escape(self.to_commas(self.onderwerp)))
+        html.append("</tr>")
+        html.append("<tr class='exporthead'>")
         html.append("<td><p><strong>Indieners:</strong></p></td>")
         html.append("<td><p>%s</p></td>" % escape(self.to_commas(self.indieners)))
         html.append("</tr>")
@@ -340,6 +345,10 @@ class Motie(Stuk):
         html.append("<tr class='exporttitle'>")
         html.append("<td><p>%s</p></td>" % self.format_boeknummer())
         html.append("<td colspan='2'><p>%s</p></td>" % escape(self.titel))
+        html.append("</tr>")
+        html.append("<tr class='exporthead'>")
+        html.append("<td><p><strong>Onderwerp:</strong></p></td>")
+        html.append("<td valign='top' colspan='2'><p>%s</p></td>" % escape(self.to_commas(self.onderwerp)))
         html.append("</tr>")
 
         uit = self.to_list(escape(self.uitspraken))
@@ -562,6 +571,10 @@ class Modificatie(Stuk):
         html.append("<td><p>%s</p></td>" % escape(self.titel))
         html.append("</tr>")
         html.append("<tr class='exporthead'>")
+        html.append("<td><p><strong>Onderwerp:</strong></p></td>")
+        html.append("<td><p>%s</p></td>" % escape(self.to_commas(self.onderwerp)))
+        html.append("</tr>")
+        html.append("<tr class='exporthead'>")
         html.append("<td><p><strong>Indieners:</strong></p></td>")
         html.append("<td><p>%s</p></td>" % escape(self.to_commas(self.indieners)))
         html.append("</tr>")
@@ -613,6 +626,11 @@ class Modificatie(Stuk):
         html.append("<tr class='exporttitle'>")
         html.append("<td><p>%s</p></td>" % self.format_boeknummer())
         html.append("<td colspan='2'><p>%s</p></td>" % escape(self.titel))
+        html.append("</tr>")
+
+        html.append("<tr class='exporthead'>")
+        html.append("<td><p><strong>Onderwerp:</strong></p></td>")
+        html.append("<td valign='top' colspan='2'><p>%s</p></td>" % escape(self.to_commas(self.onderwerp)))
         html.append("</tr>")
 
         html.append("<tr>")
