@@ -156,11 +156,12 @@ class Stuk(SiteRelated):
     woordvoerder = models.CharField(max_length=250,)
     toelichting = models.TextField(blank=True, help_text='Gebruik een dubbele enter voor de volgende paragraaf')
 
-    def format_boeknummer(self):
+    def format_boeknummer(self, boeknrlen=2):
         if self.categorie is None:
             return self.stuk_type()
         else:
-            return escape("%s%.02d" % (self.categorie.prefix, self.boeknummer))
+            format = "%s%.0" + str(max([boeknrlen, 2])) + "d"
+            return escape(format % (self.categorie.prefix, self.boeknummer))
 
     def is_verwijderd(self):
         return self.status == Stuk.VERWIJDERD
@@ -241,10 +242,10 @@ class Motie(Stuk):
 
         return "<p>De ALV der Jonge Democraten,</p>" + con + over + uit + orde + toe
 
-    def as_dict(self, typje):
+    def as_dict(self, typje, boeknrlen=2):
         # Dict-output, kan hergebruikt worden om JSON te genereren
         res = {}
-        res['id'] = self.format_boeknummer()
+        res['id'] = self.format_boeknummer(boeknrlen)
         res['titel'] = self.titel
         if self.categorie:
             res['groep'] = self.categorie.titel
@@ -432,8 +433,8 @@ class PolitiekeMotie(Motie):
     def get_absolute_url(self):
         return reverse('zues:pm', kwargs={'key': self.secret, 'pk': self.pk})
 
-    def as_dict(self):
-        return super(PolitiekeMotie, self).as_dict('PM')
+    def as_dict(self, boeknrlen=2):
+        return super(PolitiekeMotie, self).as_dict('PM', boeknrlen)
 
     def as_html_table(self):
         return super(PolitiekeMotie, self).as_html_table('PM')
