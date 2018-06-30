@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 def generate_lid(lidnummer):
     lidnummer = int(lidnummer)
     if not hasattr(settings, 'JANEUS_SERVER'):
-        res = (b'', 'Onbekend lid'.encode('utf-8'))
+        res = (getattr(settings, 'DUMMY_MEMBER_EMAIL', b''), 'Onbekend lid'.encode('utf-8'))
     else:
         res = Janeus().attributes(lidnummer)
     if res is None:
@@ -225,7 +225,8 @@ def view_home(request):
 
                 secret_url = reverse('zues:login', kwargs={'key': key, 'lid': lid.lidnummer})
                 secret_url = request.build_absolute_uri(secret_url)
-                secret_url = re.sub(r'^http://', r'https://', secret_url)
+                if not settings.DEBUG:
+                    secret_url = re.sub(r'^http://', r'https://', secret_url)
 
                 if getattr(settings, 'EMAIL_HOST', '') == '':
                     return HttpResponseRedirect(secret_url)
