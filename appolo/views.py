@@ -47,5 +47,5 @@ def data(request):
     voorstellen['Amendementen'] = [x.as_dict() for x in Amendement.objects.filter(status=Stuk.PUBLIEK)]
     voorstellen['HR-wijzigingen'] = [x.as_dict() for x in HRWijziging.objects.filter(status=Stuk.PUBLIEK)]
     dataDict['voorstellen'] = voorstellen
-    output = json.dumps(dataDict, indent=4, separators=(',', ': '))
+    output = json.dumps(dataDict, ensure_ascii=False, indent=4, separators=(',', ': '))
     return HttpResponse(output)
