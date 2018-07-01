@@ -40,7 +40,10 @@ def data(request):
     dataDict['agenda'] = agenda()
     dataDict['locaties'] = locaties()
     voorstellen = {}
-    voorstellen['Politieke Moties'] = [x.as_dict() for x in PolitiekeMotie.objects.filter(status=Stuk.PUBLIEK)]
+    # het aantal politieke moties loopt soms over de 100, en dan is er een extra voorloopnul nodig in het nummber (e.g. PM052)
+    li = PolitiekeMotie.objects.filter(status=Stuk.PUBLIEK)
+    boeknrlen = len(str(len(li)))
+    voorstellen['Politieke Moties'] = [x.as_dict(boeknrlen) for x in li]
     voorstellen["Organimo's"] = [x.as_dict() for x in Organimo.objects.filter(status=Stuk.PUBLIEK)]
     voorstellen['Actuele Politieke Moties'] = [x.as_dict() for x in ActuelePolitiekeMotie.objects.filter(status=Stuk.PUBLIEK)]
     voorstellen['Resoluties'] = [x.as_dict() for x in Resolutie.objects.filter(status=Stuk.PUBLIEK)]
