@@ -125,7 +125,7 @@ class Categorie(SiteRelated):
         return "Categorie {0}".format(self.prefix)
 
     class Meta:
-        verbose_name_plural = u'categorieen'
+        verbose_name_plural = u'categorieën'
 
 
 class Stuk(SiteRelated):
@@ -398,7 +398,7 @@ class Motie(Stuk):
 class Organimo(Motie):
     class Meta:
         ordering = ('-laatsteupdate',)
-        verbose_name_plural = 'organimos'
+        verbose_name_plural = 'organimo\'s'
 
     def __str__(self):
         return 'ORG %s' % self.titel
