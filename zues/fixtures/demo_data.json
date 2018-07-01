@@ -1,0 +1,225 @@
+[
+{
+  "model": "sites.site",
+  "fields": {
+    "domain": "example.com",
+    "name": "example.com"
+  },
+  "pk": 1
+},
+{
+  "model": "sites.site",
+  "fields": {
+    "domain": "127.0.0.1:8000",
+    "name": "127.0.0.1:8000"
+  },
+  "pk": 3
+},
+{
+  "model": "zues.login",
+  "fields": {
+    "site": 3,
+    "naam": "Onbekend lid",
+    "lidnummer": 1234,
+    "secret": "30316e54fc2398545babbc1dc7a2f67c4a16f7a5da4f983c62c7339474777b64"
+  },
+  "pk": 9
+},
+{
+  "model": "zues.login",
+  "fields": {
+    "site": 3,
+    "naam": "Onbekend lid",
+    "lidnummer": 7777,
+    "secret": "7039664cc2ee98b76880ee36e5d7c9ccb895315b4dd0abf0243b94695c5d445e"
+  },
+  "pk": 10
+},
+{
+  "model": "zues.login",
+  "fields": {
+    "site": 3,
+    "naam": "Onbekend lid",
+    "lidnummer": 96969,
+    "secret": "f83c09a3d1adaf460cdb107a263df73cc1cd816c4d593f82afdfe9375956d18e"
+  },
+  "pk": 11
+},
+{
+  "model": "zues.settings",
+  "fields": {
+    "site": 3,
+    "naam": "ALV  999",
+    "mededeling": "Landelijk Congres van de Jonge Democraten te Sint-Maarten. Op jdcongres.nl staat meer informatie.",
+    "public": true,
+    "pm_start": "2017-12-31T23:00:00Z",
+    "pm_stop": "2029-12-31T22:59:59Z",
+    "apm_start": "2017-12-31T23:00:00Z",
+    "apm_stop": "2029-12-31T22:59:59Z",
+    "org_start": "2017-12-31T23:00:00Z",
+    "org_stop": "2029-12-31T22:59:59Z",
+    "res_start": "2017-12-31T23:00:00Z",
+    "res_stop": "2029-12-31T22:59:59Z",
+    "am_start": "2017-12-31T23:00:00Z",
+    "am_stop": "2029-12-31T22:59:59Z",
+    "hr_start": "2017-12-31T23:00:00Z",
+    "hr_stop": "2029-12-31T22:59:59Z"
+  },
+  "pk": 2
+},
+{
+  "model": "zues.categorie",
+  "fields": {
+    "site": 3,
+    "prefix": "RES",
+    "titel": "Resolutie",
+    "index": 4
+  },
+  "pk": 3
+},
+{
+  "model": "zues.categorie",
+  "fields": {
+    "site": 3,
+    "prefix": "APM",
+    "titel": "Actuele Politieke Motie",
+    "index": 2
+  },
+  "pk": 4
+},
+{
+  "model": "zues.categorie",
+  "fields": {
+    "site": 3,
+    "prefix": "PM",
+    "titel": "Politieke Motie",
+    "index": 1
+  },
+  "pk": 5
+},
+{
+  "model": "zues.categorie",
+  "fields": {
+    "site": 3,
+    "prefix": "ORG",
+    "titel": "Organimo",
+    "index": 3
+  },
+  "pk": 6
+},
+{
+  "model": "zues.organimo",
+  "fields": {
+    "site": 3,
+    "titel": "ALV? WK!",
+    "onderwerp": "ALV",
+    "eigenaar": 11,
+    "status": 5,
+    "admin_opmerkingen": "",
+    "categorie": 6,
+    "boeknummer": 1,
+    "indienmoment": "2018-07-01",
+    "laatsteupdate": "2018-07-02",
+    "secret": "cL56CEVp63TwiiCPG8k1Gjf72n-guzUsJG8xfy70",
+    "indieners": "Jan, Kees, Piet, Theo, Peter",
+    "woordvoerder": "Jan",
+    "toelichting": "",
+    "constateringen": "een ALV soms samenvalt met het WK-voetbal\r\n",
+    "overwegingen": "het WK-voetbal een dusdanig groot internationaal evenement is dat iedereen de kans moet hebben dit live te volgen\r\n",
+    "uitspraken": "een ALV niet gehouden kan worden tijdens een WK-voetbal\r\n"
+  },
+  "pk": 1
+},
+{
+  "model": "zues.organimo",
+  "fields": {
+    "site": 3,
+    "titel": "Stop de UTF-8 waa\u00f1zi\u00f1",
+    "onderwerp": "UTF-8",
+    "eigenaar": 10,
+    "status": 5,
+    "admin_opmerkingen": "",
+    "categorie": 6,
+    "boeknummer": 2,
+    "indienmoment": "2018-07-01",
+    "laatsteupdate": "2018-07-02",
+    "secret": "agHMFrrowl2fYp6Tl0tZeOlbhyYdWuFIDnHC8aEw",
+    "indieners": "G\u00fcnther, Pawe\u0142, Bl\u00f8f, \u00d8rjan, Aliz\u00e9e",
+    "woordvoerder": "G\u00fcnther",
+    "toelichting": "g\u00e9\u00e9n commentaar",
+    "constateringen": "de set van ASCII-karakters \u00fcberhaupt niet genoeg is om alle namen van JD-ers correct te schrijven\r\n",
+    "overwegingen": "programmeurs soms niet bekend zijn met UTF-8\r\n\r\nprogrammeurs hierdoor 1 \u00e1 2 keer per jaar UTF-8 gerelateerde fouten maken",
+    "uitspraken": "de JD moet streven naar een ledenbestand waarin 20% van de namen UTF-8 karakters bevatten"
+  },
+  "pk": 2
+},
+{
+  "model": "zues.politiekemotie",
+  "fields": {
+    "site": 3,
+    "titel": "Hoofdsponsor songfestival",
+    "onderwerp": "Songfestival",
+    "eigenaar": 11,
+    "status": 5,
+    "admin_opmerkingen": "",
+    "categorie": 5,
+    "boeknummer": 2,
+    "indienmoment": "2018-07-01",
+    "laatsteupdate": "2018-07-02",
+    "secret": "zRL2bm9U42jzVcPsrEEeNjbnGkVWw-A19bwL63t4",
+    "indieners": "Jan, Piet, Kees, Jeroen, Theo",
+    "woordvoerder": "Jan",
+    "toelichting": "",
+    "constateringen": "landen die het meeste bijdragen aan het songfestival meer privileges hebben\r\n\r\nde winnaar van het songfestival het jaar erop het evenement mag organiseren",
+    "overwegingen": "het songfestival een belangrijk onderdeel is van de Europese cultuur\r\n\r\nhet (statistisch) goed mogelijk is dat Nederland de komende 100 jaar geen enkele keerhet songfestival zal winnen, en dus geen enkele keer het songfestival zal organiseren\r\n\r\nwe Nederland goed op de kaart kunnen zetten als het songfestival hier gehouden wordt\r\n",
+    "uitspraken": "Nederland een dusdanige investering doet in het songfestival dat het elk jaar in Nederland gehouden mag worden\r\n"
+  },
+  "pk": 103
+},
+{
+  "model": "zues.politiekemotie",
+  "fields": {
+    "site": 3,
+    "titel": "Politie-KE motie",
+    "onderwerp": "kernenergie",
+    "eigenaar": 11,
+    "status": 5,
+    "admin_opmerkingen": "",
+    "categorie": 5,
+    "boeknummer": 1,
+    "indienmoment": "2018-07-01",
+    "laatsteupdate": "2018-07-02",
+    "secret": "N32vSUKmILiYFbeR6u6RfJvAXu4b5krEsb9YGtwA",
+    "indieners": "Wilfred, Reinier, Theo, Remco, Jan-Peter",
+    "woordvoerder": "Wilfred",
+    "toelichting": "",
+    "constateringen": "kernenergie (afkorting: KE) genoemd wordt als (deel)oplossing voor klimaatverandering",
+    "overwegingen": "doorgaans eerst pilots worden georganiseerd alvorens iets landelijk uit te rollen\r\n\r\n",
+    "uitspraken": "er een pilot moet komen waarbij de energievoorziening van politiebureaus volledig vezorgd wordt door KE"
+  },
+  "pk": 104
+},
+{
+  "model": "zues.actuelepolitiekemotie",
+  "fields": {
+    "site": 3,
+    "titel": "61-urige werkweek",
+    "onderwerp": "60-urige werkweek",
+    "eigenaar": 11,
+    "status": 5,
+    "admin_opmerkingen": "",
+    "categorie": 4,
+    "boeknummer": 1,
+    "indienmoment": "2018-07-01",
+    "laatsteupdate": "2018-07-02",
+    "secret": "SoabwXC8vnbgs3FiwJzsQktqUh49-EpvlGTkyQBm",
+    "indieners": "Klaas, Piet, Theo, Otto, Reinier",
+    "woordvoerder": "Piet",
+    "toelichting": "",
+    "constateringen": "Oostenrijk plannen heeft voor een 60-urige werkweek",
+    "overwegingen": "Nederland niet onder mag doen voor Oostenrijk",
+    "uitspraken": "een 61-urige werkweek in Nederland mogelijk moet worden"
+  },
+  "pk": 2
+}
+]
