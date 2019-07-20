@@ -7,7 +7,7 @@ to the conference teams using this web application.
 Setup
 =====
 * Use `build_env.sh` to setup an environment.
-* `source env/bin/activate.sh` to activate the environment.
+* `source env/bin/activate` to activate the environment.
 * Copy `zuessite/local_settings_example.py` to `zuessite/local_settings.py`.
 * Follow instructions in `zuessite/local_settings.py`.
 * Use `python manage.py migrate` to setup the database.
