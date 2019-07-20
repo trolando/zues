@@ -14,9 +14,11 @@ logger = logging.getLogger(__name__)
 def current_request():
     return getattr(_thread_local, "request", None)
 
-
 class CurrentRequestMiddleware(object):
-    def process_request(self, request):
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
         _thread_local.request = request
 
         site_id = request.session.get("site_id", None)
@@ -46,6 +48,7 @@ class CurrentRequestMiddleware(object):
 
         import django.contrib.sites.shortcuts
         django.contrib.sites.shortcuts.get_current_site = lambda request: site
+        return self.get_response(request)
 
 
 def set_current_site_id(site_id):

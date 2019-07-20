@@ -12,15 +12,12 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
 
-TEMPLATE_DIRS = [os.path.join(BASE_DIR, 'templates')]
-
 # Application definition
 
-INSTALLED_APPS = (
+INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -33,9 +30,9 @@ INSTALLED_APPS = (
     'ldap',
     'captcha',
     'janeus',
-)
+]
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -44,11 +41,35 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'zues.utils.CurrentRequestMiddleware',
     'janeus.utils.CurrentRequestMiddleware'
-)
+]
 
 ROOT_URLCONF = 'zuessite.urls'
 
 WSGI_APPLICATION = 'zuessite.wsgi.application'
+
+# Templates
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [
+            os.path.join(BASE_DIR, 'templates')
+        ],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.contrib.auth.context_processors.auth',
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.template.context_processors.i18n',
+                'django.template.context_processors.media',
+                'django.template.context_processors.static',
+                'django.template.context_processors.tz',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+
+    },
+]
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/
@@ -76,8 +97,5 @@ except SystemError as e:  # relative imports do not work when using `manage.py r
 except ImportError as e:
     if "local_settings" not in str(e):
         raise e
-
-from zues.utils import current_site_id
-JANEUS_CURRENT_SITE = current_site_id
 
 SITE_ID = 1

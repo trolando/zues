@@ -24,8 +24,8 @@ class Activiteit(models.Model):
     naam = models.CharField(max_length=200)
     begintijd = models.DateTimeField()
     eindtijd = models.DateTimeField()
-    dag = models.ForeignKey(Dag)
-    locatie = models.ForeignKey(Locatie)
+    dag = models.ForeignKey(Dag, on_delete=models.PROTECT)
+    locatie = models.ForeignKey(Locatie, on_delete=models.PROTECT)
 
     class Meta:
         verbose_name_plural = 'activiteiten'
