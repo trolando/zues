@@ -1,5 +1,5 @@
 from django.contrib.auth.signals import user_logged_in
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.conf import settings
 from django.core.mail import EmailMessage
 import re

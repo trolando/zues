@@ -1,4 +1,4 @@
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db import models
 from django.utils import formats
 from django.utils.html import escape
@@ -15,7 +15,7 @@ class SiteRelated(models.Model):
     class Meta:
         abstract = True
 
-    site = models.ForeignKey("sites.Site", editable=False)
+    site = models.ForeignKey("sites.Site", editable=False, on_delete=models.PROTECT)
 
     def save(self, update_site=False, *args, **kwargs):
         if update_site or not self.site_id:
