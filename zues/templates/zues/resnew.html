@@ -37,7 +37,7 @@
 <h3>Formulier</h3>
 <form action="" method="post">{% csrf_token %}
 <fieldset>
-<div><p>Gebruik het veld Betreft om hoofdstuk, paginanummer en regelnummers aan te geven. Als je type Wijzigen (voor het vervangen van teksten) gebruikt, vul dan beide tekstvelden in!</p></div>
+<div><p>Gebruik het veld Betreft om hoofdstuk, paginanummer en regelnummers aan te geven. Als je type Vervangen (voor het vervangen van teksten) gebruikt, vul dan beide tekstvelden in!</p></div>
 {{ form.non_field_errors }}
 {% for f in form.visible_fields %}
 <div class="row">

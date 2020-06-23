@@ -15,6 +15,7 @@
 <li>&quot;Jonge Democraten&quot; is meervoud.</li>
 <li>Amendementen worden in derde persoon geschreven (dus: &quot;De JD vindt&quot;, i.t.t. &quot;wij vinden&quot;).</li>
 <li>Wanneer een amendement wordt ingediend door een afdeling of een ander orgaan dient deze ondertekend te worden voor de voorzitter en secretaris van de afdeling/orgaan.</li>
+<li>Organisatorische voorstellen worden zo veel mogelijk behandeld tijdens het organisatorische congres in September.</li>
 </ul>
 
 {% if obj %}
@@ -36,7 +37,7 @@
 <h3>Formulier</h3>
 <form action="" method="post">{% csrf_token %}
 <fieldset>
-<div><p>Gebruik het veld Betreft om hoofdstuk, paginanummer en regelnummers aan te geven. Als je type Wijzigen (voor het vervangen van teksten) gebruikt, vul dan beide tekstvelden in!</p></div>
+<div><p>Gebruik het veld Betreft om hoofdstuk, paginanummer en regelnummers aan te geven. Als je type Vervangen (voor het vervangen van teksten) gebruikt, vul dan beide tekstvelden in!</p></div>
 {{ form.non_field_errors }}
 {% for f in form.visible_fields %}
 <div class="row">

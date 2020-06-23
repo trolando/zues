@@ -1,7 +1,7 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 
 from appolo import views
 
-urlpatterns = patterns('',
+urlpatterns = [
     url(r'^data$', views.data, name='data'),
-)
+]

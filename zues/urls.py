@@ -1,6 +1,6 @@
-from django.conf.urls import patterns, url, include
-from django.views.generic import DetailView, ListView
+from django.conf.urls import url
 from zues import views
+
 
 urlpatterns = [
     url(r'^$', views.view_home, name='home'),
@@ -38,12 +38,12 @@ urlpatterns = [
     url(r'^hr/wijzig/(?P<pk>\d+)/$', views.WijzigHR.as_view(), name='wijzighr'),
     url(r'^hr/verwijder/(?P<pk>\d+)/$', views.VerwijderHR.as_view(), name='verwijderhr'),
 
-    url(r'^alles/$', views.view_publiek, name='publiek'),
-    url(r'^handig/voor/arend/$', views.view_publiek),
+    url(r'^alles/$', views.view_publiek),
+    url(r'^handig/voor/arend/$', views.view_publiek, name='publiek'),
     url(r'^export/$', views.view_export, name='export'),
+    url(r'^exportsnc/$', views.view_export_snc, name='exportsnc'),
     url(r'^reorder/$', views.view_reorder, name='reorder'),
 
     url(r'^lidnummer/$', views.view_lidnummer, name='lidnummer'),
     url(r'^lidnummerverzonden/$', views.lidnummer_verzonden),
 ]
-

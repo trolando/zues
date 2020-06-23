@@ -1,6 +1,8 @@
 {% extends 'zues/base.html' %}
+{% load l10n %}
 {% block terugnaarbegin %}<p>Ingelogd als {{ lid.naam }} (<a href="{% url 'zues:loguit' %}">uitloggen</a>)</p>{% endblock %}
 {% block content %}
+{% if settings.public %}
 <p>
 Dit is de startpagina voor het beheren van jouw voorstellen.
 </p>
@@ -150,87 +152,77 @@ Deze URL zie je in de adresbalk van de browser als je het voorstel bekijkt.
 <h3>Voorstellen indienen</h3>
 
 <fieldset>
-{% if tijden.mag_pm %}
+{% if settings.mag_pm %}
 <div class="row">
 <div class="cell" style="min-width: 300px;"><p><a href="{% url 'zues:nieuwepm' %}">Nieuwe Politieke Motie</a></p></div>
-<div class="cell" style="padding-left:20px;"><p>{{ tijden.deadline_pm }}</p></div>
+<div class="cell" style="padding-left:20px;"><p>{{ settings.deadline_pm }}</p></div>
 </div>
 {% else %}
 <div class="row">
 <div class="cell" style="min-width: 300px;"><p>Nieuwe Politieke Motie</p></div>
-<div class="cell" style="padding-left:20px;"><p>{{ tijden.deadline_pm }}</p></div>
+<div class="cell" style="padding-left:20px;"><p>{{ settings.deadline_pm }}</p></div>
 </div>
 {% endif %}
-{% if tijden.mag_apm %}
+{% if settings.mag_apm %}
 <div class="row">
 <div class="cell" style="min-width: 300px;"><p><a href="{% url 'zues:nieuweapm' %}">Nieuwe Actueel Politieke Motie</a></p></div>
-<div class="cell" style="padding-left:20px;"><p>{{ tijden.deadline_apm }}</p></div>
+<div class="cell" style="padding-left:20px;"><p>{{ settings.deadline_apm }}</p></div>
 </div>
 {% else %}
 <div class="row">
 <div class="cell" style="min-width: 300px;"><p>Nieuwe Actueel Politieke Motie</p></div>
-<div class="cell" style="padding-left:20px;"><p>{{ tijden.deadline_apm }}</p></div>
+<div class="cell" style="padding-left:20px;"><p>{{ settings.deadline_apm }}</p></div>
 </div>
 {% endif %}
-{% if tijden.mag_org %}
+{% if settings.mag_org %}
 <div class="row">
 <div class="cell" style="min-width: 300px;"><p><a href="{% url 'zues:nieuweorg' %}">Nieuwe Organimo</a></p></div>
-<div class="cell" style="padding-left:20px;"><p>{{ tijden.deadline_org }}</p></div>
+<div class="cell" style="padding-left:20px;"><p>{{ settings.deadline_org }}</p></div>
 </div>
 {% else %}
 <div class="row">
 <div class="cell" style="min-width: 300px;"><p>Nieuwe Organimo</p></div>
-<div class="cell" style="padding-left:20px;"><p>{{ tijden.deadline_org }}</p></div>
+<div class="cell" style="padding-left:20px;"><p>{{ settings.deadline_org }}</p></div>
 </div>
 {% endif %}
-{% if tijden.mag_res %}
+{% if settings.mag_res %}
 <div class="row">
 <div class="cell" style="min-width: 300px;"><p><a href="{% url 'zues:nieuweres' %}">Nieuwe Resolutie</a></p></div>
-<div class="cell" style="padding-left:20px;"><p>{{ tijden.deadline_res }}</p></div>
+<div class="cell" style="padding-left:20px;"><p>{{ settings.deadline_res }}</p></div>
 </div>
 {% else %}
 <div class="row">
 <div class="cell" style="min-width: 300px;"><p>Nieuwe Resolutie</p></div>
-<div class="cell" style="padding-left:20px;"><p>{{ tijden.deadline_res }}</p></div>
+<div class="cell" style="padding-left:20px;"><p>{{ settings.deadline_res }}</p></div>
 </div>
 {% endif %}
-{% if tijden.mag_am %}
+{% if settings.mag_am %}
 <div class="row">
 <div class="cell" style="min-width: 300px;"><p><a href="{% url 'zues:nieuweam' %}">Nieuw Amendement</a></p></div>
-<div class="cell" style="padding-left:20px;"><p>{{ tijden.deadline_am }}</p></div>
+<div class="cell" style="padding-left:20px;"><p>{{ settings.deadline_am }}</p></div>
 </div>
 {% else %}
 <div class="row">
 <div class="cell" style="min-width: 300px;"><p>Nieuw Amendement</p></div>
-<div class="cell" style="padding-left:20px;"><p>{{ tijden.deadline_am }}</p></div>
+<div class="cell" style="padding-left:20px;"><p>{{ settings.deadline_am }}</p></div>
 </div>
 {% endif %}
-{% if tijden.mag_hr %}
+{% if settings.mag_hr %}
 <div class="row">
 <div class="cell" style="min-width: 300px;"><p><a href="{% url 'zues:nieuwehr' %}">Nieuwe HR-wijziging</a></p></div>
-<div class="cell" style="padding-left:20px;"><p>{{ tijden.deadline_hr }}</p></div>
+<div class="cell" style="padding-left:20px;"><p>{{ settings.deadline_hr }}</p></div>
 </div>
 {% else %}
 <div class="row">
 <div class="cell" style="min-width: 300px;"><p>Nieuwe HR-wijziging</p></div>
-<div class="cell" style="padding-left:20px;"><p>{{ tijden.deadline_hr }}</p></div>
+<div class="cell" style="padding-left:20px;"><p>{{ settings.deadline_hr }}</p></div>
 </div>
 {% endif %}
 </fieldset>
 
-{% if staff %}
+{% else %}
 
-<h3>Exporteren</h3>
-
-<fieldset>
-<div class="row">
-<div class="cell" style="min-width: 300px;"><p><a href="{% url 'zues:export' %}">Exporteren</a></p></div>
-</div>
-<div class="row">
-<div class="cell" style="min-width: 300px;"><p><a href="{% url 'zues:reorder' %}">Reorder</a></p></div>
-</div>
-</fieldset>
-
+<p>De congresvoorstelsite is op dit moment niet geopend!</p>
 
 {% endif %}
 

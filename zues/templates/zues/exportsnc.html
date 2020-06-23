@@ -7,8 +7,8 @@
 {% for k in categories %}
 <h2>{{ k.titel }}</h2>
 {% for m in k.items %}
-{{ m.as_html_table }}
-<span>&nbsp;</span>
+{{ m.as_html_table_snc }}
+<br />
 {% endfor %}
 {% endfor %}
 
