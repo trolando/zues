@@ -15,7 +15,11 @@ class SiteRelated(models.Model):
     class Meta:
         abstract = True
 
-    site = models.ForeignKey("sites.Site", editable=False, on_delete=models.PROTECT)
+    site = models.ForeignKey(
+        "sites.Site",
+        editable=False,
+        on_delete=models.PROTECT
+    )
 
     def save(self, update_site=False, *args, **kwargs):
         if update_site or not self.site_id:
@@ -144,10 +148,20 @@ class Stuk(SiteRelated):
 
     titel = models.CharField(max_length=250,)
     onderwerp = models.CharField(max_length=250, blank=True, null=True)
-    eigenaar = models.ForeignKey(Login, blank=True, null=True, on_delete=models.SET_NULL)  # bij verwijderen eigenaar, verliest eigenaar
+    eigenaar = models.ForeignKey(
+        Login,
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,  # bij verwijderen eigenaar, verliest eigenaar
+    )
     status = models.IntegerField(choices=STATUS_CHOICES, default=INGEDIEND)
     admin_opmerkingen = models.TextField(blank=True, help_text='Opmerkingen van de beheerder')
-    categorie = models.ForeignKey(Categorie, blank=True, null=True, on_delete=models.SET_NULL)  # bij verwijderen categorie, doei categorie
+    categorie = models.ForeignKey(
+        Categorie,
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,  # bij verwijderen categorie, doei categorie
+    )
     boeknummer = models.IntegerField(blank=True, default=0)
     indienmoment = models.DateField(auto_now_add=True)
     laatsteupdate = models.DateField(auto_now=True)

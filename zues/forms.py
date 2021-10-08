@@ -116,7 +116,7 @@ class LidnummerRecaptchaForm(LidnummerForm):
 
 
 class HelpLidnummerForm(Form):
-    email = EmailField(max_length=254, label='Emailadres:')
+    email = EmailField(max_length=254, label='E-mailadres:')
 
 
 class HelpLidnummerRecaptchaForm(HelpLidnummerForm):

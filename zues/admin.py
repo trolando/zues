@@ -16,26 +16,36 @@ class MotieForm(forms.ModelForm):
 
 def ingediend(modeladmin, request, queryset):
     queryset.update(status=Stuk.INGEDIEND)
+
+
 ingediend.short_description = "Mark selected as Ingediend"
 
 
 def verwijderen(modeladmin, request, queryset):
     queryset.update(status=Stuk.VERWIJDERD)
+
+
 verwijderen.short_description = "Mark selected as Verwijderd"
 
 
 def accepteren(modeladmin, request, queryset):
     queryset.update(status=Stuk.GEACCEPTEERD)
+
+
 accepteren.short_description = "Mark selected as Geaccepteerd"
 
 
 def repareren(modeladmin, request, queryset):
     queryset.update(status=Stuk.REPAREREN)
+
+
 repareren.short_description = "Mark selected as Repareren"
 
 
 def publiek(modeladmin, request, queryset):
     queryset.update(status=Stuk.PUBLIEK)
+
+
 publiek.short_description = "Mark selected as Publiek"
 
 

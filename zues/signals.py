@@ -6,7 +6,6 @@ import re
 
 
 def on_user_login(sender, user, request, **kwargs):
-    from janeus import Janeus
     from zues import models
     from zues import views
 
@@ -14,7 +13,8 @@ def on_user_login(sender, user, request, **kwargs):
         return
 
     username = user.get_username()
-    res = Janeus().by_uid(username)
+    # TODO
+    res = None
     if res is None:
         return
 
@@ -53,5 +53,6 @@ def on_user_login(sender, user, request, **kwargs):
 
     request.session['lid'] = lidnummer
     request.session['key'] = lid.secret
+
 
 user_logged_in.connect(on_user_login)

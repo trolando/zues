@@ -14,6 +14,7 @@ logger = logging.getLogger(__name__)
 def current_request():
     return getattr(_thread_local, "request", None)
 
+
 class CurrentRequestMiddleware(object):
     def __init__(self, get_response):
         self.get_response = get_response

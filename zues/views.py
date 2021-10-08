@@ -7,12 +7,11 @@ from django.core.mail import EmailMessage
 from django.urls import reverse, reverse_lazy
 from django.db.models import Q
 from django.http import HttpResponseRedirect, Http404, HttpResponseForbidden
-from django.shortcuts import render_to_response
+from django.shortcuts import render
 from django.views.generic import DetailView, UpdateView, DeleteView, CreateView
 from zues import models
 from zues import forms
 from zues.utils import current_site_id
-from janeus import Janeus
 import base64
 import hashlib
 import json
@@ -29,7 +28,8 @@ def generate_lid(lidnummer):
     if not hasattr(settings, 'JANEUS_SERVER'):
         res = (getattr(settings, 'DUMMY_MEMBER_EMAIL', b''), 'Onbekend lid'.encode('utf-8'))
     else:
-        res = Janeus().attributes(lidnummer)
+        # Todo
+        res = None
     if res is None:
         return None
     email, naam = res
@@ -45,11 +45,11 @@ def _generate_lid(lidnummer, email, naam):
         lid = lid[0]
         lid.secret = hashlib.sha256(code.encode('utf-8')).hexdigest()
     else:
-        # lid bestaat nog njet
+        # lid bestaat nog niet
         lid = models.Login(naam=naam, lidnummer=lidnummer, secret=hashlib.sha256(code.encode('utf-8')).hexdigest())
 
     lid.save()
-    return (lid, email, naam, code)
+    return lid, email, naam, code
 
 
 def check_login(request):
@@ -81,22 +81,18 @@ def view_lidnummer(request):
             if not hasattr(settings, 'JANEUS_SERVER'):
                 return HttpResponseRedirect('/lidnummerverzonden/')
 
-            for lidnummer, naam in Janeus().lidnummers(email):
-                naam = naam.decode('utf-8')
-                subject = '[JD] Lidnummer'
-                from_email = 'noreply@jongedemocraten.nl'
-
-                inhoud = []
-                inhoud.append('Beste %s,' % naam)
-                inhoud.append('')
-                inhoud.append('Je hebt via de site van de Jonge Democraten je lidnummer opgevraagd. Je lidnummer is ' + str(lidnummer) + '.')
-                inhoud.append('')
-                inhoud.append('Met vrijzinnige groet,')
-                inhoud.append('De Jonge Democraten.')
-                inhoud = '\n'.join(inhoud)
-
-                msg = EmailMessage(subject, inhoud, from_email=from_email, to=[email])
-                msg.send()
+            # for lidnummer, naam in Janeus().lidnummers(email):
+            #     naam = naam.decode('utf-8')
+            #     subject = '[JD] Lidnummer'
+            #     from_email = 'noreply@jongedemocraten.nl'
+            #
+            #     inhoud = ['Beste %s,' % naam, '',
+            #               'Je hebt via de site van de Jonge Democraten je lidnummer opgevraagd. Je lidnummer is ' + str(
+            #                   lidnummer) + '.', '', 'Met vrijzinnige groet,', 'De Jonge Democraten.']
+            #     inhoud = '\n'.join(inhoud)
+            #
+            #     msg = EmailMessage(subject, inhoud, from_email=from_email, to=[email])
+            #     msg.send()
 
             return HttpResponseRedirect('/lidnummerverzonden/')
     else:
@@ -108,11 +104,11 @@ def view_lidnummer(request):
     context = {'form': form, }
     context.update(csrf(request))
 
-    return render_to_response("zues/lidnummer.html", context)
+    return render(request, "zues/lidnummer.html", context)
 
 
 def lidnummer_verzonden(request):
-    return render_to_response("zues/lidnummerverzonden.html")
+    return render(request, "zues/lidnummerverzonden.html")
 
 
 def get_categorieen(q=(Q(status=models.Stuk.GEACCEPTEERD) | Q(status=models.Stuk.PUBLIEK))):
@@ -207,7 +203,7 @@ def view_home(request):
         context['allam'] = models.Amendement.objects.filter(status=models.Stuk.PUBLIEK)
         context['allhr'] = models.HRWijziging.objects.filter(status=models.Stuk.PUBLIEK)
         context['allcount'] = len(context['allpm']) + len(context['allapm']) + len(context['allorg']) + len(context['allres']) + len(context['allam']) + len(context['allhr'])
-        return render_to_response("zues/yolo.html", context)
+        return render(request, "zues/yolo.html", context)
 
     if request.method == 'POST':
         if getattr(settings, 'RECAPTCHA_PUBLIC_KEY', '') == '':
@@ -261,7 +257,7 @@ def view_home(request):
     context = {'form': form, }
     context.update(csrf(request))
 
-    return render_to_response("zues/home.html", context)
+    return render(request, "zues/home.html", context)
 
 
 def view_publiek(request):
@@ -269,19 +265,19 @@ def view_publiek(request):
     if lid is None:
         return HttpResponseRedirect('/')
     context = {'categories': get_categorieen(Q(status=models.Stuk.PUBLIEK))}
-    return render_to_response("zues/publiek.html", context)
+    return render(request, "zues/publiek.html", context)
 
 
 @staff_member_required
 def view_export(request):
     context = {'categories': get_categorieen()}
-    return render_to_response("zues/export.html", context)
+    return render(request, "zues/export.html", context)
 
 
 @staff_member_required
 def view_export_snc(request):
     context = {'categories': get_categorieen()}
-    return render_to_response("zues/exportsnc.html", context)
+    return render(request, "zues/exportsnc.html", context)
 
 
 @staff_member_required
@@ -321,11 +317,11 @@ def view_reorder(request):
                 i = i + 1
 
     context = {'categories': get_categorieen()}
-    return render_to_response("zues/reorder.html", context)
+    return render(request, "zues/reorder.html", context)
 
 
 def login_verzonden(request):
-    return render_to_response("zues/loginverzonden.html")
+    return render(request, "zues/loginverzonden.html")
 
 
 def login(request, lid, key):
@@ -335,7 +331,7 @@ def login(request, lid, key):
         request.session['lid'] = lid
         request.session['key'] = hetlid[0].secret
         return HttpResponseRedirect('/')
-    return render_to_response("zues/loginfout.html")
+    return render(request, "zues/loginfout.html")
 
 
 def loguit(request):
@@ -406,7 +402,7 @@ class MagWijzigenMixin(object):
     def get_object(self, **kwargs):
         obj = super(MagWijzigenMixin, self).get_object(**kwargs)
         if not obj.mag_wijzigen():
-            raise PermissionDenied()
+            raise PermissionDenied
         return obj
 
 
@@ -414,7 +410,7 @@ class MagVerwijderenMixin(object):
     def get_object(self, **kwargs):
         obj = super(MagVerwijderenMixin, self).get_object(**kwargs)
         if not obj.mag_verwijderen():
-            raise PermissionDenied()
+            raise PermissionDenied
         return obj
 
 
@@ -470,7 +466,7 @@ class NieuwePM(LoginMixin, SettingsMixin, CreateView):
             return self.render_to_response(self.get_context_data(form=form, obj=self.object))
         else:
             self.object = form.save(commit=False)
-            self.object.secret = base64.urlsafe_b64encode(os.urandom(30))
+            self.object.secret = base64.urlsafe_b64encode(os.urandom(30)).decode("utf-8")
             self.object.eigenaar = models.Login.objects.filter(lidnummer=self.request.session['lid'])[0]
             self.object.save()
             return HttpResponseRedirect(self.object.get_absolute_url())
@@ -526,7 +522,7 @@ class NieuweAPM(LoginMixin, SettingsMixin, CreateView):
             return self.render_to_response(self.get_context_data(form=form, obj=self.object))
         else:
             self.object = form.save(commit=False)
-            self.object.secret = base64.urlsafe_b64encode(os.urandom(30))
+            self.object.secret = base64.urlsafe_b64encode(os.urandom(30)).decode("utf-8")
             self.object.eigenaar = models.Login.objects.filter(lidnummer=self.request.session['lid'])[0]
             self.object.save()
             return HttpResponseRedirect(self.object.get_absolute_url())
@@ -582,7 +578,7 @@ class NieuweORG(LoginMixin, SettingsMixin, CreateView):
             return self.render_to_response(self.get_context_data(form=form, obj=self.object))
         else:
             self.object = form.save(commit=False)
-            self.object.secret = base64.urlsafe_b64encode(os.urandom(30))
+            self.object.secret = base64.urlsafe_b64encode(os.urandom(30)).decode("utf-8")
             self.object.eigenaar = models.Login.objects.filter(lidnummer=self.request.session['lid'])[0]
             self.object.save()
             return HttpResponseRedirect(self.object.get_absolute_url())
@@ -638,7 +634,7 @@ class NieuweRES(LoginMixin, SettingsMixin, CreateView):
             return self.render_to_response(self.get_context_data(form=form, obj=self.object))
         else:
             self.object = form.save(commit=False)
-            self.object.secret = base64.urlsafe_b64encode(os.urandom(30))
+            self.object.secret = base64.urlsafe_b64encode(os.urandom(30)).decode("utf-8")
             self.object.eigenaar = models.Login.objects.filter(lidnummer=self.request.session['lid'])[0]
             self.object.save()
             return HttpResponseRedirect(self.object.get_absolute_url())
@@ -694,7 +690,7 @@ class NieuweAM(LoginMixin, SettingsMixin, CreateView):
             return self.render_to_response(self.get_context_data(form=form, obj=self.object))
         else:
             self.object = form.save(commit=False)
-            self.object.secret = base64.urlsafe_b64encode(os.urandom(30))
+            self.object.secret = base64.urlsafe_b64encode(os.urandom(30)).decode("utf-8")
             self.object.eigenaar = models.Login.objects.filter(lidnummer=self.request.session['lid'])[0]
             self.object.save()
             return HttpResponseRedirect(self.object.get_absolute_url())
@@ -750,7 +746,7 @@ class NieuweHR(LoginMixin, SettingsMixin, CreateView):
             return self.render_to_response(self.get_context_data(form=form, obj=self.object))
         else:
             self.object = form.save(commit=False)
-            self.object.secret = base64.urlsafe_b64encode(os.urandom(30))
+            self.object.secret = base64.urlsafe_b64encode(os.urandom(30)).decode("utf-8")
             self.object.eigenaar = models.Login.objects.filter(lidnummer=self.request.session['lid'])[0]
             self.object.save()
             return HttpResponseRedirect(self.object.get_absolute_url())
