@@ -1,54 +1,56 @@
 from django.http import HttpResponse
-from django.shortcuts import render
-import pprint
 import json
 
-from appolo.models import Locatie, Nieuwsitem, Dag, Activiteit
+from appolo.models import Locatie, Nieuwsitem, Dag
 from zues.models import Organimo, PolitiekeMotie, ActuelePolitiekeMotie, Resolutie, Amendement, HRWijziging, Stuk
 
+
 def locaties():
-    locatieList = [x for x in Locatie.objects.values()]
-    return locatieList
+
+    locatie_list = [x for x in Locatie.objects.values()]
+    return locatie_list
+
 
 def nieuwsitems():
-    nieuwsList = [x for x in Nieuwsitem.objects.values()]
-    return nieuwsList
+    nieuws_list = [x for x in Nieuwsitem.objects.values()]
+    return nieuws_list
+
 
 def agenda():
-    agendaList = Dag.objects.all()
-    allActiviteiten = []
-    for dag in agendaList:
-        dagEntry = {
+    agenda_list = Dag.objects.all()
+    all_activiteiten = []
+    for dag in agenda_list:
+        dag_entry = {
             'datum': dag.__dict__['datum'].isoformat(), 
             'items': []
         }
-        activiteitenList = dag.activiteit_set.all()
-        for activiteit in activiteitenList:
-            activiteitEntry = {
+        activiteiten_list = dag.activiteit_set.all()
+        for activiteit in activiteiten_list:
+            activiteit_entry = {
                 'tijd': activiteit.__dict__['begintijd'].isoformat(),
                 'eindtijd': activiteit.__dict__['eindtijd'].isoformat(),
                 'titel': activiteit.__dict__['naam'],
                 'locatie': activiteit.locatie.__dict__['naam'] 
             }
-            dagEntry['items'].append(activiteitEntry)
-        allActiviteiten.append(dagEntry)
-    return allActiviteiten
+            dag_entry['items'].append(activiteit_entry)
+        all_activiteiten.append(dag_entry)
+    return all_activiteiten
+
 
 def data(request):
-    dataDict = {}
-    dataDict['nieuwsitems'] = nieuwsitems()
-    dataDict['agenda'] = agenda()
-    dataDict['locaties'] = locaties()
+    data_dict = {'nieuwsitems': nieuwsitems(), 'agenda': agenda(), 'locaties': locaties()}
     voorstellen = {}
-    # het aantal politieke moties loopt soms over de 100, en dan is er een extra voorloopnul nodig in het nummber (e.g. PM052)
+    # het aantal politieke moties loopt soms over de 100,
+    # en dan is er een extra voorloopnul nodig in het nummer (e.g. PM052)
     li = PolitiekeMotie.objects.filter(status=Stuk.PUBLIEK)
     boeknrlen = len(str(len(li)))
     voorstellen['Politieke Moties'] = [x.as_dict(boeknrlen) for x in li]
     voorstellen["Organimo's"] = [x.as_dict() for x in Organimo.objects.filter(status=Stuk.PUBLIEK)]
-    voorstellen['Actuele Politieke Moties'] = [x.as_dict() for x in ActuelePolitiekeMotie.objects.filter(status=Stuk.PUBLIEK)]
+    voorstellen['Actuele Politieke Moties'] = \
+        [x.as_dict() for x in ActuelePolitiekeMotie.objects.filter(status=Stuk.PUBLIEK)]
     voorstellen['Resoluties'] = [x.as_dict() for x in Resolutie.objects.filter(status=Stuk.PUBLIEK)]
     voorstellen['Amendementen'] = [x.as_dict() for x in Amendement.objects.filter(status=Stuk.PUBLIEK)]
     voorstellen['HR-wijzigingen'] = [x.as_dict() for x in HRWijziging.objects.filter(status=Stuk.PUBLIEK)]
-    dataDict['voorstellen'] = voorstellen
-    output = json.dumps(dataDict, ensure_ascii=False, indent=4, separators=(',', ': '))
+    data_dict['voorstellen'] = voorstellen
+    output = json.dumps(data_dict, ensure_ascii=False, indent=4, separators=(',', ': '))
     return HttpResponse(output)

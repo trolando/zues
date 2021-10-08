@@ -7,7 +7,6 @@ SECRET_KEY = ''
 
 # Debug should be False in production
 DEBUG = False
-TEMPLATE_DEBUG = False
 
 # Step 2: put all the domain names under which the site should be reachable
 # in this list.

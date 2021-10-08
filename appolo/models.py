@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class Locatie(models.Model):
     def __str__(self):
         return self.naam
@@ -10,6 +11,7 @@ class Locatie(models.Model):
     class Meta:
         verbose_name_plural = 'locaties'
 
+
 class Dag(models.Model):
     def __str__(self):
         return str(self.datum)
@@ -17,6 +19,7 @@ class Dag(models.Model):
 
     class Meta:
         verbose_name_plural = 'dagen'
+
 
 class Activiteit(models.Model):
     def __str__(self):
@@ -30,6 +33,7 @@ class Activiteit(models.Model):
     class Meta:
         verbose_name_plural = 'activiteiten'
 
+
 class Nieuwsitem(models.Model):
     def __str__(self):
         return self.titel
@@ -38,6 +42,7 @@ class Nieuwsitem(models.Model):
 
     class Meta:
         verbose_name_plural = 'nieuwsitems'
+
 
 class Hashtag(models.Model):
     def __str__(self):

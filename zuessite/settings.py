@@ -10,10 +10,11 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 # Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
+# See https://docs.djangoproject.com/en/stable/howto/deployment/checklist/
 
 # Application definition
 
@@ -25,11 +26,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
-    'zues',
-    'appolo',
-    'ldap',
+    'zues.apps.ZuesConfig',
+    'appolo.apps.AppoloConfig',
     'captcha',
-    'janeus',
 ]
 
 MIDDLEWARE = [
@@ -40,7 +39,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'zues.utils.CurrentRequestMiddleware',
-    'janeus.utils.CurrentRequestMiddleware'
 ]
 
 ROOT_URLCONF = 'zuessite.urls'
@@ -52,7 +50,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            os.path.join(BASE_DIR, 'templates')
+            os.path.join(BASE_DIR, 'zues/templates')
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -71,10 +69,12 @@ TEMPLATES = [
     },
 ]
 
-# Internationalization
-# https://docs.djangoproject.com/en/1.6/topics/i18n/
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LANGUAGE_CODE = 'nl_NL'
+# Internationalization
+# https://docs.djangoproject.com/en/stable/topics/i18n/
+
+LANGUAGE_CODE = 'nl'
 TIME_ZONE = 'Europe/Amsterdam'
 USE_I18N = True
 USE_L10N = True
@@ -92,7 +92,9 @@ STATIC_URL = '/static/'
 # defined per machine.
 try:
     from .local_settings import *
-except SystemError as e:  # relative imports do not work when using `manage.py runserver`: (Parent module '' not loaded, cannot perform relative import)
+except SystemError as e:
+    # relative imports do not work when using `manage.py runserver`: (
+    # Parent module '' not loaded, cannot perform relative import)
     from local_settings import *
 except ImportError as e:
     if "local_settings" not in str(e):

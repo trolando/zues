@@ -6,4 +6,3 @@ admin.site.register(Dag)
 admin.site.register(Activiteit)
 admin.site.register(Nieuwsitem)
 admin.site.register(Hashtag)
-
